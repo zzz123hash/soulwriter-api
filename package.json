@@ -1,16 +1,20 @@
 {
-  name: soulwriter-api,
-  version: 1.0.0,
-  description: 绘梦灵魂作家API,
-  main: src/app.js,
-  scripts: {
-    start: node src/app.js,
-    dev: node --watch src/app.js,
-    prisma:generate: prisma generate,
-    prisma:push: prisma db push
+  "name": "soulwriter-api",
+  "version": "1.0.0",
+  "description": "绘梦灵魂作家API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push"
   },
-  keywords: [],
-  author: ,
-  license: ISC,
-  type: commonjs
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^12.8.0",
+    "fastify": "^5.8.4"
+  }
 }

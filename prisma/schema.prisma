@@ -1,10 +1,10 @@
 generator client {
-  provider = prisma-client-js
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = sqlite
-  url      = env(DATABASE_URL)
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Project {
@@ -25,8 +25,8 @@ model Role {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   
   name     String
-  soulData String  @default({})
-  attrs    String  @default([])
+  soulData String  @default("{}")
+  attrs    String  @default("[]")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

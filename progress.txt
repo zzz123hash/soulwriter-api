@@ -1,0 +1,18 @@
+# 绘梦API开发进度
+
+## 2026-04-11
+
+### 00:30 项目初始化完成
+- npm init + fastify + better-sqlite3
+- 数据库初始化成功
+- API测试通过
+
+### 已实现端点
+- GET /health
+- GET/POST /api/v1/projects
+- GET/POST /api/v1/roles
+- GET/PUT /api/v1/roles/:id/soul
+
+### 运行
+`npm start` 启动服务
+

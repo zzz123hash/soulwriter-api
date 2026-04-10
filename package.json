@@ -1,0 +1,16 @@
+{
+  name: soulwriter-api,
+  version: 1.0.0,
+  description: 绘梦灵魂作家API,
+  main: src/app.js,
+  scripts: {
+    start: node src/app.js,
+    dev: node --watch src/app.js,
+    prisma:generate: prisma generate,
+    prisma:push: prisma db push
+  },
+  keywords: [],
+  author: ,
+  license: ISC,
+  type: commonjs
+}

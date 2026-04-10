@@ -2,10 +2,10 @@
 
 ## 2026-04-11
 
-### 00:30 项目初始化完成
-- npm init + fastify + better-sqlite3
-- 数据库初始化成功
-- API测试通过
+### 01:30 实际状态确认
+- 项目初始化完成（fastify + sqlite）
+- 基础CRUD已实现
+- Git提交：61d21b5
 
 ### 已实现端点
 - GET /health
@@ -13,6 +13,11 @@
 - GET/POST /api/v1/roles
 - GET/PUT /api/v1/roles/:id/soul
 
-### 运行
-`npm start` 启动服务
+### 待开发
+- [ ] Item/Location/Setting CRUD
+- [ ] AI任务接口
+- [ ] 沙盘推演
+- [ ] 单元测试
 
+### 运行
+npm start

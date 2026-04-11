@@ -354,3 +354,121 @@ const start = async () => {
   }
 };
 start();
+
+// ============ 女娲推演引擎 (Nvwa) ============
+const { initNvwaDB, runNvwaTick, DEFAULT_ATTRS } = require('./nvwa_engine');
+
+// 初始化女娲数据库
+initNvwaDB(db);
+
+// 创建女娲角色
+fastify.post('/api/v1/nvwa/characters', async (req) => {
+  const { name, gender, attributes, metadata } = req.body;
+  if (!name) return { error: 'name required' };
+  
+  const id = crypto.randomUUID();
+  const attrs = attributes || DEFAULT_ATTRS;
+  
+  db.prepare(`
+    INSERT INTO nvwa_souls (id, name, gender, attributes, metadata)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(id, name, gender || 'unknown', JSON.stringify(attrs), JSON.stringify(metadata || {}));
+  
+  return { id, name, attributes: attrs };
+});
+
+// 获取女娲角色列表
+fastify.get('/api/v1/nvwa/characters', (req) => {
+  const characters = db.prepare("SELECT * FROM nvwa_souls WHERE status = 'active'").all();
+  return characters.map(c => ({
+    ...c,
+    attributes: JSON.parse(c.attributes || '{}')
+  }));
+});
+
+// 更新角色属性
+fastify.put('/api/v1/nvwa/characters/:id/attributes', (req) => {
+  const { key, value, delta, reason } = req.body;
+  const char = db.prepare("SELECT * FROM nvwa_souls WHERE id = ?").get(req.params.id);
+  if (!char) return { error: 'character not found' };
+  
+  let attrs = JSON.parse(char.attributes || '{}');
+  
+  if (delta !== undefined) {
+    const current = Number(attrs[key]) || 0;
+    attrs[key] = Math.max(0, Math.min(100, current + delta));
+  } else if (value !== undefined) {
+    attrs[key] = Math.max(0, Math.min(100, value));
+  }
+  
+  db.prepare('UPDATE nvwa_souls SET attributes = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?')
+    .run(JSON.stringify(attrs), req.params.id);
+  
+  return { success: true, attributes: attrs };
+});
+
+// 世界变量
+fastify.get('/api/v1/nvwa/world', (req) => {
+  const vars = db.prepare('SELECT * FROM nvwa_world_vars').all();
+  const result = {};
+  vars.forEach(v => { result[v.key] = v.value; });
+  return result;
+});
+
+fastify.put('/api/v1/nvwa/world/:key', (req) => {
+  const { value, delta } = req.body;
+  const current = db.prepare('SELECT * FROM nvwa_world_vars WHERE key = ?').get(req.params.key);
+  
+  if (!current) {
+    const id = crypto.randomUUID();
+    const newValue = delta ? Number(delta) : Number(value);
+    db.prepare('INSERT INTO nvwa_world_vars (id, key, value) VALUES (?, ?, ?)')
+      .run(id, req.params.key, newValue);
+  } else {
+    const newValue = delta !== undefined 
+      ? Math.max(0, Math.min(100, current.value + Number(delta)))
+      : Number(value);
+    db.prepare('UPDATE nvwa_world_vars SET value = ?, updatedAt = CURRENT_TIMESTAMP WHERE key = ?')
+      .run(newValue, req.params.key);
+  }
+  
+  return { success: true };
+});
+
+// 推演日志
+fastify.get('/api/v1/nvwa/logs', (req) => {
+  const limit = Number(req.query.limit) || 50;
+  return db.prepare('SELECT * FROM nvwa_logs ORDER BY createdAt DESC LIMIT ?').all(limit);
+});
+
+// 推演事件
+fastify.get('/api/v1/nvwa/events', (req) => {
+  const limit = Number(req.query.limit) || 20;
+  return db.prepare('SELECT * FROM nvwa_events ORDER BY createdAt DESC LIMIT ?').all(limit);
+});
+
+// 运行推演
+fastify.post('/api/v1/nvwa/simulate', async (req) => {
+  // 获取AI配置
+  const aiConfig = db.prepare('SELECT * FROM ai_config LIMIT 1').get();
+  if (!aiConfig) {
+    return { success: false, error: 'AI未配置' };
+  }
+  
+  const result = await runNvwaTick(db, aiConfig, req.body || {});
+  return result;
+});
+
+// 获取女娲状态
+fastify.get('/api/v1/nvwa/status', (req) => {
+  const charCount = db.prepare("SELECT COUNT(*) as count FROM nvwa_souls WHERE status = 'active'").get();
+  const eventCount = db.prepare('SELECT COUNT(*) as count FROM nvwa_events').get();
+  const worldVars = db.prepare('SELECT * FROM nvwa_world_vars').all();
+  
+  return {
+    activeCharacters: charCount.count,
+    totalEvents: eventCount.count,
+    worldVariables: worldVars.reduce((acc, v) => { acc[v.key] = v.value; return acc; }, {}),
+    tension: worldVars.find(v => v.key === 'tension')?.value || 50
+  };
+});

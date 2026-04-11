@@ -1,23 +1,42 @@
 # 绘梦API开发进度
 
-## 2026-04-11
+## 2026-04-11 09:00
 
-### 01:30 实际状态确认
-- 项目初始化完成（fastify + sqlite）
-- 基础CRUD已实现
-- Git提交：61d21b5
+### 进度更新
+- ✅ Phase 1: API基础设施 - 完成
+- ✅ Phase 2: 实体CRUD - 完成
+- ✅ Phase 3: AI配置接口 - 完成 (09:00)
+- 🔄 Phase 3: AI任务调用 - 待测试
 
-### 已实现端点
+### 已实现端点 (共28个)
 - GET /health
 - GET/POST /api/v1/projects
+- GET/PUT/DELETE /api/v1/projects/:id
 - GET/POST /api/v1/roles
+- GET/PUT/DELETE /api/v1/roles/:id
 - GET/PUT /api/v1/roles/:id/soul
+- GET/POST /api/v1/items
+- GET/PUT/DELETE /api/v1/items/:id
+- GET/POST /api/v1/locations
+- GET/PUT/DELETE /api/v1/locations/:id
+- GET/POST /api/v1/settings
+- GET/PUT/DELETE /api/v1/settings/:id
+- GET/PUT /api/v1/ai/config
+- POST /api/v1/ai/run
+
+### AI配置功能
+- ai_config表存储配置
+- 支持本地引擎 (localhost:42897)
+- 支持云端引擎 (OpenAI兼容API)
+- API Key安全隐藏
 
 ### 待开发
-- [ ] Item/Location/Setting CRUD
-- [ ] AI任务接口
-- [ ] 沙盘推演
+- [ ] 沙盘推演引擎 (Nvwa)
+- [ ] 创世树 (GenesisTree)
 - [ ] 单元测试
 
+### Git提交
+- 7b4f1aa feat: AI配置接口 + 本地/云端引擎支持
+
 ### 运行
-npm start
+npm start (端口3000)

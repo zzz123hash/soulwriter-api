@@ -1,381 +1,407 @@
-/* ============ 基础样式 ============ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* SoulWriter - 书架风格 */
 
+/* ============ 基础 ============ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #13131a;
-  --bg-tertiary: #1a1a24;
-  --text-primary: #e0e0e0;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --accent-blue: #3b82f6;
-  --accent-purple: #8b5cf6;
-  --accent-green: #22c55e;
-  --border-color: #2a2a3a;
+  --bg: #1a1a2e;
+  --bg2: #16213e;
+  --bg3: #0f3460;
+  --text: #e8e8e8;
+  --text2: #a0a0a0;
+  --accent: #e94560;
+  --accent2: #533483;
+  --gold: #f5c518;
+  --border: #2a2a4a;
 }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+/* ============ 欢迎页 ============ */
+.welcome-page {
   min-height: 100vh;
-}
-
-/* ============ 欢迎页面 ============ */
-.welcome-container {
-  max-width: 900px;
+  padding: 40px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 60px 20px;
-  text-align: center;
 }
 
 .welcome-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 60px;
 }
 
-.welcome-title {
-  font-size: 3em;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+.logo-area { text-align: center; flex: 1; }
+
+.app-logo {
+  font-size: 4em;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--gold), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
+  letter-spacing: -2px;
+  text-shadow: 0 4px 20px rgba(233, 69, 96, 0.3);
 }
 
-.welcome-subtitle {
-  font-size: 1.5em;
-  color: var(--text-secondary);
+.app-slogan {
+  font-size: 1.4em;
+  color: var(--text2);
+  margin-top: 8px;
+  letter-spacing: 4px;
 }
 
-.welcome-books {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
-}
-
-.book-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: left;
+.header-actions { position: fixed; top: 20px; right: 20px; }
+.lang-select {
+  padding: 10px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
-.book-card:hover {
-  border-color: var(--accent-blue);
-  transform: translateY(-2px);
-}
+/* ============ 书架区 ============ */
+.bookshelf-section { margin-bottom: 40px; }
 
-.book-card .book-title {
-  font-size: 1.2em;
+.section-title {
+  font-size: 1.8em;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 30px;
+  padding-left: 20px;
+  border-left: 4px solid var(--accent);
 }
 
-.book-card .book-meta {
-  color: var(--text-secondary);
+.bookshelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 40px;
+}
+
+/* ============ 书架书籍 ============ */
+.book-item {
+  display: flex;
+  gap: 20px;
+  padding: 24px;
+  background: var(--bg2);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+
+.book-item:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 40px rgba(233, 69, 96, 0.2);
+}
+
+.book-cover {
+  position: relative;
+  width: 100px;
+  height: 140px;
+  flex-shrink: 0;
+  perspective: 800px;
+}
+
+.book-spine {
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 4px 0 0 4px;
+}
+
+.book-front {
+  position: absolute;
+  left: 16px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(145deg, var(--bg3), var(--bg2));
+  border-radius: 0 6px 6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-left: none;
+}
+
+.book-name {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+.book-info { flex: 1; display: flex; flex-direction: column; }
+
+.book-title {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.book-desc {
   font-size: 0.9em;
+  color: var(--text2);
+  flex: 1;
+  line-height: 1.5;
   margin-bottom: 12px;
 }
 
-.book-card .book-actions {
-  display: flex;
-  gap: 8px;
+.book-actions { display: flex; gap: 8px; }
+
+/* ============ 空书架 ============ */
+.empty-bookshelf {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 40px;
+  background: var(--bg2);
+  border-radius: 20px;
+  border: 2px dashed var(--border);
 }
 
-.welcome-actions {
-  margin-top: 20px;
+.empty-bookshelf::before {
+  content: '📚';
+  font-size: 4em;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.5;
 }
+
+.empty-bookshelf {
+  font-size: 1.2em;
+  color: var(--text2);
+}
+
+/* ============ 创建书籍按钮 ============ */
+.create-book-area {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.btn-create-book {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 48px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 16px;
+  color: white;
+  font-size: 1.3em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 8px 30px rgba(233, 69, 96, 0.3);
+}
+
+.btn-create-book:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(233, 69, 96, 0.4);
+}
+
+.btn-icon { font-size: 1.5em; }
 
 /* ============ 主布局 ============ */
-.main-layout {
-  display: flex;
-  height: 100vh;
-}
+.main-layout { display: flex; height: 100vh; }
 
 .sidebar {
   width: 260px;
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
 }
 
 .sidebar-header {
-  padding: 16px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
 }
 
-.sidebar-header .book-title {
+.book-title {
   font-size: 1.1em;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-weight: 700;
+  margin-bottom: 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.sidebar-nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 0;
-}
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
 
-.nav-section {
-  margin-bottom: 16px;
-}
+.nav-section { margin-bottom: 16px; }
 
 .nav-item {
-  padding: 10px 20px;
+  padding: 12px 20px;
   cursor: pointer;
   transition: all 0.15s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-size: 1em;
 }
 
-.nav-item:hover {
-  background: var(--bg-tertiary);
-}
+.nav-item:hover { background: var(--bg3); }
 
 .nav-item.active {
-  background: var(--accent-blue);
+  background: var(--accent);
   color: white;
+  border-radius: 0 12px 12px 0;
+  margin-right: 8px;
 }
 
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-}
+.main-content { flex: 1; overflow-y: auto; padding: 32px; }
 
 /* ============ 内容区 ============ */
 .content-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
-.content-header h2 {
-  font-size: 1.5em;
-  font-weight: 600;
-}
-
-/* ============ 按钮 ============ */
-.btn {
-  padding: 8px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.15s;
-}
-
-.btn:hover {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
-}
-
-.btn-primary {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-}
-
-.btn-large {
-  padding: 16px 32px;
-  font-size: 1.1em;
-}
-
-.btn-sm {
-  padding: 4px 12px;
-  font-size: 12px;
-}
-
-.btn-danger {
-  color: #ef4444;
-  border-color: #ef4444;
-}
-
-.btn-danger:hover {
-  background: #ef4444;
-  color: white;
-}
-
-/* ============ 卡片 ============ */
-.card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.card-title {
-  font-weight: 600;
-  font-size: 1em;
-}
-
-.card-badge {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: var(--accent-blue);
-  color: white;
-}
-
-.card-body {
-  color: var(--text-secondary);
-}
-
-.card-desc {
-  font-size: 13px;
-  margin-bottom: 8px;
+.view-title {
+  font-size: 2em;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--text), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
-/* ============ 角色卡片 ============ */
-.soul-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 8px;
+.entity-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  transition: all 0.2s;
 }
 
-.soul-tag {
+.entity-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.card-type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--accent);
+  color: white;
+  border-radius: 6px;
   font-size: 11px;
-  padding: 2px 6px;
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-  color: var(--accent-purple);
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
-/* ============ 物品卡片 ============ */
-.item-card .card-type {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
+.card-name {
+  font-size: 1.2em;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
-/* ============ 章节列表 ============ */
-.chapters-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.card-desc {
+  font-size: 0.85em;
+  color: var(--text2);
+  line-height: 1.5;
 }
 
-.chapter-card {
+.card-rarity {
+  display: inline-block;
+  padding: 4px 10px;
+  color: white;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.card-type { font-size: 0.8em; color: var(--text2); margin-bottom: 4px; }
+
+.card-icon-lg { font-size: 2em; margin-bottom: 10px; }
+
+/* ============ 章节 ============ */
+.chapters-list { display: flex; flex-direction: column; gap: 12px; }
+
+.chapter-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 18px 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.2s;
 }
 
-.chapter-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.chapter-item:hover { border-color: var(--accent); }
 
-.chapter-title {
-  font-weight: 600;
-}
+.chapter-info { display: flex; flex-direction: column; gap: 4px; }
 
-.chapter-meta {
-  font-size: 12px;
-  color: var(--text-muted);
-}
+.chapter-title { font-weight: 600; font-size: 1.1em; }
 
-.chapter-actions {
-  display: flex;
-  gap: 8px;
-}
+.chapter-meta { font-size: 0.85em; color: var(--text2); }
 
-/* ============ 写作界面 ============ */
+.chapter-actions { display: flex; gap: 8px; }
+
+/* ============ 写作 ============ */
 .writing-container {
   display: flex;
-  height: calc(100vh - 100px);
-  gap: 16px;
+  gap: 20px;
+  height: calc(100vh - 120px);
 }
 
 .writing-sidebar {
   width: 280px;
-  background: var(--bg-secondary);
-  border-radius: 12px;
+  background: var(--bg2);
+  border-radius: 14px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.scenes-list {
-  flex: 1;
-  overflow-y: auto;
-}
+.scenes-list { flex: 1; overflow-y: auto; }
 
 .scene-item {
-  padding: 12px;
-  background: var(--bg-tertiary);
-  border-radius: 8px;
+  padding: 14px;
+  background: var(--bg3);
+  border-radius: 10px;
   margin-bottom: 8px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.scene-item:hover {
-  background: var(--accent-blue);
+.scene-item:hover, .scene-item.active {
+  background: var(--accent);
 }
 
-.scene-item.active {
-  background: var(--accent-purple);
-}
-
-.scene-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.scene-meta {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 4px;
-}
+.scene-title { font-weight: 600; font-size: 14px; }
+.scene-meta { font-size: 12px; opacity: 0.7; margin-top: 4px; }
 
 .writing-main {
   flex: 1;
-  background: var(--bg-secondary);
-  border-radius: 12px;
+  background: var(--bg2);
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .writing-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -385,68 +411,67 @@ body {
   flex: 1;
   background: transparent;
   border: none;
-  font-size: 1.2em;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 1.3em;
+  font-weight: 700;
+  color: var(--text);
   padding: 8px;
 }
 
-.scene-title-input:focus {
-  outline: none;
-  background: var(--bg-tertiary);
-  border-radius: 8px;
-}
+.scene-title-input:focus { outline: none; background: var(--bg3); border-radius: 8px; }
 
-.writing-stats {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.writing-stats strong {
-  color: var(--accent-blue);
-}
+.writing-stats { color: var(--text2); }
+.writing-stats strong { color: var(--gold); }
 
 .writing-editor {
   flex: 1;
-  padding: 20px;
-  background: var(--bg-primary);
+  padding: 24px;
+  background: var(--bg);
   border: none;
-  color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.8;
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.9;
   resize: none;
   font-family: inherit;
 }
 
-.writing-editor:focus {
-  outline: none;
-}
+.writing-editor:focus { outline: none; }
 
 .writing-footer {
-  padding: 12px 20px;
-  border-top: 1px solid var(--border-color);
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--bg-secondary);
+  background: var(--bg2);
 }
 
-.writing-tools {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--text-secondary);
+.writing-tools { display: flex; align-items: center; gap: 16px; color: var(--text2); }
+.writing-tools input[type="range"] { width: 120px; }
+
+/* ============ 按钮 ============ */
+.btn {
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg3);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
 }
 
-.writing-tools input[type="range"] {
-  width: 120px;
-}
+.btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
+.btn-primary:hover { background: #d63850; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-danger { color: #ef4444; border-color: #ef4444; }
+.btn-danger:hover { background: #ef4444; color: white; }
 
 /* ============ 模态框 ============ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -454,9 +479,9 @@ body {
 }
 
 .modal {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
   width: 90%;
   max-width: 480px;
   max-height: 90vh;
@@ -467,131 +492,35 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
 }
 
-.modal-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-}
+.modal-header h3 { font-size: 1.3em; font-weight: 700; }
+.modal-close { background: none; border: none; color: var(--text2); font-size: 28px; cursor: pointer; }
+.modal-body { padding: 24px; }
 
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 24px;
-  cursor: pointer;
-}
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
 
-.modal-close:hover {
-  color: var(--text-primary);
-}
-
-.modal-body {
-  padding: 20px;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.form-group .input {
+.input {
   width: 100%;
-  padding: 10px 12px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 14px;
+  padding: 12px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 15px;
 }
 
-.form-group .input:focus {
-  outline: none;
-  border-color: var(--accent-blue);
-}
+.input:focus { outline: none; border-color: var(--accent); }
 
-.form-group textarea.input {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
+.form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
 
 /* ============ 空状态 ============ */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-  grid-column: 1 / -1;
-}
+.empty-state { text-align: center; padding: 60px; color: var(--text2); }
 
-/* ============ 输入框 ============ */
-.input {
-  padding: 8px 12px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--accent-blue);
-}
-
-/* ============ 加载中 ============ */
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  color: var(--text-muted);
-}
-
-/* ============ 图标 ============ */
-.card-icon {
-  font-size: 20px;
-  margin-right: 8px;
-}
-
-/* ============ 语言切换器 ============ */
-.lang-switcher {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 999;
-}
-
-.lang-select {
-  padding: 8px 12px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 14px;
-  cursor: pointer;
-  outline: none;
-}
-
-.lang-select:hover {
-  border-color: var(--accent-blue);
-}
-
-.lang-select option {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
+/* ============ 占位 ============ */
+.placeholder-view { text-align: center; padding: 80px; }
+.placeholder-view h2 { font-size: 2em; margin-bottom: 16px; }
+.placeholder-view p { color: var(--text2); }

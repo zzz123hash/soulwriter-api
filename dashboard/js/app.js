@@ -1,6 +1,6 @@
 /**
- * 绘梦 SoulWriter - 主应用
- * 支持中英文切换
+ * SoulWriter - 灵魂创作者
+ * 首页书架效果
  */
 
 const API_BASE = 'http://localhost:3000/api/v1';
@@ -8,51 +8,41 @@ const API_BASE = 'http://localhost:3000/api/v1';
 // 语言配置
 const i18n = {
   'zh-CN': {
-    app: { name: '绘梦', subtitle: '灵魂作家' },
+    app: { name: 'SoulWriter', subtitle: '灵魂创作者 · 内容塑魂师' },
     nav: { roles: '角色', items: '物品', locations: '地点', chapters: '章节', writing: '写作', genesis: '创世树', nvwa: '女娲推演', relationships: '关系图谱', settings: '设置' },
-    book: { create: '创建书本', noBooks: '暂无书本，创建一个开始吧', title: '书名', description: '简介', deleteConfirm: '确定删除这本书？' },
-    role: { create: '创建角色', noRoles: '暂无角色，创建一个吧', name: '姓名', type: '类型', description: '描述', types: { human: '人类', cyborg: '机械人', creature: '异兽', ai: 'AI' } },
+    book: { create: '创建新书', noBooks: '书架空空如也，创建第一本书吧', title: '书名', description: '简介', deleteConfirm: '确定删除这本书？' },
+    role: { create: '创建角色', noRoles: '暂无角色', name: '姓名', type: '类型', description: '描述', types: { human: '人类', cyborg: '机械人', creature: '异兽', ai: 'AI' } },
     item: { create: '创建物品', noItems: '暂无物品', name: '名称', type: '类型', rarity: '稀有度', description: '描述', types: { weapon: '武器', armor: '防具', potion: '药水', accessory: '饰品', material: '材料', keyItem: '关键物品', misc: '杂物' }, rarities: { common: '普通', uncommon: '优秀', rare: '稀有', epic: '史诗', legendary: '传说' } },
     location: { create: '创建地点', noLocations: '暂无地点', name: '名称', type: '类型', description: '描述', types: { city: '城市', town: '城镇', village: '村庄', indoor: '室内', wilderness: '荒野', forest: '森林', mountain: '山脉', water: '水域' } },
-    chapter: { create: '创建章节', noChapters: '暂无章节，创建一个开始写作吧', title: '标题', statuses: { draft: '草稿', writing: '写作中', review: '审核中', published: '已发布' } },
+    chapter: { create: '创建章节', noChapters: '暂无章节', title: '标题', statuses: { draft: '草稿', writing: '写作中', review: '审核中', published: '已发布' } },
     scene: { create: '创建场景', title: '场景标题', tension: '张力', emotion: '情感', wordCount: '字数', types: { scene: '场景', chapterStart: '章节开头', chapterEnd: '章节结尾', transition: '过渡' }, emotions: { neutral: '平静', happy: '开心', sad: '悲伤', tense: '紧张', angry: '愤怒', romantic: '浪漫' } },
     writing: { placeholder: '开始写作...', save: '保存', saved: '已保存' },
-    common: { back: '返回', loading: '加载中...', create: '创建', cancel: '取消', delete: '删除', save: '保存', edit: '编辑' }
+    common: { back: '返回', loading: '加载中...', create: '创建', cancel: '取消', delete: '删除', save: '保存', edit: '打开', bookshelf: '我的书架' }
   },
   'en-US': {
-    app: { name: 'SoulWriter', subtitle: 'Story Crafting Tool' },
+    app: { name: 'SoulWriter', subtitle: 'Soul Creator · Content Shaper' },
     nav: { roles: 'Roles', items: 'Items', locations: 'Locations', chapters: 'Chapters', writing: 'Writing', genesis: 'Genesis Tree', nvwa: 'Nvwa Engine', relationships: 'Relationships', settings: 'Settings' },
-    book: { create: 'Create Book', noBooks: 'No books yet. Create one to start!', title: 'Title', description: 'Description', deleteConfirm: 'Delete this book?' },
-    role: { create: 'Create Role', noRoles: 'No roles yet. Create one!', name: 'Name', type: 'Type', description: 'Description', types: { human: 'Human', cyborg: 'Cyborg', creature: 'Creature', ai: 'AI' } },
+    book: { create: 'Create Book', noBooks: 'Your bookshelf is empty. Create your first book!', title: 'Title', description: 'Description', deleteConfirm: 'Delete this book?' },
+    role: { create: 'Create Role', noRoles: 'No roles yet', name: 'Name', type: 'Type', description: 'Description', types: { human: 'Human', cyborg: 'Cyborg', creature: 'Creature', ai: 'AI' } },
     item: { create: 'Create Item', noItems: 'No items yet', name: 'Name', type: 'Type', rarity: 'Rarity', description: 'Description', types: { weapon: 'Weapon', armor: 'Armor', potion: 'Potion', accessory: 'Accessory', material: 'Material', keyItem: 'Key Item', misc: 'Misc' }, rarities: { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' } },
     location: { create: 'Create Location', noLocations: 'No locations yet', name: 'Name', type: 'Type', description: 'Description', types: { city: 'City', town: 'Town', village: 'Village', indoor: 'Indoor', wilderness: 'Wilderness', forest: 'Forest', mountain: 'Mountain', water: 'Water' } },
-    chapter: { create: 'Create Chapter', noChapters: 'No chapters yet. Create one to start writing!', title: 'Title', statuses: { draft: 'Draft', writing: 'Writing', review: 'Review', published: 'Published' } },
+    chapter: { create: 'Create Chapter', noChapters: 'No chapters yet', title: 'Title', statuses: { draft: 'Draft', writing: 'Writing', review: 'Review', published: 'Published' } },
     scene: { create: 'Create Scene', title: 'Scene Title', tension: 'Tension', emotion: 'Emotion', wordCount: 'Words', types: { scene: 'Scene', chapterStart: 'Chapter Start', chapterEnd: 'Chapter End', transition: 'Transition' }, emotions: { neutral: 'Neutral', happy: 'Happy', sad: 'Sad', tense: 'Tense', angry: 'Angry', romantic: 'Romantic' } },
     writing: { placeholder: 'Start writing...', save: 'Save', saved: 'Saved' },
-    common: { back: 'Back', loading: 'Loading...', create: 'Create', cancel: 'Cancel', delete: 'Delete', save: 'Save', edit: 'Edit' }
+    common: { back: 'Back', loading: 'Loading...', create: 'Create', cancel: 'Cancel', delete: 'Delete', save: 'Save', edit: 'Open', bookshelf: 'My Bookshelf' }
   }
 };
 
-// 获取当前语言
-function getLang() {
-  return localStorage.getItem('soulwriter-lang') || 'zh-CN';
-}
-
-// 翻译函数
+function getLang() { return localStorage.getItem('soulwriter-lang') || 'zh-CN'; }
 function t(key) {
   const lang = getLang();
   const keys = key.split('.');
   let value = i18n[lang];
-  for (const k of keys) {
-    value = value?.[k];
-    if (!value) return key;
-  }
+  for (const k of keys) { value = value?.[k]; if (!value) return key; }
   return value;
 }
 
-// 状态
 const state = {
-  lang: getLang(),
   currentView: 'welcome',
   currentBook: null,
   books: [],
@@ -63,7 +53,6 @@ const state = {
   scenes: []
 };
 
-// API
 async function api(endpoint, options = {}) {
   try {
     const res = await fetch(API_BASE + endpoint, {
@@ -71,17 +60,11 @@ async function api(endpoint, options = {}) {
       ...options
     });
     return await res.json();
-  } catch (e) {
-    console.error('API Error:', e);
-    return { error: e.message };
-  }
+  } catch (e) { return { error: e.message }; }
 }
-
-// ============ 页面渲染 ============
 
 function renderApp() {
   const app = document.getElementById('app');
-  
   if (!state.currentBook) {
     app.innerHTML = renderWelcome();
     bindWelcomeEvents();
@@ -89,34 +72,46 @@ function renderApp() {
     app.innerHTML = renderMainLayout();
     bindMainEvents();
   }
-  
-  // 更新语言选择器
   const langSelect = document.getElementById('lang-select');
   if (langSelect) langSelect.value = getLang();
 }
 
-// ============ 欢迎页面 ============
+// ============ 书架首页 ============
 
 function renderWelcome() {
   return `
-    <div class="welcome-container">
-      <div class="welcome-header">
-        <h1 class="welcome-title">${t('app.name')}</h1>
-        <p class="welcome-subtitle">${t('app.subtitle')}</p>
-      </div>
+    <div class="welcome-page">
+      <header class="welcome-header">
+        <div class="logo-area">
+          <h1 class="app-logo">SoulWriter</h1>
+          <p class="app-slogan">${t('app.subtitle')}</p>
+        </div>
+        <div class="header-actions">
+          <select id="lang-select" class="lang-select">
+            <option value="zh-CN" selected>🇨🇳 中文</option>
+            <option value="en-US">🇺🇸 English</option>
+          </select>
+        </div>
+      </header>
       
-      <div class="welcome-books" id="books-list">
-        <div class="books-loading">${t('common.loading')}</div>
-      </div>
+      <section class="bookshelf-section">
+        <h2 class="section-title">📚 ${t('common.bookshelf')}</h2>
+        <div class="bookshelf" id="books-list">
+          <div class="books-loading">${t('common.loading')}</div>
+        </div>
+      </section>
       
-      <div class="welcome-actions">
-        <button class="btn btn-primary btn-large" id="create-book-btn">
-          + ${t('book.create')}
+      <div class="create-book-area">
+        <button class="btn-create-book" id="create-book-btn">
+          <span class="btn-icon">+</span>
+          <span class="btn-text">${t('book.create')}</span>
         </button>
       </div>
     </div>
   `;
 }
+
+// ============ 主布局 ============
 
 function renderMainLayout() {
   return `
@@ -124,54 +119,29 @@ function renderMainLayout() {
       <aside class="sidebar">
         <div class="sidebar-header">
           <h2 class="book-title">${state.currentBook?.name || ''}</h2>
-          <button class="btn btn-sm" id="back-to-books">${t('common.back')}</button>
+          <button class="btn btn-sm" id="back-to-books">← ${t('common.back')}</button>
         </div>
-        
         <nav class="sidebar-nav">
           <div class="nav-section">
-            <div class="nav-item ${state.currentView === 'roles' ? 'active' : ''}" data-view="roles">
-              📁 ${t('nav.roles')}
-            </div>
-            <div class="nav-item ${state.currentView === 'items' ? 'active' : ''}" data-view="items">
-              🎁 ${t('nav.items')}
-            </div>
-            <div class="nav-item ${state.currentView === 'locations' ? 'active' : ''}" data-view="locations">
-              📍 ${t('nav.locations')}
-            </div>
+            <div class="nav-item ${state.currentView === 'roles' ? 'active' : ''}" data-view="roles">📁 ${t('nav.roles')}</div>
+            <div class="nav-item ${state.currentView === 'items' ? 'active' : ''}" data-view="items">🎁 ${t('nav.items')}</div>
+            <div class="nav-item ${state.currentView === 'locations' ? 'active' : ''}" data-view="locations">📍 ${t('nav.locations')}</div>
           </div>
-          
           <div class="nav-section">
-            <div class="nav-item ${state.currentView === 'chapters' ? 'active' : ''}" data-view="chapters">
-              📖 ${t('nav.chapters')}
-            </div>
-            <div class="nav-item ${state.currentView === 'writing' ? 'active' : ''}" data-view="writing">
-              ✍️ ${t('nav.writing')}
-            </div>
+            <div class="nav-item ${state.currentView === 'chapters' ? 'active' : ''}" data-view="chapters">📖 ${t('nav.chapters')}</div>
+            <div class="nav-item ${state.currentView === 'writing' ? 'active' : ''}" data-view="writing">✍️ ${t('nav.writing')}</div>
           </div>
-          
           <div class="nav-section">
-            <div class="nav-item ${state.currentView === 'genesis' ? 'active' : ''}" data-view="genesis">
-              🌳 ${t('nav.genesis')}
-            </div>
-            <div class="nav-item ${state.currentView === 'nvwa' ? 'active' : ''}" data-view="nvwa">
-              🔮 ${t('nav.nvwa')}
-            </div>
-            <div class="nav-item ${state.currentView === 'relationships' ? 'active' : ''}" data-view="relationships">
-              🔗 ${t('nav.relationships')}
-            </div>
+            <div class="nav-item ${state.currentView === 'genesis' ? 'active' : ''}" data-view="genesis">🌳 ${t('nav.genesis')}</div>
+            <div class="nav-item ${state.currentView === 'nvwa' ? 'active' : ''}" data-view="nvwa">🔮 ${t('nav.nvwa')}</div>
+            <div class="nav-item ${state.currentView === 'relationships' ? 'active' : ''}" data-view="relationships">🔗 ${t('nav.relationships')}</div>
           </div>
-          
           <div class="nav-section">
-            <div class="nav-item ${state.currentView === 'settings' ? 'active' : ''}" data-view="settings">
-              ⚙️ ${t('nav.settings')}
-            </div>
+            <div class="nav-item ${state.currentView === 'settings' ? 'active' : ''}" data-view="settings">⚙️ ${t('nav.settings')}</div>
           </div>
         </nav>
       </aside>
-      
-      <main class="main-content" id="main-content">
-        ${renderContent()}
-      </main>
+      <main class="main-content" id="main-content">${renderContent()}</main>
     </div>
   `;
 }
@@ -191,58 +161,40 @@ function renderContent() {
   }
 }
 
-// ============ 角色管理 ============
+// ============ 角色/物品/地点 ============
 
 function renderRoles() {
   return `
     <div class="content-header">
-      <h2>${t('nav.roles')}</h2>
+      <h2 class="view-title">${t('nav.roles')}</h2>
       <button class="btn btn-primary" id="add-role-btn">+ ${t('role.create')}</button>
     </div>
-    <div class="cards-grid" id="roles-list">
+    <div class="cards-grid">
       ${state.roles.length === 0 ? `<div class="empty-state">${t('role.noRoles')}</div>` : ''}
       ${state.roles.map(role => `
-        <div class="card role-card" data-id="${role.id}">
-          <div class="card-header">
-            <span class="card-title">${role.name}</span>
-            <span class="card-badge">${t('role.types.' + role.type)}</span>
-          </div>
-          <div class="card-body">
-            <p class="card-desc">${role.description || ''}</p>
-            ${role.soulData ? `<div class="soul-preview">${renderSoulPreview(role.soulData)}</div>` : ''}
-          </div>
+        <div class="entity-card" data-id="${role.id}">
+          <div class="card-type-badge">${t('role.types.' + role.type)}</div>
+          <h3 class="card-name">${role.name}</h3>
+          <p class="card-desc">${role.description || ''}</p>
         </div>
       `).join('')}
     </div>
   `;
 }
 
-function renderSoulPreview(soulData) {
-  try {
-    const soul = typeof soulData === 'string' ? JSON.parse(soulData) : soulData;
-    return Object.entries(soul).slice(0, 3).map(([k, v]) => `<span class="soul-tag">${k}: ${v}</span>`).join('');
-  } catch {
-    return '';
-  }
-}
-
-// ============ 物品管理 ============
-
 function renderItems() {
   return `
     <div class="content-header">
-      <h2>${t('nav.items')}</h2>
+      <h2 class="view-title">${t('nav.items')}</h2>
       <button class="btn btn-primary" id="add-item-btn">+ ${t('item.create')}</button>
     </div>
-    <div class="cards-grid" id="items-list">
+    <div class="cards-grid">
       ${state.items.length === 0 ? `<div class="empty-state">${t('item.noItems')}</div>` : ''}
       ${state.items.map(item => `
-        <div class="card item-card" data-id="${item.id}">
-          <div class="card-header">
-            <span class="card-title">${item.name}</span>
-            <span class="card-badge" style="background: ${getRarityColor(item.rarity)}">${t('item.rarities.' + item.rarity)}</span>
-          </div>
-          <p class="card-type">${t('item.type')}: ${t('item.types.' + item.type)}</p>
+        <div class="entity-card item-card" data-id="${item.id}">
+          <div class="card-rarity" style="background:${getRarityColor(item.rarity)}">${t('item.rarities.' + item.rarity)}</div>
+          <h3 class="card-name">${item.name}</h3>
+          <p class="card-type">${t('item.types.' + item.type)}</p>
           <p class="card-desc">${item.description || ''}</p>
         </div>
       `).join('')}
@@ -250,23 +202,19 @@ function renderItems() {
   `;
 }
 
-// ============ 地点管理 ============
-
 function renderLocations() {
   return `
     <div class="content-header">
-      <h2>${t('nav.locations')}</h2>
+      <h2 class="view-title">${t('nav.locations')}</h2>
       <button class="btn btn-primary" id="add-location-btn">+ ${t('location.create')}</button>
     </div>
-    <div class="cards-grid" id="locations-list">
+    <div class="cards-grid">
       ${state.locations.length === 0 ? `<div class="empty-state">${t('location.noLocations')}</div>` : ''}
       ${state.locations.map(loc => `
-        <div class="card location-card" data-id="${loc.id}">
-          <div class="card-header">
-            <span class="card-icon">${getLocationIcon(loc.type)}</span>
-            <span class="card-title">${loc.name}</span>
-          </div>
-          <p class="card-type">${t('location.type')}: ${t('location.types.' + loc.type)}</p>
+        <div class="entity-card" data-id="${loc.id}">
+          <div class="card-icon-lg">${getLocationIcon(loc.type)}</div>
+          <h3 class="card-name">${loc.name}</h3>
+          <p class="card-type">${t('location.types.' + loc.type)}</p>
           <p class="card-desc">${loc.description || ''}</p>
         </div>
       `).join('')}
@@ -274,25 +222,25 @@ function renderLocations() {
   `;
 }
 
-// ============ 章节管理 ============
+// ============ 章节 ============
 
 function renderChapters() {
   return `
     <div class="content-header">
-      <h2>${t('nav.chapters')}</h2>
+      <h2 class="view-title">${t('nav.chapters')}</h2>
       <button class="btn btn-primary" id="add-chapter-btn">+ ${t('chapter.create')}</button>
     </div>
-    <div class="chapters-list" id="chapters-list">
+    <div class="chapters-list">
       ${state.chapters.length === 0 ? `<div class="empty-state">${t('chapter.noChapters')}</div>` : ''}
       ${state.chapters.map(ch => `
-        <div class="chapter-card card" data-id="${ch.id}">
+        <div class="chapter-item" data-id="${ch.id}">
           <div class="chapter-info">
             <span class="chapter-title">${ch.title}</span>
-            <span class="chapter-meta">${ch.wordCount || 0} | ${t('chapter.statuses.' + ch.status)}</span>
+            <span class="chapter-meta">${ch.wordCount || 0}字 · ${t('chapter.statuses.' + ch.status)}</span>
           </div>
           <div class="chapter-actions">
-            <button class="btn btn-sm" data-action="write">${t('nav.writing')}</button>
-            <button class="btn btn-sm btn-danger" data-action="delete">${t('common.delete')}</button>
+            <button class="btn btn-sm" data-action="write">✍️ ${t('nav.writing')}</button>
+            <button class="btn btn-sm btn-danger" data-action="delete">🗑️</button>
           </div>
         </div>
       `).join('')}
@@ -300,7 +248,7 @@ function renderChapters() {
   `;
 }
 
-// ============ 写作界面 ============
+// ============ 写作 ============
 
 function renderWriting() {
   return `
@@ -315,7 +263,7 @@ function renderWriting() {
           ${state.scenes.map(s => `
             <div class="scene-item" data-id="${s.id}">
               <div class="scene-title">${s.title}</div>
-              <div class="scene-meta">${s.wordCount || 0} | ${t('scene.tension')}: ${s.tension || 50}</div>
+              <div class="scene-meta">${s.wordCount || 0}字</div>
             </div>
           `).join('')}
         </div>
@@ -350,44 +298,26 @@ function renderWriting() {
 
 // ============ 其他视图 ============
 
-function renderGenesis() {
-  return `<div class="card"><h3>🌳 ${t('nav.genesis')}</h3><p>${t('common.loading')}...</p></div>`;
-}
+function renderGenesis() { return `<div class="placeholder-view"><h2>🌳 ${t('nav.genesis')}</h2><p>开发中...</p></div>`; }
+function renderNvwa() { return `<div class="placeholder-view"><h2>🔮 ${t('nav.nvwa')}</h2><p>开发中...</p></div>`; }
+function renderRelationships() { return `<div class="placeholder-view"><h2>🔗 ${t('nav.relationships')}</h2><p>开发中...</p></div>`; }
+function renderSettings() { return `<div class="placeholder-view"><h2>⚙️ ${t('nav.settings')}</h2><p>SoulWriter v1.0</p></div>`; }
 
-function renderNvwa() {
-  return `<div class="card"><h3>🔮 ${t('nav.nvwa')}</h3><p>${t('common.loading')}...</p></div>`;
-}
-
-function renderRelationships() {
-  return `<div class="card"><h3>🔗 ${t('nav.relationships')}</h3><p>${t('common.loading')}...</p></div>`;
-}
-
-function renderSettings() {
-  return `
-    <div class="content-header">
-      <h2>⚙️ ${t('nav.settings')}</h2>
-    </div>
-    <div class="card">
-      <h3>${t('nav.settings')}</h3>
-      <p>${t('app.name')} v1.0</p>
-    </div>
-  `;
-}
-
-// ============ 事件绑定 ============
+// ============ 事件 ============
 
 function bindWelcomeEvents() {
   document.getElementById('create-book-btn')?.addEventListener('click', showCreateBookModal);
+  document.getElementById('lang-select')?.addEventListener('change', (e) => {
+    localStorage.setItem('soulwriter-lang', e.target.value);
+    window.location.reload();
+  });
   loadBooks();
 }
 
 function bindMainEvents() {
   document.getElementById('back-to-books')?.addEventListener('click', () => {
-    state.currentBook = null;
-    state.currentView = 'welcome';
-    renderApp();
+    state.currentBook = null; state.currentView = 'welcome'; renderApp();
   });
-  
   document.querySelectorAll('.nav-item').forEach(el => {
     el.addEventListener('click', () => {
       state.currentView = el.dataset.view;
@@ -395,24 +325,19 @@ function bindMainEvents() {
       bindMainEvents();
     });
   });
-  
   document.getElementById('add-role-btn')?.addEventListener('click', showCreateRoleModal);
   document.getElementById('add-item-btn')?.addEventListener('click', showCreateItemModal);
   document.getElementById('add-location-btn')?.addEventListener('click', showCreateLocationModal);
   document.getElementById('add-chapter-btn')?.addEventListener('click', showCreateChapterModal);
   document.getElementById('add-scene-btn')?.addEventListener('click', showCreateSceneModal);
-  document.getElementById('save-scene-btn')?.addEventListener('click', saveCurrentScene);
-  
+  document.getElementById('save-scene-btn')?.addEventListener('click', () => alert(t('writing.saved')));
   document.getElementById('writing-editor')?.addEventListener('input', (e) => {
     document.getElementById('word-count').textContent = e.target.value.length;
   });
-  
   document.getElementById('tension-slider')?.addEventListener('input', (e) => {
     document.getElementById('tension-value').textContent = e.target.value;
   });
 }
-
-// ============ 数据加载 ============
 
 async function loadBooks() {
   const books = await api('/projects');
@@ -432,33 +357,37 @@ async function loadBookData() {
 function renderBooksList() {
   const container = document.getElementById('books-list');
   if (!container) return;
-  
   if (state.books.length === 0) {
-    container.innerHTML = `<div class="empty-state">${t('book.noBooks')}</div>`;
+    container.innerHTML = `<div class="empty-bookshelf">${t('book.noBooks')}</div>`;
     return;
   }
-  
   container.innerHTML = state.books.map(book => `
-    <div class="book-card" data-id="${book.id}">
-      <div class="book-title">${book.name}</div>
-      <div class="book-meta">${book.description || ''}</div>
-      <div class="book-actions">
-        <button class="btn btn-sm" data-action="open">${t('common.edit')}</button>
-        <button class="btn btn-sm btn-danger" data-action="delete">${t('common.delete')}</button>
+    <div class="book-item" data-id="${book.id}">
+      <div class="book-cover">
+        <div class="book-spine"></div>
+        <div class="book-front">
+          <span class="book-name">${book.name}</span>
+        </div>
+      </div>
+      <div class="book-info">
+        <h3 class="book-title">${book.name}</h3>
+        <p class="book-desc">${book.description || '...'}</p>
+        <div class="book-actions">
+          <button class="btn btn-sm" data-action="open">${t('common.edit')}</button>
+          <button class="btn btn-sm btn-danger" data-action="delete">${t('common.delete')}</button>
+        </div>
       </div>
     </div>
   `).join('');
   
-  container.querySelectorAll('.book-card').forEach(card => {
+  container.querySelectorAll('.book-item').forEach(card => {
     const bookId = card.dataset.id;
-    
     card.querySelector('[data-action="open"]')?.addEventListener('click', async () => {
       state.currentBook = state.books.find(b => b.id === bookId);
       await loadBookData();
       state.currentView = 'roles';
       renderApp();
     });
-    
     card.querySelector('[data-action="delete"]')?.addEventListener('click', async () => {
       if (confirm(t('book.deleteConfirm'))) {
         await api(`/projects/${bookId}`, { method: 'DELETE' });
@@ -475,19 +404,10 @@ function showCreateBookModal() {
   modal.className = 'modal-overlay';
   modal.innerHTML = `
     <div class="modal">
-      <div class="modal-header">
-        <h3>${t('book.create')}</h3>
-        <button class="modal-close">×</button>
-      </div>
+      <div class="modal-header"><h3>${t('book.create')}</h3><button class="modal-close">×</button></div>
       <form class="modal-body">
-        <div class="form-group">
-          <label>${t('book.title')}</label>
-          <input type="text" name="name" class="input" required placeholder="${t('book.title')}">
-        </div>
-        <div class="form-group">
-          <label>${t('book.description')}</label>
-          <textarea name="description" class="input" rows="3" placeholder="${t('book.description')}"></textarea>
-        </div>
+        <div class="form-group"><label>${t('book.title')}</label><input type="text" name="name" class="input" required></div>
+        <div class="form-group"><label>${t('book.description')}</label><textarea name="description" class="input" rows="3"></textarea></div>
         <div class="form-actions">
           <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
           <button type="submit" class="btn btn-primary">${t('common.create')}</button>
@@ -495,73 +415,24 @@ function showCreateBookModal() {
       </form>
     </div>
   `;
-  
   document.body.appendChild(modal);
-  
   modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
   modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
   modal.querySelector('form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const data = { name: e.target.name.value, description: e.target.description.value };
-    const result = await api('/projects', { method: 'POST', body: JSON.stringify(data) });
+    const result = await api('/projects', { method: 'POST', body: JSON.stringify({ name: e.target.name.value, description: e.target.description.value }) });
     modal.remove();
-    if (result.id) {
-      state.currentBook = result;
-      state.currentView = 'roles';
-      renderApp();
-    }
+    if (result.id) { state.currentBook = result; state.currentView = 'roles'; renderApp(); }
   });
 }
 
 function showCreateRoleModal() {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <h3>${t('role.create')}</h3>
-        <button class="modal-close">×</button>
-      </div>
-      <form class="modal-body">
-        <div class="form-group">
-          <label>${t('role.name')}</label>
-          <input type="text" name="name" class="input" required>
-        </div>
-        <div class="form-group">
-          <label>${t('role.type')}</label>
-          <select name="type" class="input">
-            <option value="human">${t('role.types.human')}</option>
-            <option value="cyborg">${t('role.types.cyborg')}</option>
-            <option value="creature">${t('role.types.creature')}</option>
-            <option value="ai">${t('role.types.ai')}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>${t('role.description')}</label>
-          <textarea name="description" class="input" rows="3"></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
-          <button type="submit" class="btn btn-primary">${t('common.create')}</button>
-        </div>
-      </form>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
-  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-  modal.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = {
-      projectId: state.currentBook.id,
-      name: e.target.name.value,
-      type: e.target.type.value,
-      description: e.target.description.value
-    };
-    await api('/roles', { method: 'POST', body: JSON.stringify(data) });
-    modal.remove();
+  showModal(t('role.create'), `
+    <div class="form-group"><label>${t('role.name')}</label><input type="text" name="name" class="input" required></div>
+    <div class="form-group"><label>${t('role.type')}</label><select name="type" class="input"><option value="human">${t('role.types.human')}</option><option value="cyborg">${t('role.types.cyborg')}</option><option value="creature">${t('role.types.creature')}</option><option value="ai">${t('role.types.ai')}</option></select></div>
+    <div class="form-group"><label>${t('role.description')}</label><textarea name="description" class="input" rows="3"></textarea></div>
+  `, async (data) => {
+    await api('/roles', { method: 'POST', body: JSON.stringify({ projectId: state.currentBook.id, ...data }) });
     await loadBookData();
     document.getElementById('main-content').innerHTML = renderContent();
     bindMainEvents();
@@ -569,68 +440,13 @@ function showCreateRoleModal() {
 }
 
 function showCreateItemModal() {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <h3>${t('item.create')}</h3>
-        <button class="modal-close">×</button>
-      </div>
-      <form class="modal-body">
-        <div class="form-group">
-          <label>${t('item.name')}</label>
-          <input type="text" name="name" class="input" required>
-        </div>
-        <div class="form-group">
-          <label>${t('item.type')}</label>
-          <select name="type" class="input">
-            <option value="weapon">${t('item.types.weapon')}</option>
-            <option value="armor">${t('item.types.armor')}</option>
-            <option value="potion">${t('item.types.potion')}</option>
-            <option value="accessory">${t('item.types.accessory')}</option>
-            <option value="material">${t('item.types.material')}</option>
-            <option value="keyItem">${t('item.types.keyItem')}</option>
-            <option value="misc">${t('item.types.misc')}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>${t('item.rarity')}</label>
-          <select name="rarity" class="input">
-            <option value="common">${t('item.rarities.common')}</option>
-            <option value="uncommon">${t('item.rarities.uncommon')}</option>
-            <option value="rare">${t('item.rarities.rare')}</option>
-            <option value="epic">${t('item.rarities.epic')}</option>
-            <option value="legendary">${t('item.rarities.legendary')}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>${t('item.description')}</label>
-          <textarea name="description" class="input" rows="3"></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
-          <button type="submit" class="btn btn-primary">${t('common.create')}</button>
-        </div>
-      </form>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
-  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-  modal.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = {
-      projectId: state.currentBook.id,
-      name: e.target.name.value,
-      type: e.target.type.value,
-      rarity: e.target.rarity.value,
-      description: e.target.description.value
-    };
-    await api('/items', { method: 'POST', body: JSON.stringify(data) });
-    modal.remove();
+  showModal(t('item.create'), `
+    <div class="form-group"><label>${t('item.name')}</label><input type="text" name="name" class="input" required></div>
+    <div class="form-group"><label>${t('item.type')}</label><select name="type" class="input"><option value="weapon">${t('item.types.weapon')}</option><option value="armor">${t('item.types.armor')}</option><option value="potion">${t('item.types.potion')}</option><option value="accessory">${t('item.types.accessory')}</option><option value="material">${t('item.types.material')}</option><option value="keyItem">${t('item.types.keyItem')}</option><option value="misc">${t('item.types.misc')}</option></select></div>
+    <div class="form-group"><label>${t('item.rarity')}</label><select name="rarity" class="input"><option value="common">${t('item.rarities.common')}</option><option value="uncommon">${t('item.rarities.uncommon')}</option><option value="rare">${t('item.rarities.rare')}</option><option value="epic">${t('item.rarities.epic')}</option><option value="legendary">${t('item.rarities.legendary')}</option></select></div>
+    <div class="form-group"><label>${t('item.description')}</label><textarea name="description" class="input" rows="3"></textarea></div>
+  `, async (data) => {
+    await api('/items', { method: 'POST', body: JSON.stringify({ projectId: state.currentBook.id, ...data }) });
     await loadBookData();
     document.getElementById('main-content').innerHTML = renderContent();
     bindMainEvents();
@@ -638,58 +454,12 @@ function showCreateItemModal() {
 }
 
 function showCreateLocationModal() {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <h3>${t('location.create')}</h3>
-        <button class="modal-close">×</button>
-      </div>
-      <form class="modal-body">
-        <div class="form-group">
-          <label>${t('location.name')}</label>
-          <input type="text" name="name" class="input" required>
-        </div>
-        <div class="form-group">
-          <label>${t('location.type')}</label>
-          <select name="type" class="input">
-            <option value="city">${t('location.types.city')}</option>
-            <option value="town">${t('location.types.town')}</option>
-            <option value="village">${t('location.types.village')}</option>
-            <option value="indoor">${t('location.types.indoor')}</option>
-            <option value="wilderness">${t('location.types.wilderness')}</option>
-            <option value="forest">${t('location.types.forest')}</option>
-            <option value="mountain">${t('location.types.mountain')}</option>
-            <option value="water">${t('location.types.water')}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>${t('location.description')}</label>
-          <textarea name="description" class="input" rows="3"></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
-          <button type="submit" class="btn btn-primary">${t('common.create')}</button>
-        </div>
-      </form>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
-  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-  modal.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = {
-      projectId: state.currentBook.id,
-      name: e.target.name.value,
-      type: e.target.type.value,
-      description: e.target.description.value
-    };
-    await api('/locations', { method: 'POST', body: JSON.stringify(data) });
-    modal.remove();
+  showModal(t('location.create'), `
+    <div class="form-group"><label>${t('location.name')}</label><input type="text" name="name" class="input" required></div>
+    <div class="form-group"><label>${t('location.type')}</label><select name="type" class="input"><option value="city">${t('location.types.city')}</option><option value="town">${t('location.types.town')}</option><option value="village">${t('location.types.village')}</option><option value="indoor">${t('location.types.indoor')}</option><option value="wilderness">${t('location.types.wilderness')}</option><option value="forest">${t('location.types.forest')}</option><option value="mountain">${t('location.types.mountain')}</option><option value="water">${t('location.types.water')}</option></select></div>
+    <div class="form-group"><label>${t('location.description')}</label><textarea name="description" class="input" rows="3"></textarea></div>
+  `, async (data) => {
+    await api('/locations', { method: 'POST', body: JSON.stringify({ projectId: state.currentBook.id, ...data }) });
     await loadBookData();
     document.getElementById('main-content').innerHTML = renderContent();
     bindMainEvents();
@@ -697,39 +467,8 @@ function showCreateLocationModal() {
 }
 
 function showCreateChapterModal() {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <h3>${t('chapter.create')}</h3>
-        <button class="modal-close">×</button>
-      </div>
-      <form class="modal-body">
-        <div class="form-group">
-          <label>${t('chapter.title')}</label>
-          <input type="text" name="title" class="input" required>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
-          <button type="submit" class="btn btn-primary">${t('common.create')}</button>
-        </div>
-      </form>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
-  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-  modal.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = {
-      projectId: state.currentBook.id,
-      title: e.target.title.value
-    };
-    await api('/chapters', { method: 'POST', body: JSON.stringify(data) });
-    modal.remove();
+  showModal(t('chapter.create'), `<div class="form-group"><label>${t('chapter.title')}</label><input type="text" name="title" class="input" required></div>`, async (data) => {
+    await api('/chapters', { method: 'POST', body: JSON.stringify({ projectId: state.currentBook.id, ...data }) });
     await loadBookData();
     document.getElementById('main-content').innerHTML = renderContent();
     bindMainEvents();
@@ -737,102 +476,52 @@ function showCreateChapterModal() {
 }
 
 function showCreateSceneModal() {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <h3>${t('scene.create')}</h3>
-        <button class="modal-close">×</button>
-      </div>
-      <form class="modal-body">
-        <div class="form-group">
-          <label>${t('scene.title')}</label>
-          <input type="text" name="title" class="input" required>
-        </div>
-        <div class="form-group">
-          <label>${t('scene.type')}</label>
-          <select name="sceneType" class="input">
-            <option value="scene">${t('scene.types.scene')}</option>
-            <option value="chapterStart">${t('scene.types.chapterStart')}</option>
-            <option value="chapterEnd">${t('scene.types.chapterEnd')}</option>
-            <option value="transition">${t('scene.types.transition')}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>${t('scene.tension')}: <span id="modal-tension-value">50</span></label>
-          <input type="range" name="tension" min="0" max="100" value="50" id="modal-tension-slider">
-        </div>
-        <div class="form-group">
-          <label>${t('scene.emotion')}</label>
-          <select name="emotion" class="input">
-            <option value="neutral">${t('scene.emotions.neutral')}</option>
-            <option value="happy">${t('scene.emotions.happy')}</option>
-            <option value="sad">${t('scene.emotions.sad')}</option>
-            <option value="tense">${t('scene.emotions.tense')}</option>
-            <option value="angry">${t('scene.emotions.angry')}</option>
-            <option value="romantic">${t('scene.emotions.romantic')}</option>
-          </select>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
-          <button type="submit" class="btn btn-primary">${t('common.create')}</button>
-        </div>
-      </form>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  const slider = modal.querySelector('#modal-tension-slider');
-  const value = modal.querySelector('#modal-tension-value');
-  slider?.addEventListener('input', () => { value.textContent = slider.value; });
-  
-  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
-  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-  modal.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = {
-      projectId: state.currentBook.id,
-      title: e.target.title.value,
-      sceneType: e.target.sceneType.value,
-      tension: parseInt(e.target.tension.value),
-      emotion: e.target.emotion.value
-    };
-    await api('/scenes', { method: 'POST', body: JSON.stringify(data) });
-    modal.remove();
+  showModal(t('scene.create'), `
+    <div class="form-group"><label>${t('scene.title')}</label><input type="text" name="title" class="input" required></div>
+    <div class="form-group"><label>${t('scene.type')}</label><select name="sceneType" class="input"><option value="scene">${t('scene.types.scene')}</option><option value="chapterStart">${t('scene.types.chapterStart')}</option><option value="chapterEnd">${t('scene.types.chapterEnd')}</option><option value="transition">${t('scene.types.transition')}</option></select></div>
+    <div class="form-group"><label>${t('scene.tension')}: <span id="modal-tension-value">50</span></label><input type="range" name="tension" min="0" max="100" value="50" id="modal-tension-slider"></div>
+    <div class="form-group"><label>${t('scene.emotion')}</label><select name="emotion" class="input"><option value="neutral">${t('scene.emotions.neutral')}</option><option value="happy">${t('scene.emotions.happy')}</option><option value="sad">${t('scene.emotions.sad')}</option><option value="tense">${t('scene.emotions.tense')}</option><option value="angry">${t('scene.emotions.angry')}</option><option value="romantic">${t('scene.emotions.romantic')}</option></select></div>
+  `, async (data) => {
+    await api('/scenes', { method: 'POST', body: JSON.stringify({ projectId: state.currentBook.id, ...data }) });
     await loadBookData();
     document.getElementById('main-content').innerHTML = renderContent();
     bindMainEvents();
   });
 }
 
-async function saveCurrentScene() {
-  alert(t('writing.saved'));
+function showModal(title, fieldsHtml, onSubmit) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `<div class="modal"><div class="modal-header"><h3>${title}</h3><button class="modal-close">×</button></div><form class="modal-body">${fieldsHtml}<div class="form-actions"><button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button><button type="submit" class="btn btn-primary">${t('common.create')}</button></div></form></div>`;
+  document.body.appendChild(modal);
+  
+  const slider = modal.querySelector('#modal-tension-slider');
+  const tensionValue = modal.querySelector('#modal-tension-value');
+  slider?.addEventListener('input', () => { tensionValue.textContent = slider.value; });
+  
+  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    if (data.tension) data.tension = parseInt(data.tension);
+    await onSubmit(data);
+    modal.remove();
+  });
 }
 
-// ============ 辅助函数 ============
+// ============ 辅助 ============
 
 function getRarityColor(rarity) {
-  const colors = { common: '#9ca3af', uncommon: '#22c55e', rare: '#3b82f6', epic: '#a855f7', legendary: '#f59e0b' };
+  const colors = { common: '#6b7280', uncommon: '#22c55e', rare: '#3b82f6', epic: '#a855f7', legendary: '#f59e0b' };
   return colors[rarity] || colors.common;
 }
 
 function getLocationIcon(type) {
-  const icons = {
-    cosmic: '🌌', world: '🌍', continent: '🗺️', region: '🏞️',
-    city: '🏙️', town: '🏘️', village: '🏠', indoor: '🏰',
-    path: '🛤️', wilderness: '🌲', forest: '🌳', mountain: '⛰️',
-    water: '🌊', special: '✨'
-  };
+  const icons = { city: '🏙️', town: '🏘️', village: '🏠', indoor: '🏰', wilderness: '🌲', forest: '🌳', mountain: '⛰️', water: '🌊' };
   return icons[type] || '📍';
 }
 
-// ============ 初始化 ============
-
-function init() {
-  console.log('🚀 SoulWriter 启动 | Lang:', getLang());
-  renderApp();
-}
-
+function init() { console.log('🚀 SoulWriter 启动'); renderApp(); }
 document.addEventListener('DOMContentLoaded', init);

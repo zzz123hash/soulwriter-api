@@ -1,6 +1,6 @@
 # 绘梦API开发进度
 
-## 2026-04-11 16:42
+## 2026-04-11 17:06
 
 ### 进度总览
 - ✅ Phase 1: API基础设施 - 完成
@@ -10,35 +10,30 @@
 - ✅ Phase 5: 创世树 - 完成
 - ✅ Phase 6: 导出功能 - 完成
 - ✅ Phase 7: Dashboard界面 - 完成
-- ✅ Phase 8: 写作功能 - 完成 (16:40)
+- ✅ Phase 8: 写作功能 - 完成
+- ✅ Phase 9: i18n多语言 - 完成 (17:00)
+- ✅ Phase 10: 从创建书本开始 - 完成 (17:00)
 
 ### 访问地址
 - Dashboard: http://192.168.0.128:3000/dashboard/
 - API: http://192.168.0.128:3000/api/v1
 - GitHub: https://github.com/zzz123hash/soulwriter-api
 
-### 新增功能 (Phase 8)
-- 章节CRUD API
-- 场景CRUD API
-- 写作界面（左侧场景列表 + 右侧编辑器）
-- 张力滑块 (0-100)
-- 情感选择 (neutral/happy/sad/tense/angry/romantic)
-- 实时字数统计
-- 场景类型 (scene/chapter_start/chapter_end/transition)
+### 新增功能 (Phase 9-10)
+- i18n多语言支持 (zh-CN.json)
+- 欢迎页面：从创建书本开始
+- 侧边栏导航：角色/物品/地点/章节/写作/创世树/女娲
+- SoulSchema灵魂矩阵设计
 
 ### Git提交
-43754b7 feat: 写作功能 + Dashboard完善
-f01fd0d style: Modal样式和卡片布局
-efbb53c feat: 集成组件的app.js
-069cc47 feat: Dashboard组件开发
-0d650cb feat: Dashboard基础结构
-ee67c4d feat: 添加核心模块
+39ef71f feat: 从创建书本开始的完整Dashboard + i18n
 
 ### 服务状态
 ✅ 运行正常 (端口3000)
 
 ### 待解决
 - AI API Key配置
-- 3D关系图谱界面
-- 创世树界面
+- 配置中心（提示词/字段模板可修改）
+- 3D关系图谱
 - 女娲推演界面
+- 创世树界面

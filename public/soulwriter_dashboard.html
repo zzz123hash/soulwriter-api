@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绘梦 SoulWriter - API Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f23; color: #e0e0e0; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; padding: 40px 0; }
+        h1 { font-size: 2.5em; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .subtitle { color: #888; font-size: 1.1em; }
+        .status-bar { display: flex; justify-content: center; gap: 30px; margin: 30px 0; }
+        .status-item { background: #1a1a3e; padding: 15px 25px; border-radius: 12px; text-align: center; }
+        .status-item .value { font-size: 1.8em; font-weight: bold; color: #667eea; }
+        .status-item .label { color: #888; margin-top: 5px; font-size: 0.9em; }
+        .section { background: #1a1a3e; border-radius: 16px; padding: 25px; margin: 20px 0; }
+        h2 { color: #667eea; margin-bottom: 20px; font-size: 1.3em; }
+        .api-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .api-item { background: #252552; padding: 15px; border-radius: 10px; display: flex; align-items: center; gap: 12px; }
+        .method { padding: 4px 10px; border-radius: 6px; font-size: 0.75em; font-weight: bold; }
+        .method.get { background: #10b981; color: #000; }
+        .method.post { background: #3b82f6; color: #fff; }
+        .method.put { background: #f59e0b; color: #000; }
+        .method.delete { background: #ef4444; color: #fff; }
+        .endpoint { color: #ddd; font-family: monospace; font-size: 0.9em; }
+        .btn { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1em; margin: 10px 5px; }
+        .btn:hover { opacity: 0.9; }
+        .log { background: #0d0d1a; padding: 20px; border-radius: 10px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.85em; white-space: pre-wrap; }
+        .log-entry { margin: 8px 0; padding: 8px; border-radius: 5px; }
+        .log-entry.success { background: #10b98120; border-left: 3px solid #10b981; }
+        .log-entry.error { background: #ef444420; border-left: 3px solid #ef4444; }
+        .log-entry.info { background: #3b82f620; border-left: 3px solid #3b82f6; }
+        .test-panel { margin-top: 20px; }
+        input, select { background: #252552; border: 1px solid #333; color: #fff; padding: 10px 15px; border-radius: 8px; width: 100%; margin: 5px 0; }
+        .result { background: #0d0d1a; padding: 15px; border-radius: 8px; margin-top: 15px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85em; }
+        .modules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .module { background: #252552; padding: 20px; border-radius: 12px; text-align: center; }
+        .module .icon { font-size: 2em; margin-bottom: 10px; }
+        .module h3 { color: #667eea; margin-bottom: 8px; }
+        .module p { color: #888; font-size: 0.85em; }
+        .module .count { font-size: 1.5em; color: #10b981; font-weight: bold; margin-top: 10px; }
+        .footer { text-align: center; padding: 30px; color: #555; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>绘梦 SoulWriter</h1>
+            <p class="subtitle">AI灵魂塑造器 - 小说创作革命性工具</p>
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="value" id="api-status">检测中...</div>
+                    <div class="label">API状态</div>
+                </div>
+                <div class="status-item">
+                    <div class="value" id="projects-count">-</div>
+                    <div class="label">项目数</div>
+                </div>
+                <div class="status-item">
+                    <div class="value" id="roles-count">-</div>
+                    <div class="label">角色数</div>
+                </div>
+                <div class="status-item">
+                    <div class="value" id="api-version">v1.0</div>
+                    <div class="label">版本</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="modules">
+            <div class="module">
+                <div class="icon">🎭</div>
+                <h3>女娲推演引擎</h3>
+                <p>角色量子纠缠，属性K线演化</p>
+                <div class="count" id="nvwa-status">-</div>
+            </div>
+            <div class="module">
+                <div class="icon">🌳</div>
+                <h3>创世树</h3>
+                <p>剧情分支，节点生成</p>
+                <div class="count" id="genesis-count">-</div>
+            </div>
+            <div class="module">
+                <div class="icon">📤</div>
+                <h3>导出功能</h3>
+                <p>TXT/JSON/Markdown</p>
+                <div class="count">3</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 API接口测试</h2>
+            <div class="api-list">
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <span class="endpoint">/health</span>
+                </div>
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <span class="endpoint">/api/v1/projects</span>
+                </div>
+                <div class="api-item">
+                    <span class="method post">POST</span>
+                    <span class="endpoint">/api/v1/projects</span>
+                </div>
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <span class="endpoint">/api/v1/nvwa/status</span>
+                </div>
+                <div class="api-item">
+                    <span class="method post">POST</span>
+                    <span class="endpoint">/api/v1/nvwa/simulate</span>
+                </div>
+                <div class="api-item">
+                    <span class="method get">GET</span>
+                    <span class="endpoint">/api/v1/genesis/seeds</span>
+                </div>
+            </div>
+
+            <div class="test-panel">
+                <h3 style="margin: 20px 0 10px; color: #888;">快速测试</h3>
+                <select id="api-select">
+                    <option value="health">GET /health</option>
+                    <option value="projects">GET /api/v1/projects</option>
+                    <option value="nvwa-status">GET /api/v1/nvwa/status</option>
+                    <option value="ai-config">GET /api/v1/ai/config</option>
+                    <option value="genesis-seeds">GET /api/v1/genesis/seeds</option>
+                </select>
+                <button class="btn" onclick="testAPI()">发送请求</button>
+                <button class="btn" onclick="loadDashboard()">刷新面板</button>
+                <div id="test-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 操作日志</h2>
+            <div id="log-container" class="log"></div>
+        </div>
+
+        <div class="section">
+            <h2>🚀 API文档</h2>
+            <div class="api-list">
+                <div class="api-item" style="flex-direction:column; align-items:flex-start;">
+                    <strong style="color:#667eea;">基础CRUD</strong>
+                    <span style="color:#888; font-size:0.8em; margin-top:5px;">Project/Role/Item/Location/Setting</span>
+                </div>
+                <div class="api-item" style="flex-direction:column; align-items:flex-start;">
+                    <strong style="color:#667eea;">女娲推演</strong>
+                    <span style="color:#888; font-size:0.8em; margin-top:5px;">characters/souls/world/logs/events/simulate</span>
+                </div>
+                <div class="api-item" style="flex-direction:column; align-items:flex-start;">
+                    <strong style="color:#667eea;">创世树</strong>
+                    <span style="color:#888; font-size:0.8em; margin-top:5px;">seeds/nodes/edges/tree</span>
+                </div>
+                <div class="api-item" style="flex-direction:column; align-items:flex-start;">
+                    <strong style="color:#667eea;">导出</strong>
+                    <span style="color:#888; font-size:0.8em; margin-top:5px;">txt/json/markdown</span>
+                </div>
+                <div class="api-item" style="flex-direction:column; align-items:flex-start;">
+                    <strong style="color:#667eea;">AI配置</strong>
+                    <span style="color:#888; font-size:0.8em; margin-top:5px;">config/run</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>绘梦 SoulWriter - 灵魂塑造器</p>
+            <p>服务地址: http://localhost:3000 | 开发时间: 2026-04-11</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        const logs = [];
+
+        function addLog(message, type = 'info') {
+            const time = new Date().toLocaleTimeString('zh-CN');
+            logs.unshift({ time, message, type });
+            if (logs.length > 50) logs.pop();
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('log-container');
+            container.innerHTML = logs.map(l => 
+                `<div class="log-entry ${l.type}">[${l.time}] ${l.message}</div>`
+            ).join('');
+        }
+
+        async function testAPI() {
+            const select = document.getElementById('api-select');
+            const endpoint = select.value;
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '请求中...';
+
+            try {
+                let url = API_BASE;
+                let method = 'GET';
+                let body = null;
+
+                switch(endpoint) {
+                    case 'health':
+                        url += '/health';
+                        break;
+                    case 'projects':
+                        url += '/api/v1/projects';
+                        break;
+                    case 'nvwa-status':
+                        url += '/api/v1/nvwa/status';
+                        break;
+                    case 'ai-config':
+                        url += '/api/v1/ai/config';
+                        break;
+                    case 'genesis-seeds':
+                        url += '/api/v1/genesis/seeds';
+                        break;
+                }
+
+                const options = { method, headers: { 'Content-Type': 'application/json' } };
+                if (body) options.body = JSON.stringify(body);
+
+                const res = await fetch(url, options);
+                const data = await res.json();
+                
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                addLog(`${method} ${endpoint} -> ${res.status}`, res.ok ? 'success' : 'error');
+            } catch(e) {
+                resultDiv.textContent = '错误: ' + e.message;
+                addLog(`${endpoint} 失败: ${e.message}`, 'error');
+            }
+        }
+
+        async function loadDashboard() {
+            // API状态
+            try {
+                const res = await fetch(API_BASE + '/health');
+                const data = await res.json();
+                document.getElementById('api-status').textContent = data.status === 'ok' ? '✅' : '❌';
+                document.getElementById('api-status').style.color = data.status === 'ok' ? '#10b981' : '#ef4444';
+                addLog('API连接成功', 'success');
+            } catch(e) {
+                document.getElementById('api-status').textContent = '❌';
+                document.getElementById('api-status').style.color = '#ef4444';
+                addLog('API连接失败: ' + e.message, 'error');
+                return;
+            }
+
+            // 项目数
+            try {
+                const res = await fetch(API_BASE + '/api/v1/projects');
+                const data = await res.json();
+                document.getElementById('projects-count').textContent = Array.isArray(data) ? data.length : '-';
+            } catch(e) {}
+
+            // Nvwa状态
+            try {
+                const res = await fetch(API_BASE + '/api/v1/nvwa/status');
+                const data = await res.json();
+                document.getElementById('nvwa-status').textContent = data.activeCharacters + '角色';
+            } catch(e) {
+                document.getElementById('nvwa-status').textContent = '-';
+            }
+
+            // Genesis
+            try {
+                const res = await fetch(API_BASE + '/api/v1/genesis/seeds');
+                const data = await res.json();
+                document.getElementById('genesis-count').textContent = Array.isArray(data) ? data.length : '-';
+            } catch(e) {
+                document.getElementById('genesis-count').textContent = '-';
+            }
+        }
+
+        // 初始化
+        loadDashboard();
+        setInterval(loadDashboard, 30000);
+        addLog('仪表盘已加载', 'info');
+    </script>
+</body>
+</html>

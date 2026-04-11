@@ -1,6 +1,6 @@
 # 绘梦API开发进度
 
-## 2026-04-11 12:06
+## 2026-04-11 16:42
 
 ### 进度总览
 - ✅ Phase 1: API基础设施 - 完成
@@ -9,27 +9,36 @@
 - ✅ Phase 4: 女娲推演引擎 - 完成
 - ✅ Phase 5: 创世树 - 完成
 - ✅ Phase 6: 导出功能 - 完成
-- ✅ Phase 7: Dashboard界面 - 完成 (12:04)
+- ✅ Phase 7: Dashboard界面 - 完成
+- ✅ Phase 8: 写作功能 - 完成 (16:40)
 
 ### 访问地址
-http://192.168.0.128:3000/ (集成Dashboard)
+- Dashboard: http://192.168.0.128:3000/dashboard/
+- API: http://192.168.0.128:3000/api/v1
+- GitHub: https://github.com/zzz123hash/soulwriter-api
 
-### 已实现端点 (60+个)
-- CRUD: Project/Role/Item/Location/Setting
-- AI: /ai/config, /ai/run
-- Genesis: /genesis/seeds, /genesis/nodes, /genesis/tree
-- Export: /export/{txt,json,md}
-- Nvwa: /nvwa/status, /nvwa/simulate, /nvwa/characters
+### 新增功能 (Phase 8)
+- 章节CRUD API
+- 场景CRUD API
+- 写作界面（左侧场景列表 + 右侧编辑器）
+- 张力滑块 (0-100)
+- 情感选择 (neutral/happy/sad/tense/angry/romantic)
+- 实时字数统计
+- 场景类型 (scene/chapter_start/chapter_end/transition)
 
 ### Git提交
-3dbb91d feat: 集成Dashboard到API服务
-b3b91b6 feat: 前端Dashboard
-9ca500c feat: 导出模块
-cbce1ca feat: 创世树GenesisTree模块
-2c8b175 feat: 女娲推演引擎Nvwa框架
+43754b7 feat: 写作功能 + Dashboard完善
+f01fd0d style: Modal样式和卡片布局
+efbb53c feat: 集成组件的app.js
+069cc47 feat: Dashboard组件开发
+0d650cb feat: Dashboard基础结构
+ee67c4d feat: 添加核心模块
 
-### 运行
-npm start (端口3000) - 服务正常
+### 服务状态
+✅ 运行正常 (端口3000)
 
 ### 待解决
 - AI API Key配置
+- 3D关系图谱界面
+- 创世树界面
+- 女娲推演界面

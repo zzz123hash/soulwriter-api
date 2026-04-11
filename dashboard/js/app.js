@@ -400,14 +400,15 @@ function renderBooksList() {
 // ============ 模态框 ============
 
 function showCreateBookModal() {
+  logger.info('打开创建书本对话框');
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header"><h3>${t('book.create')}</h3><button class="modal-close">×</button></div>
-      <form class="modal-body">
-        <div class="form-group"><label>${t('book.title')}</label><input type="text" name="name" class="input" required></div>
-        <div class="form-group"><label>${t('book.description')}</label><textarea name="description" class="input" rows="3"></textarea></div>
+      <form class="modal-body" id="create-book-form">
+        <div class="form-group"><label>${t('book.title')}</label><input type="text" name="name" class="input" required placeholder="输入书名"></div>
+        <div class="form-group"><label>${t('book.description')}</label><textarea name="description" class="input" rows="3" placeholder="简要描述这本书"></textarea></div>
         <div class="form-actions">
           <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
           <button type="submit" class="btn btn-primary">${t('common.create')}</button>
@@ -416,14 +417,51 @@ function showCreateBookModal() {
     </div>
   `;
   document.body.appendChild(modal);
-  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
-  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-  modal.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const result = await api('/projects', { method: 'POST', body: JSON.stringify({ name: e.target.name.value, description: e.target.description.value }) });
+  
+  const closeModal = () => {
+    logger.debug('关闭对话框');
     modal.remove();
-    if (result.id) { state.currentBook = result; state.currentView = 'roles'; renderApp(); }
+  };
+  
+  modal.querySelector('[data-action="cancel"]').addEventListener('click', closeModal);
+  modal.querySelector('.modal-close').addEventListener('click', closeModal);
+  modal.querySelector('#create-book-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const name = formData.get('name');
+    const description = formData.get('description') || '';
+    
+    logger.info('创建书本', { name, description });
+    
+    try {
+      const result = await api('/projects', { 
+        method: 'POST', 
+        body: JSON.stringify({ name, description }) 
+      });
+      
+      logger.debug('API响应', { result });
+      
+      closeModal();
+      
+      if (result && result.id) {
+        logger.success('书本创建成功', { id: result.id, name: result.name });
+        state.currentBook = result;
+        state.currentView = 'roles';
+        renderApp();
+      } else {
+        logger.error('创建失败：无效响应', { result });
+        alert('创建失败：' + (result.error || '未知错误'));
+      }
+    } catch (err) {
+      logger.error('创建书本异常', { error: err.message });
+      alert('创建失败：' + err.message);
+    }
   });
+  
+  // 自动聚焦到输入框
+  setTimeout(() => {
+    modal.querySelector('input[name="name"]')?.focus();
+  }, 100);
 }
 
 function showCreateRoleModal() {

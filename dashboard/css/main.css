@@ -1,201 +1,448 @@
-/* === CSS Variables === */
+/* ============ 基础样式 ============ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
   --bg-primary: #0a0a0f;
   --bg-secondary: #13131a;
   --bg-tertiary: #1a1a24;
-  --text-primary: #f0f0f5;
-  --text-secondary: #8b8b9a;
-  --text-muted: #5a5a6a;
+  --text-primary: #e0e0e0;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
   --accent-blue: #3b82f6;
-  --accent-purple: #a855f7;
+  --accent-purple: #8b5cf6;
   --accent-green: #22c55e;
-  --accent-orange: #f59e0b;
-  --border-color: rgba(255,255,255,0.1);
-  --shadow: 0 4px 20px rgba(0,0,0,0.5);
-  --radius: 8px;
-  --sidebar-width: 220px;
-}
-
-/* === Reset === */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  --border-color: #2a2a3a;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
-/* === Layout === */
-#app {
+/* ============ 欢迎页面 ============ */
+.welcome-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.welcome-header {
+  margin-bottom: 60px;
+}
+
+.welcome-title {
+  font-size: 3em;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.welcome-subtitle {
+  font-size: 1.5em;
+  color: var(--text-secondary);
+}
+
+.welcome-books {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.book-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.book-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.book-card .book-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.book-card .book-meta {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  margin-bottom: 12px;
+}
+
+.book-card .book-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.welcome-actions {
+  margin-top: 20px;
+}
+
+/* ============ 主布局 ============ */
+.main-layout {
   display: flex;
   height: 100vh;
 }
 
 .sidebar {
-  width: var(--sidebar-width);
+  width: 260px;
   background: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
-  padding: 16px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header .book-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+.nav-section {
+  margin-bottom: 16px;
+}
+
+.nav-item {
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.nav-item.active {
+  background: var(--accent-blue);
+  color: white;
 }
 
 .main-content {
   flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* ============ 内容区 ============ */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.content-header h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+/* ============ 按钮 ============ */
+.btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 1.1em;
+}
+
+.btn-sm {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.btn-danger {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.btn-danger:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* ============ 卡片 ============ */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1em;
+}
+
+.card-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent-blue);
+  color: white;
+}
+
+.card-body {
+  color: var(--text-secondary);
+}
+
+.card-desc {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* ============ 角色卡片 ============ */
+.soul-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.soul-tag {
+  font-size: 11px;
+  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  color: var(--accent-purple);
+}
+
+/* ============ 物品卡片 ============ */
+.item-card .card-type {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+/* ============ 章节列表 ============ */
+.chapters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chapter-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chapter-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chapter-title {
+  font-weight: 600;
+}
+
+.chapter-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.chapter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ============ 写作界面 ============ */
+.writing-container {
+  display: flex;
+  height: calc(100vh - 100px);
+  gap: 16px;
+}
+
+.writing-sidebar {
+  width: 280px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scenes-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.scene-item {
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.scene-item:hover {
+  background: var(--accent-blue);
+}
+
+.scene-item.active {
+  background: var(--accent-purple);
+}
+
+.scene-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.scene-meta {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.writing-main {
+  flex: 1;
+  background: var(--bg-secondary);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.top-bar {
-  height: 56px;
-  background: var(--bg-secondary);
+.writing-header {
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
-  gap: 20px;
 }
 
-.logo {
-  font-size: 18px;
+.scene-title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 1.2em;
   font-weight: 600;
   color: var(--text-primary);
+  padding: 8px;
 }
 
-.tab-bar {
-  display: flex;
-  gap: 8px;
-}
-
-.tab {
-  padding: 6px 16px;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.tab:hover {
+.scene-title-input:focus {
+  outline: none;
   background: var(--bg-tertiary);
-  color: var(--text-primary);
+  border-radius: 8px;
 }
 
-.tab.active {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
-  color: white;
+.writing-stats {
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
-.content {
+.writing-stats strong {
+  color: var(--accent-blue);
+}
+
+.writing-editor {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
+  background: var(--bg-primary);
+  border: none;
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.8;
+  resize: none;
+  font-family: inherit;
 }
 
-/* === Sidebar === */
-.sidebar-section {
-  margin-bottom: 20px;
+.writing-editor:focus {
+  outline: none;
 }
 
-.sidebar-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-  padding-left: 8px;
+.writing-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
 }
 
-.sidebar-item {
+.writing-tools {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: var(--radius);
+  gap: 12px;
   color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
 }
 
-.sidebar-item:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
+.writing-tools input[type="range"] {
+  width: 120px;
 }
 
-.sidebar-item.active {
-  background: var(--accent-blue);
-  color: white;
-}
-
-/* === Cards === */
-.card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.card-meta {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-/* === Buttons === */
-.btn {
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background: var(--accent-blue);
-  color: white;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-}
-
-/* === Form === */
-.input {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--accent-blue);
-}
-
-/* === Modal === */
+/* ============ 模态框 ============ */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -256,6 +503,26 @@ body {
   margin-bottom: 6px;
 }
 
+.form-group .input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.form-group .input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.form-group textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
 .form-actions {
   display: flex;
   gap: 12px;
@@ -263,83 +530,40 @@ body {
   margin-top: 20px;
 }
 
-/* === Cards Grid === */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+/* ============ 空状态 ============ */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  grid-column: 1 / -1;
 }
 
-.card-header {
+/* ============ 输入框 ============ */
+.input {
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+/* ============ 加载中 ============ */
+.loading {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  justify-content: center;
+  height: 100vh;
+  color: var(--text-muted);
 }
 
-.card-badge {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: var(--accent-blue);
-  color: white;
-}
-
+/* ============ 图标 ============ */
 .card-icon {
   font-size: 20px;
   margin-right: 8px;
-}
-
-.card-desc {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.card-soul {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.soul-label {
-  color: var(--accent-purple);
-}
-
-.card-type {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.card-footer {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-color);
-}
-
-.card-footer .btn {
-  flex: 1;
-  padding: 6px;
-  font-size: 12px;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-}
-
-.card-footer .btn:hover {
-  background: var(--accent-blue);
-  color: white;
-}
-
-.content-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.content-header h2 {
-  font-size: 20px;
-  font-weight: 600;
 }

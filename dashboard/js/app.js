@@ -49,7 +49,6 @@ function renderSidebar() {
     </div>
   `;
   
-  // 绑定事件
   sidebar.querySelectorAll('[data-view]').forEach(el => {
     el.addEventListener('click', () => {
       state.currentView = el.dataset.view;
@@ -62,35 +61,19 @@ function renderSidebar() {
 // === 内容区渲染 ===
 async function renderContent() {
   const content = document.getElementById('content');
-  
   switch (state.currentView) {
-    case 'roles':
-      await renderRoles(content);
-      break;
-    case 'items':
-      await renderItems(content);
-      break;
-    case 'locations':
-      await renderLocations(content);
-      break;
-    case 'relationships':
-      await renderRelationships(content);
-      break;
-    case 'genesis':
-      await renderGenesis(content);
-      break;
-    case 'nvwa':
-      await renderNvwa(content);
-      break;
-    case 'export':
-      await renderExport(content);
-      break;
-    default:
-      content.innerHTML = '<div class="card"><p>功能开发中...</p></div>';
+    case 'roles': await renderRoles(content); break;
+    case 'items': await renderItems(content); break;
+    case 'locations': await renderLocations(content); break;
+    case 'relationships': await renderRelationships(content); break;
+    case 'genesis': await renderGenesis(content); break;
+    case 'nvwa': await renderNvwa(content); break;
+    case 'export': await renderExport(content); break;
+    default: content.innerHTML = '<div class="card"><p>功能开发中...</p></div>';
   }
 }
 
-// === 角色列表 ===
+// === 角色管理 ===
 async function renderRoles(container) {
   container.innerHTML = `
     <div class="content-header">
@@ -99,15 +82,10 @@ async function renderRoles(container) {
     </div>
     <div id="roles-list" class="cards-grid"></div>
   `;
-  
-  document.getElementById('add-role-btn').addEventListener('click', () => {
-    showRoleEditor();
-  });
-  
+  document.getElementById('add-role-btn').addEventListener('click', () => showRoleEditor());
   await loadRoles();
 }
 
-// === 加载角色 ===
 async function loadRoles() {
   const res = await api('/roles');
   state.roles = res.data || [];
@@ -117,21 +95,28 @@ async function loadRoles() {
 function renderRolesList() {
   const list = document.getElementById('roles-list');
   if (!list) return;
-  
   if (state.roles.length === 0) {
-    list.innerHTML = '<div class="card"><p>暂无角色，创建一个吧</p></div>';
+    list.innerHTML = '<div class="card"><p>暂无角色，创建第一个吧</p></div>';
     return;
   }
-  
-  list.innerHTML = state.roles.map(role => `
-    <div class="card role-card" data-id="${role.id}">
-      <div class="card-title">${role.name}</div>
-      <div class="card-meta">${role.description || '暂无描述'}</div>
-    </div>
-  `).join('');
+  list.innerHTML = state.roles.map(role => {
+    const soulPreview = role.soulMatrix 
+      ? Object.entries(role.soulMatrix).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(', ')
+      : '暂无灵魂设定';
+    return `
+      <div class="card role-card" data-id="${role.id}">
+        <div class="card-header">
+          <span class="card-title">${role.name}</span>
+          <span class="card-badge">${role.type || '角色'}</span>
+        </div>
+        <p class="card-desc">${role.description || '暂无描述'}</p>
+        <div class="card-soul"><span class="soul-label">灵魂:</span> ${soulPreview}</div>
+      </div>
+    `;
+  }).join('');
 }
 
-// === 物品列表 ===
+// === 物品管理 ===
 async function renderItems(container) {
   container.innerHTML = `
     <div class="content-header">
@@ -140,11 +125,7 @@ async function renderItems(container) {
     </div>
     <div id="items-list" class="cards-grid"></div>
   `;
-  
-  document.getElementById('add-item-btn').addEventListener('click', () => {
-    showItemEditor();
-  });
-  
+  document.getElementById('add-item-btn').addEventListener('click', () => showItemEditor());
   await loadItems();
 }
 
@@ -154,24 +135,31 @@ async function loadItems() {
   renderItemsList();
 }
 
+const RARITY_COLORS = { common: '#9ca3af', uncommon: '#22c55e', rare: '#3b82f6', epic: '#a855f7', legendary: '#f59e0b' };
+
 function renderItemsList() {
   const list = document.getElementById('items-list');
   if (!list) return;
-  
   if (state.items.length === 0) {
     list.innerHTML = '<div class="card"><p>暂无物品</p></div>';
     return;
   }
-  
-  list.innerHTML = state.items.map(item => `
-    <div class="card item-card" data-id="${item.id}">
-      <div class="card-title">${item.name}</div>
-      <div class="card-meta">类型: ${item.type}</div>
-    </div>
-  `).join('');
+  list.innerHTML = state.items.map(item => {
+    const color = RARITY_COLORS[item.rarity] || RARITY_COLORS.common;
+    return `
+      <div class="card item-card" data-id="${item.id}">
+        <div class="card-header">
+          <span class="card-title">${item.name}</span>
+          <span class="card-badge" style="background: ${color}">${item.rarity || 'common'}</span>
+        </div>
+        <p class="card-type">类型: ${item.type || 'misc'}</p>
+        <p class="card-desc">${item.description || '暂无描述'}</p>
+      </div>
+    `;
+  }).join('');
 }
 
-// === 地点列表 ===
+// === 地点管理 ===
 async function renderLocations(container) {
   container.innerHTML = `
     <div class="content-header">
@@ -180,11 +168,7 @@ async function renderLocations(container) {
     </div>
     <div id="locations-list" class="cards-grid"></div>
   `;
-  
-  document.getElementById('add-location-btn').addEventListener('click', () => {
-    showLocationEditor();
-  });
-  
+  document.getElementById('add-location-btn').addEventListener('click', () => showLocationEditor());
   await loadLocations();
 }
 
@@ -194,79 +178,161 @@ async function loadLocations() {
   renderLocationsList();
 }
 
+const TYPE_ICONS = {
+  city: '🏛️', town: '🏘️', village: '🏠', dungeon: '⚔️',
+  building: '🏗️', room: '🚪', wilderness: '🌲', mountain: '⛰️',
+  forest: '🌳', water: '🌊', generic: '📍'
+};
+
 function renderLocationsList() {
   const list = document.getElementById('locations-list');
   if (!list) return;
-  
   if (state.locations.length === 0) {
     list.innerHTML = '<div class="card"><p>暂无地点</p></div>';
     return;
   }
-  
-  list.innerHTML = state.locations.map(loc => `
-    <div class="card location-card" data-id="${loc.id}">
-      <div class="card-title">${loc.name}</div>
-      <div class="card-meta">类型: ${loc.type}</div>
-    </div>
-  `).join('');
+  list.innerHTML = state.locations.map(loc => {
+    const icon = TYPE_ICONS[loc.type] || TYPE_ICONS.generic;
+    return `
+      <div class="card location-card" data-id="${loc.id}">
+        <div class="card-header">
+          <span class="card-icon">${icon}</span>
+          <span class="card-title">${loc.name}</span>
+        </div>
+        <p class="card-type">类型: ${loc.type || 'generic'}</p>
+        <p class="card-desc">${loc.description || '暂无描述'}</p>
+      </div>
+    `;
+  }).join('');
 }
 
-// === 关系图谱 ===
-async function renderRelationships(container) {
-  container.innerHTML = `
-    <div class="content-header">
-      <h2>关系图谱</h2>
-    </div>
-    <div class="card">
-      <p>3D关系图谱开发中...</p>
-      <p>将显示角色、物品、地点之间的关系</p>
+// === 占位视图 ===
+async function renderRelationships(c) { c.innerHTML = '<div class="card"><h3>关系图谱</h3><p>3D关系图谱开发中...</p></div>'; }
+async function renderGenesis(c) { c.innerHTML = '<div class="card"><h3>创世树</h3><p>创世树开发中...</p></div>'; }
+async function renderNvwa(c) { c.innerHTML = '<div class="card"><h3>女娲推演</h3><p>女娲推演引擎开发中...</p></div>'; }
+async function renderExport(c) { c.innerHTML = '<div class="card"><h3>导出</h3><p>导出功能开发中...</p></div>'; }
+
+// === 编辑器模态框 ===
+function showRoleEditor(role = null) {
+  const isEdit = !!role;
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header"><h3>${isEdit ? '编辑角色' : '新建角色'}</h3><button class="modal-close">×</button></div>
+      <form class="modal-body">
+        <div class="form-group"><label>名称</label><input type="text" name="name" class="input" value="${role?.name || ''}" required></div>
+        <div class="form-group"><label>类型</label>
+          <select name="type" class="input">
+            <option value="protagonist">主角</option><option value="supporting">配角</option>
+            <option value="antagonist">反派</option><option value="minor">龙套</option>
+          </select>
+        </div>
+        <div class="form-group"><label>描述</label><textarea name="description" class="input" rows="2">${role?.description || ''}</textarea></div>
+        <div class="form-actions">
+          <button type="button" class="btn" data-action="cancel">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
     </div>
   `;
+  document.body.appendChild(modal);
+  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = { name: e.target.name.value, type: e.target.type.value, description: e.target.description.value };
+    if (isEdit) { await api('/roles/' + role.id, { method: 'PUT', body: JSON.stringify(data) }); }
+    else { await api('/roles', { method: 'POST', body: JSON.stringify(data) }); }
+    modal.remove();
+    await loadRoles();
+  });
 }
 
-// === 创世树 ===
-async function renderGenesis(container) {
-  container.innerHTML = `
-    <div class="content-header">
-      <h2>创世树</h2>
-      <button class="btn btn-primary">+ 新建节点</button>
-    </div>
-    <div class="card">
-      <p>创世树开发中...</p>
+function showItemEditor(item = null) {
+  const isEdit = !!item;
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header"><h3>${isEdit ? '编辑物品' : '新建物品'}</h3><button class="modal-close">×</button></div>
+      <form class="modal-body">
+        <div class="form-group"><label>名称</label><input type="text" name="name" class="input" value="${item?.name || ''}" required></div>
+        <div class="form-group"><label>类型</label>
+          <select name="type" class="input">
+            <option value="weapon">武器</option><option value="armor">防具</option>
+            <option value="potion">药水</option><option value="accessory">饰品</option>
+            <option value="material">材料</option><option value="key_item">关键物品</option>
+            <option value="misc">杂物</option>
+          </select>
+        </div>
+        <div class="form-group"><label>稀有度</label>
+          <select name="rarity" class="input">
+            <option value="common">普通</option><option value="uncommon">优秀</option>
+            <option value="rare">稀有</option><option value="epic">史诗</option>
+            <option value="legendary">传说</option>
+          </select>
+        </div>
+        <div class="form-group"><label>描述</label><textarea name="description" class="input" rows="2">${item?.description || ''}</textarea></div>
+        <div class="form-actions">
+          <button type="button" class="btn" data-action="cancel">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
     </div>
   `;
+  document.body.appendChild(modal);
+  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = { name: e.target.name.value, type: e.target.type.value, rarity: e.target.rarity.value, description: e.target.description.value };
+    if (isEdit) { await api('/items/' + item.id, { method: 'PUT', body: JSON.stringify(data) }); }
+    else { await api('/items', { method: 'POST', body: JSON.stringify(data) }); }
+    modal.remove();
+    await loadItems();
+  });
 }
 
-// === 女娲推演 ===
-async function renderNvwa(container) {
-  container.innerHTML = `
-    <div class="content-header">
-      <h2>女娲推演</h2>
-    </div>
-    <div class="card">
-      <p>女娲推演引擎开发中...</p>
-      <p>支持角色行为预测、剧情演变</p>
+function showLocationEditor(location = null) {
+  const isEdit = !!location;
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header"><h3>${isEdit ? '编辑地点' : '新建地点'}</h3><button class="modal-close">×</button></div>
+      <form class="modal-body">
+        <div class="form-group"><label>名称</label><input type="text" name="name" class="input" value="${location?.name || ''}" required></div>
+        <div class="form-group"><label>类型</label>
+          <select name="type" class="input">
+            <option value="city">🏛️ 城市</option><option value="town">🏘️ 城镇</option>
+            <option value="village">🏠 村庄</option><option value="dungeon">⚔️ 地下城</option>
+            <option value="building">🏗️ 建筑</option><option value="room">🚪 房间</option>
+            <option value="wilderness">🌲 荒野</option><option value="mountain">⛰️ 山脉</option>
+            <option value="forest">🌳 森林</option><option value="water">🌊 水域</option>
+            <option value="generic">📍 其他</option>
+          </select>
+        </div>
+        <div class="form-group"><label>描述</label><textarea name="description" class="input" rows="2">${location?.description || ''}</textarea></div>
+        <div class="form-actions">
+          <button type="button" class="btn" data-action="cancel">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
     </div>
   `;
+  document.body.appendChild(modal);
+  modal.querySelector('[data-action="cancel"]').addEventListener('click', () => modal.remove());
+  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+  modal.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = { name: e.target.name.value, type: e.target.type.value, description: e.target.description.value };
+    if (isEdit) { await api('/locations/' + location.id, { method: 'PUT', body: JSON.stringify(data) }); }
+    else { await api('/locations', { method: 'POST', body: JSON.stringify(data) }); }
+    modal.remove();
+    await loadLocations();
+  });
 }
-
-// === 导出 ===
-async function renderExport(container) {
-  container.innerHTML = `
-    <div class="content-header">
-      <h2>导出</h2>
-    </div>
-    <div class="card">
-      <p>导出功能开发中...</p>
-      <p>支持TXT、JSON、Markdown、脚本格式</p>
-    </div>
-  `;
-}
-
-// === 占位函数 ===
-function showRoleEditor() { alert('角色编辑器开发中...'); }
-function showItemEditor() { alert('物品编辑器开发中...'); }
-function showLocationEditor() { alert('地点编辑器开发中...'); }
 
 // === 初始化 ===
 async function init() {
@@ -276,4 +342,3 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
-export { state, api };

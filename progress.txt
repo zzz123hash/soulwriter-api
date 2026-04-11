@@ -1,6 +1,6 @@
 # 绘梦API开发进度
 
-## 2026-04-11 11:04
+## 2026-04-11 12:06
 
 ### 进度总览
 - ✅ Phase 1: API基础设施 - 完成
@@ -9,15 +9,21 @@
 - ✅ Phase 4: 女娲推演引擎 - 完成
 - ✅ Phase 5: 创世树 - 完成
 - ✅ Phase 6: 导出功能 - 完成
+- ✅ Phase 7: Dashboard界面 - 完成 (12:04)
 
-### 已实现端点 (50+个)
-- 基础CRUD: Project/Role/Item/Location/Setting
-- 女娲推演: nvwa/* (characters/souls/world/logs/events/simulate)
-- 创世树: genesis/* (seeds/nodes/edges/tree)
-- 导出: export/project/:id/{txt,json,md}
-- AI: ai/config/ai/run
+### 访问地址
+http://192.168.0.128:3000/ (集成Dashboard)
+
+### 已实现端点 (60+个)
+- CRUD: Project/Role/Item/Location/Setting
+- AI: /ai/config, /ai/run
+- Genesis: /genesis/seeds, /genesis/nodes, /genesis/tree
+- Export: /export/{txt,json,md}
+- Nvwa: /nvwa/status, /nvwa/simulate, /nvwa/characters
 
 ### Git提交
+3dbb91d feat: 集成Dashboard到API服务
+b3b91b6 feat: 前端Dashboard
 9ca500c feat: 导出模块
 cbce1ca feat: 创世树GenesisTree模块
 2c8b175 feat: 女娲推演引擎Nvwa框架
@@ -25,5 +31,5 @@ cbce1ca feat: 创世树GenesisTree模块
 ### 运行
 npm start (端口3000) - 服务正常
 
-### API基础开发阶段完成 ✅
-- 下一步：前端界面 / AI配置
+### 待解决
+- AI API Key配置

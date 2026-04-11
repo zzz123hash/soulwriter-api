@@ -1,6 +1,7 @@
 const fastify = require('fastify')({ logger: true });
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 
 const db = new Database(path.join(__dirname, '..', 'data.db'));
@@ -273,10 +274,111 @@ fastify.post('/api/v1/genesis/edges', (req) => {
 });
 fastify.get('/api/v1/genesis/seeds/:id/tree', (req) => buildTree(db, req.params.id));
 
+
+// API根路由
+fastify.get('/api/v1', () => ({ name: 'SoulWriter API', version: '1.0.0' }));
+
+// ============ 章节/场景管理 ============
+db.exec("CREATE TABLE IF NOT EXISTS chapters (id TEXT PRIMARY KEY, projectId TEXT NOT NULL, title TEXT NOT NULL, orderIndex INTEGER DEFAULT 0, status TEXT DEFAULT 'draft', createdAt TEXT DEFAULT CURRENT_TIMESTAMP, updatedAt TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE)");
+
+db.exec("CREATE TABLE IF NOT EXISTS scenes (id TEXT PRIMARY KEY, projectId TEXT NOT NULL, chapterId TEXT, title TEXT NOT NULL, content TEXT DEFAULT '', sceneType TEXT DEFAULT 'scene', tension INTEGER DEFAULT 50, emotion TEXT DEFAULT 'neutral', summary TEXT DEFAULT '', wordCount INTEGER DEFAULT 0, status TEXT DEFAULT 'draft', createdAt TEXT DEFAULT CURRENT_TIMESTAMP, updatedAt TEXT DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (projectId) REFERENCES projects(id) ON DELETE CASCADE)");
+
+// 章节路由
+fastify.get('/api/v1/projects/:projectId/chapters', (req) => {
+  return db.prepare('SELECT * FROM chapters WHERE projectId = ? ORDER BY orderIndex').all(req.params.projectId);
+});
+
+fastify.post('/api/v1/chapters', async (req) => {
+  const { projectId, title, orderIndex } = req.body;
+  const id = crypto.randomUUID();
+  db.prepare('INSERT INTO chapters (id, projectId, title, orderIndex) VALUES (?, ?, ?, ?)').run(id, projectId, title, orderIndex || 0);
+  return { id, projectId, title, orderIndex: orderIndex || 0 };
+});
+
+fastify.put('/api/v1/chapters/:id', (req) => {
+  const { title, orderIndex, status } = req.body;
+  const existing = db.prepare('SELECT * FROM chapters WHERE id = ?').get(req.params.id);
+  if (!existing) return { error: 'Not found' };
+  db.prepare('UPDATE chapters SET title = ?, orderIndex = ?, status = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?').run(title || existing.title, orderIndex ?? existing.orderIndex, status || existing.status, req.params.id);
+  return db.prepare('SELECT * FROM chapters WHERE id = ?').get(req.params.id);
+});
+
+fastify.delete('/api/v1/chapters/:id', (req) => {
+  db.prepare('DELETE FROM chapters WHERE id = ?').run(req.params.id);
+  return { success: true };
+});
+
+// 场景路由
+fastify.get('/api/v1/projects/:projectId/scenes', (req) => {
+  return db.prepare('SELECT * FROM scenes WHERE projectId = ? ORDER BY chapterId, createdAt').all(req.params.projectId);
+});
+
+fastify.get('/api/v1/chapters/:chapterId/scenes', (req) => {
+  return db.prepare('SELECT * FROM scenes WHERE chapterId = ? ORDER BY createdAt').all(req.params.chapterId);
+});
+
+fastify.post('/api/v1/scenes', async (req) => {
+  const { projectId, chapterId, title, content, sceneType, tension, emotion } = req.body;
+  const id = crypto.randomUUID();
+  const wordCount = (content || '').length;
+  db.prepare('INSERT INTO scenes (id, projectId, chapterId, title, content, sceneType, tension, emotion, wordCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(id, projectId, chapterId, title, content || '', sceneType || 'scene', tension || 50, emotion || 'neutral', wordCount);
+  return { id, projectId, chapterId, title, wordCount };
+});
+
+fastify.put('/api/v1/scenes/:id', (req) => {
+  const { title, content, sceneType, tension, emotion, status } = req.body;
+  const existing = db.prepare('SELECT * FROM scenes WHERE id = ?').get(req.params.id);
+  if (!existing) return { error: 'Not found' };
+  const wordCount = content !== undefined ? content.length : existing.wordCount;
+  db.prepare('UPDATE scenes SET title = ?, content = ?, sceneType = ?, tension = ?, emotion = ?, status = ?, wordCount = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?').run(title || existing.title, content !== undefined ? content : existing.content, sceneType || existing.sceneType, tension ?? existing.tension, emotion || existing.emotion, status || existing.status, wordCount, req.params.id);
+  return db.prepare('SELECT * FROM scenes WHERE id = ?').get(req.params.id);
+});
+
+fastify.delete('/api/v1/scenes/:id', (req) => {
+  db.prepare('DELETE FROM scenes WHERE id = ?').run(req.params.id);
+  return { success: true };
+});
+
+
+
+// Dashboard静态文件
+const _mimeTypes = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css',
+  '.js': 'application/javascript',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml'
+};
+
+fastify.get('/dashboard/', (req, reply) => {
+  reply.header('Content-Type', 'text/html; charset=utf-8');
+  reply.send(fs.createReadStream(path.join(__dirname, '..', 'dashboard', 'index.html')));
+});
+
+fastify.get('/dashboard/*', (req, reply) => {
+  const filepath = req.params['*'];
+  const filePath = path.join(__dirname, '..', 'dashboard', filepath);
+  
+  if (!filePath.startsWith(path.join(__dirname, '..', 'dashboard'))) {
+    return reply.code(403).send('Forbidden');
+  }
+  
+  if (fs.existsSync(filePath)) {
+    const ext = path.extname(filepath);
+    const contentType = _mimeTypes[ext] || 'application/octet-stream';
+    reply.header('Content-Type', contentType);
+    reply.send(fs.createReadStream(filePath));
+  } else {
+    reply.code(404).send('Not Found: ' + filepath);
+  }
+});
 // ============ Start ============
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000 });
+    await fastify.listen({ port: 3000, host: '0.0.0.0' });
     console.log('Server running at http://localhost:3000');
   } catch (err) {
     fastify.log.error(err);

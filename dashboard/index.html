@@ -2,7 +2,7 @@
 <html lang=zh-CN>
 <head>
   <meta charset=UTF-8>
-  <meta name=viewport content=width=device-width, initial-scale=1.0>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>绘梦 SoulWriter</title>
   <link rel="stylesheet" href="/dashboard/css/main.css">
 </head>
@@ -10,7 +10,29 @@
   <div id="app">
     <div class="loading">加载中...</div>
   </div>
-  <script src="/dashboard/js/i18n.js"></script>
+  
+  <!-- 右上角语言切换 -->
+  <div class="lang-switcher" id="lang-switcher">
+    <select id="lang-select" class="lang-select">
+      <option value="zh-CN" selected>🇨🇳 中文</option>
+      <option value="en-US">🇺🇸 English</option>
+    </select>
+  </div>
+  
   <script src="/dashboard/js/app.js"></script>
+  <script>
+    // 语言切换功能
+    document.getElementById('lang-select')?.addEventListener('change', function() {
+      const lang = this.value;
+      localStorage.setItem('soulwriter-lang', lang);
+      // 刷新页面应用新语言
+      window.location.reload();
+    });
+    
+    // 恢复语言设置
+    const savedLang = localStorage.getItem('soulwriter-lang') || 'zh-CN';
+    const langSelect = document.getElementById('lang-select');
+    if (langSelect) langSelect.value = savedLang;
+  </script>
 </body>
 </html>

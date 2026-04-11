@@ -1,14 +1,59 @@
 /**
  * 绘梦 SoulWriter - 主应用
- * 从"创建书本"开始的完整流程
+ * 支持中英文切换
  */
 
 const API_BASE = 'http://localhost:3000/api/v1';
 
+// 语言配置
+const i18n = {
+  'zh-CN': {
+    app: { name: '绘梦', subtitle: '灵魂作家' },
+    nav: { roles: '角色', items: '物品', locations: '地点', chapters: '章节', writing: '写作', genesis: '创世树', nvwa: '女娲推演', relationships: '关系图谱', settings: '设置' },
+    book: { create: '创建书本', noBooks: '暂无书本，创建一个开始吧', title: '书名', description: '简介', deleteConfirm: '确定删除这本书？' },
+    role: { create: '创建角色', noRoles: '暂无角色，创建一个吧', name: '姓名', type: '类型', description: '描述', types: { human: '人类', cyborg: '机械人', creature: '异兽', ai: 'AI' } },
+    item: { create: '创建物品', noItems: '暂无物品', name: '名称', type: '类型', rarity: '稀有度', description: '描述', types: { weapon: '武器', armor: '防具', potion: '药水', accessory: '饰品', material: '材料', keyItem: '关键物品', misc: '杂物' }, rarities: { common: '普通', uncommon: '优秀', rare: '稀有', epic: '史诗', legendary: '传说' } },
+    location: { create: '创建地点', noLocations: '暂无地点', name: '名称', type: '类型', description: '描述', types: { city: '城市', town: '城镇', village: '村庄', indoor: '室内', wilderness: '荒野', forest: '森林', mountain: '山脉', water: '水域' } },
+    chapter: { create: '创建章节', noChapters: '暂无章节，创建一个开始写作吧', title: '标题', statuses: { draft: '草稿', writing: '写作中', review: '审核中', published: '已发布' } },
+    scene: { create: '创建场景', title: '场景标题', tension: '张力', emotion: '情感', wordCount: '字数', types: { scene: '场景', chapterStart: '章节开头', chapterEnd: '章节结尾', transition: '过渡' }, emotions: { neutral: '平静', happy: '开心', sad: '悲伤', tense: '紧张', angry: '愤怒', romantic: '浪漫' } },
+    writing: { placeholder: '开始写作...', save: '保存', saved: '已保存' },
+    common: { back: '返回', loading: '加载中...', create: '创建', cancel: '取消', delete: '删除', save: '保存', edit: '编辑' }
+  },
+  'en-US': {
+    app: { name: 'SoulWriter', subtitle: 'Story Crafting Tool' },
+    nav: { roles: 'Roles', items: 'Items', locations: 'Locations', chapters: 'Chapters', writing: 'Writing', genesis: 'Genesis Tree', nvwa: 'Nvwa Engine', relationships: 'Relationships', settings: 'Settings' },
+    book: { create: 'Create Book', noBooks: 'No books yet. Create one to start!', title: 'Title', description: 'Description', deleteConfirm: 'Delete this book?' },
+    role: { create: 'Create Role', noRoles: 'No roles yet. Create one!', name: 'Name', type: 'Type', description: 'Description', types: { human: 'Human', cyborg: 'Cyborg', creature: 'Creature', ai: 'AI' } },
+    item: { create: 'Create Item', noItems: 'No items yet', name: 'Name', type: 'Type', rarity: 'Rarity', description: 'Description', types: { weapon: 'Weapon', armor: 'Armor', potion: 'Potion', accessory: 'Accessory', material: 'Material', keyItem: 'Key Item', misc: 'Misc' }, rarities: { common: 'Common', uncommon: 'Uncommon', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' } },
+    location: { create: 'Create Location', noLocations: 'No locations yet', name: 'Name', type: 'Type', description: 'Description', types: { city: 'City', town: 'Town', village: 'Village', indoor: 'Indoor', wilderness: 'Wilderness', forest: 'Forest', mountain: 'Mountain', water: 'Water' } },
+    chapter: { create: 'Create Chapter', noChapters: 'No chapters yet. Create one to start writing!', title: 'Title', statuses: { draft: 'Draft', writing: 'Writing', review: 'Review', published: 'Published' } },
+    scene: { create: 'Create Scene', title: 'Scene Title', tension: 'Tension', emotion: 'Emotion', wordCount: 'Words', types: { scene: 'Scene', chapterStart: 'Chapter Start', chapterEnd: 'Chapter End', transition: 'Transition' }, emotions: { neutral: 'Neutral', happy: 'Happy', sad: 'Sad', tense: 'Tense', angry: 'Angry', romantic: 'Romantic' } },
+    writing: { placeholder: 'Start writing...', save: 'Save', saved: 'Saved' },
+    common: { back: 'Back', loading: 'Loading...', create: 'Create', cancel: 'Cancel', delete: 'Delete', save: 'Save', edit: 'Edit' }
+  }
+};
+
+// 获取当前语言
+function getLang() {
+  return localStorage.getItem('soulwriter-lang') || 'zh-CN';
+}
+
+// 翻译函数
+function t(key) {
+  const lang = getLang();
+  const keys = key.split('.');
+  let value = i18n[lang];
+  for (const k of keys) {
+    value = value?.[k];
+    if (!value) return key;
+  }
+  return value;
+}
+
 // 状态
 const state = {
-  lang: 'zh-CN',
-  currentView: 'welcome', // welcome -> book-detail
+  lang: getLang(),
+  currentView: 'welcome',
   currentBook: null,
   books: [],
   roles: [],
@@ -32,26 +77,6 @@ async function api(endpoint, options = {}) {
   }
 }
 
-// i18n
-async function initI18n() {
-  try {
-    const res = await fetch('/i18n/locales/zh-CN.json');
-    state.i18n = await res.json();
-  } catch (e) {
-    state.i18n = {};
-  }
-}
-
-function t(key) {
-  const keys = key.split('.');
-  let value = state.i18n;
-  for (const k of keys) {
-    value = value?.[k];
-    if (!value) return key;
-  }
-  return value;
-}
-
 // ============ 页面渲染 ============
 
 function renderApp() {
@@ -64,6 +89,10 @@ function renderApp() {
     app.innerHTML = renderMainLayout();
     bindMainEvents();
   }
+  
+  // 更新语言选择器
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect) langSelect.value = getLang();
 }
 
 // ============ 欢迎页面 ============
@@ -72,17 +101,17 @@ function renderWelcome() {
   return `
     <div class="welcome-container">
       <div class="welcome-header">
-        <h1 class="welcome-title">${t('app.name') || '绘梦'}</h1>
-        <p class="welcome-subtitle">${t('app.subtitle') || '灵魂作家'}</p>
+        <h1 class="welcome-title">${t('app.name')}</h1>
+        <p class="welcome-subtitle">${t('app.subtitle')}</p>
       </div>
       
       <div class="welcome-books" id="books-list">
-        <div class="books-loading">${t('common.loading') || '加载中...'}</div>
+        <div class="books-loading">${t('common.loading')}</div>
       </div>
       
       <div class="welcome-actions">
         <button class="btn btn-primary btn-large" id="create-book-btn">
-          + ${t('book.create') || '创建书本'}
+          + ${t('book.create')}
         </button>
       </div>
     </div>
@@ -95,46 +124,46 @@ function renderMainLayout() {
       <aside class="sidebar">
         <div class="sidebar-header">
           <h2 class="book-title">${state.currentBook?.name || ''}</h2>
-          <button class="btn btn-sm" id="back-to-books">${t('common.back') || '返回'}</button>
+          <button class="btn btn-sm" id="back-to-books">${t('common.back')}</button>
         </div>
         
         <nav class="sidebar-nav">
           <div class="nav-section">
             <div class="nav-item ${state.currentView === 'roles' ? 'active' : ''}" data-view="roles">
-              📁 ${t('nav.roles') || '角色'}
+              📁 ${t('nav.roles')}
             </div>
             <div class="nav-item ${state.currentView === 'items' ? 'active' : ''}" data-view="items">
-              🎁 ${t('nav.items') || '物品'}
+              🎁 ${t('nav.items')}
             </div>
             <div class="nav-item ${state.currentView === 'locations' ? 'active' : ''}" data-view="locations">
-              📍 ${t('nav.locations') || '地点'}
+              📍 ${t('nav.locations')}
             </div>
           </div>
           
           <div class="nav-section">
             <div class="nav-item ${state.currentView === 'chapters' ? 'active' : ''}" data-view="chapters">
-              📖 ${t('nav.chapters') || '章节'}
+              📖 ${t('nav.chapters')}
             </div>
             <div class="nav-item ${state.currentView === 'writing' ? 'active' : ''}" data-view="writing">
-              ✍️ ${t('nav.writing') || '写作'}
+              ✍️ ${t('nav.writing')}
             </div>
           </div>
           
           <div class="nav-section">
             <div class="nav-item ${state.currentView === 'genesis' ? 'active' : ''}" data-view="genesis">
-              🌳 ${t('nav.genesis') || '创世树'}
+              🌳 ${t('nav.genesis')}
             </div>
             <div class="nav-item ${state.currentView === 'nvwa' ? 'active' : ''}" data-view="nvwa">
-              🔮 ${t('nav.nvwa') || '女娲推演'}
+              🔮 ${t('nav.nvwa')}
             </div>
             <div class="nav-item ${state.currentView === 'relationships' ? 'active' : ''}" data-view="relationships">
-              🔗 ${t('nav.relationships') || '关系'}
+              🔗 ${t('nav.relationships')}
             </div>
           </div>
           
           <div class="nav-section">
             <div class="nav-item ${state.currentView === 'settings' ? 'active' : ''}" data-view="settings">
-              ⚙️ ${t('nav.settings') || '设置'}
+              ⚙️ ${t('nav.settings')}
             </div>
           </div>
         </nav>
@@ -167,16 +196,16 @@ function renderContent() {
 function renderRoles() {
   return `
     <div class="content-header">
-      <h2>${t('nav.roles') || '角色'}</h2>
-      <button class="btn btn-primary" id="add-role-btn">+ ${t('role.create') || '创建角色'}</button>
+      <h2>${t('nav.roles')}</h2>
+      <button class="btn btn-primary" id="add-role-btn">+ ${t('role.create')}</button>
     </div>
     <div class="cards-grid" id="roles-list">
-      ${state.roles.length === 0 ? `<div class="empty-state">${t('role.noRoles') || '暂无角色，创建一个吧'}</div>` : ''}
+      ${state.roles.length === 0 ? `<div class="empty-state">${t('role.noRoles')}</div>` : ''}
       ${state.roles.map(role => `
         <div class="card role-card" data-id="${role.id}">
           <div class="card-header">
             <span class="card-title">${role.name}</span>
-            <span class="card-badge">${t('role.types.' + role.type) || role.type || '角色'}</span>
+            <span class="card-badge">${t('role.types.' + role.type)}</span>
           </div>
           <div class="card-body">
             <p class="card-desc">${role.description || ''}</p>
@@ -202,18 +231,18 @@ function renderSoulPreview(soulData) {
 function renderItems() {
   return `
     <div class="content-header">
-      <h2>${t('nav.items') || '物品'}</h2>
-      <button class="btn btn-primary" id="add-item-btn">+ ${t('item.create') || '创建物品'}</button>
+      <h2>${t('nav.items')}</h2>
+      <button class="btn btn-primary" id="add-item-btn">+ ${t('item.create')}</button>
     </div>
     <div class="cards-grid" id="items-list">
-      ${state.items.length === 0 ? `<div class="empty-state">${t('item.noItems') || '暂无物品'}</div>` : ''}
+      ${state.items.length === 0 ? `<div class="empty-state">${t('item.noItems')}</div>` : ''}
       ${state.items.map(item => `
         <div class="card item-card" data-id="${item.id}">
           <div class="card-header">
             <span class="card-title">${item.name}</span>
-            <span class="card-badge" style="background: ${getRarityColor(item.rarity)}">${t('item.rarities.' + item.rarity) || item.rarity}</span>
+            <span class="card-badge" style="background: ${getRarityColor(item.rarity)}">${t('item.rarities.' + item.rarity)}</span>
           </div>
-          <p class="card-type">${t('item.types.' + item.type) || item.type}</p>
+          <p class="card-type">${t('item.type')}: ${t('item.types.' + item.type)}</p>
           <p class="card-desc">${item.description || ''}</p>
         </div>
       `).join('')}
@@ -226,18 +255,18 @@ function renderItems() {
 function renderLocations() {
   return `
     <div class="content-header">
-      <h2>${t('nav.locations') || '地点'}</h2>
-      <button class="btn btn-primary" id="add-location-btn">+ ${t('location.create') || '创建地点'}</button>
+      <h2>${t('nav.locations')}</h2>
+      <button class="btn btn-primary" id="add-location-btn">+ ${t('location.create')}</button>
     </div>
     <div class="cards-grid" id="locations-list">
-      ${state.locations.length === 0 ? `<div class="empty-state">${t('location.noLocations') || '暂无地点'}</div>` : ''}
+      ${state.locations.length === 0 ? `<div class="empty-state">${t('location.noLocations')}</div>` : ''}
       ${state.locations.map(loc => `
         <div class="card location-card" data-id="${loc.id}">
           <div class="card-header">
             <span class="card-icon">${getLocationIcon(loc.type)}</span>
             <span class="card-title">${loc.name}</span>
           </div>
-          <p class="card-type">${t('location.types.' + loc.type) || loc.type}</p>
+          <p class="card-type">${t('location.type')}: ${t('location.types.' + loc.type)}</p>
           <p class="card-desc">${loc.description || ''}</p>
         </div>
       `).join('')}
@@ -250,20 +279,20 @@ function renderLocations() {
 function renderChapters() {
   return `
     <div class="content-header">
-      <h2>${t('nav.chapters') || '章节'}</h2>
-      <button class="btn btn-primary" id="add-chapter-btn">+ ${t('chapter.create') || '创建章节'}</button>
+      <h2>${t('nav.chapters')}</h2>
+      <button class="btn btn-primary" id="add-chapter-btn">+ ${t('chapter.create')}</button>
     </div>
     <div class="chapters-list" id="chapters-list">
-      ${state.chapters.length === 0 ? `<div class="empty-state">${t('chapter.noChapters') || '暂无章节，创建一个开始写作吧'}</div>` : ''}
+      ${state.chapters.length === 0 ? `<div class="empty-state">${t('chapter.noChapters')}</div>` : ''}
       ${state.chapters.map(ch => `
         <div class="chapter-card card" data-id="${ch.id}">
           <div class="chapter-info">
             <span class="chapter-title">${ch.title}</span>
-            <span class="chapter-meta">${ch.wordCount || 0}字 | ${t('chapter.statuses.' + ch.status) || ch.status}</span>
+            <span class="chapter-meta">${ch.wordCount || 0} | ${t('chapter.statuses.' + ch.status)}</span>
           </div>
           <div class="chapter-actions">
-            <button class="btn btn-sm" data-action="write">${t('nav.writing') || '写作'}</button>
-            <button class="btn btn-sm" data-action="delete">${t('common.delete') || '删除'}</button>
+            <button class="btn btn-sm" data-action="write">${t('nav.writing')}</button>
+            <button class="btn btn-sm btn-danger" data-action="delete">${t('common.delete')}</button>
           </div>
         </div>
       `).join('')}
@@ -280,30 +309,39 @@ function renderWriting() {
         <select id="chapter-select" class="input">
           ${state.chapters.map(ch => `<option value="${ch.id}">${ch.title}</option>`).join('')}
         </select>
-        <button class="btn btn-sm" id="add-scene-btn">+ ${t('scene.create') || '创建场景'}</button>
-        <div class="scenes-list">
+        <button class="btn btn-sm" id="add-scene-btn">+ ${t('scene.create')}</button>
+        <div class="scenes-list" id="scenes-list">
+          ${state.scenes.length === 0 ? `<div class="empty-state">${t('scene.create')}</div>` : ''}
           ${state.scenes.map(s => `
             <div class="scene-item" data-id="${s.id}">
               <div class="scene-title">${s.title}</div>
-              <div class="scene-meta">${s.wordCount || 0}字 | ${s.tension || 50}</div>
+              <div class="scene-meta">${s.wordCount || 0} | ${t('scene.tension')}: ${s.tension || 50}</div>
             </div>
           `).join('')}
         </div>
       </div>
       <div class="writing-main">
         <div class="writing-header">
-          <input type="text" id="scene-title" class="scene-title-input" placeholder="${t('scene.title') || '场景标题'}">
+          <input type="text" id="scene-title" class="scene-title-input" placeholder="${t('scene.title')}">
           <div class="writing-stats">
-            <span>${t('scene.wordCount') || '字数'}: <strong id="word-count">0</strong></span>
+            <span>${t('scene.wordCount')}: <strong id="word-count">0</strong></span>
           </div>
         </div>
-        <textarea id="writing-editor" class="writing-editor" placeholder="${t('writing.placeholder') || '开始写作...'}"></textarea>
+        <textarea id="writing-editor" class="writing-editor" placeholder="${t('writing.placeholder')}"></textarea>
         <div class="writing-footer">
           <div class="writing-tools">
-            <label>${t('scene.tension') || '张力'}: <span id="tension-value">50</span></label>
+            <label>${t('scene.tension')}: <span id="tension-value">50</span></label>
             <input type="range" id="tension-slider" min="0" max="100" value="50">
+            <select id="emotion-select" class="input">
+              <option value="neutral">${t('scene.emotions.neutral')}</option>
+              <option value="happy">${t('scene.emotions.happy')}</option>
+              <option value="sad">${t('scene.emotions.sad')}</option>
+              <option value="tense">${t('scene.emotions.tense')}</option>
+              <option value="angry">${t('scene.emotions.angry')}</option>
+              <option value="romantic">${t('scene.emotions.romantic')}</option>
+            </select>
           </div>
-          <button class="btn btn-primary" id="save-scene-btn">${t('writing.save') || '保存'}</button>
+          <button class="btn btn-primary" id="save-scene-btn">${t('common.save')}</button>
         </div>
       </div>
     </div>
@@ -313,28 +351,25 @@ function renderWriting() {
 // ============ 其他视图 ============
 
 function renderGenesis() {
-  return `<div class="card"><h3>${t('nav.genesis') || '创世树'}</h3><p>开发中...</p></div>`;
+  return `<div class="card"><h3>🌳 ${t('nav.genesis')}</h3><p>${t('common.loading')}...</p></div>`;
 }
 
 function renderNvwa() {
-  return `<div class="card"><h3>${t('nav.nvwa') || '女娲推演'}</h3><p>开发中...</p></div>`;
+  return `<div class="card"><h3>🔮 ${t('nav.nvwa')}</h3><p>${t('common.loading')}...</p></div>`;
 }
 
 function renderRelationships() {
-  return `<div class="card"><h3>${t('nav.relationships') || '关系图谱'}</h3><p>开发中...</p></div>`;
+  return `<div class="card"><h3>🔗 ${t('nav.relationships')}</h3><p>${t('common.loading')}...</p></div>`;
 }
 
 function renderSettings() {
   return `
     <div class="content-header">
-      <h2>${t('nav.settings') || '设置'}</h2>
+      <h2>⚙️ ${t('nav.settings')}</h2>
     </div>
     <div class="card">
-      <h3>${t('settings.language') || '语言'}</h3>
-      <select id="lang-select" class="input">
-        <option value="zh-CN" selected>中文</option>
-        <option value="en-US">English</option>
-      </select>
+      <h3>${t('nav.settings')}</h3>
+      <p>${t('app.name')} v1.0</p>
     </div>
   `;
 }
@@ -342,22 +377,17 @@ function renderSettings() {
 // ============ 事件绑定 ============
 
 function bindWelcomeEvents() {
-  // 创建书本
   document.getElementById('create-book-btn')?.addEventListener('click', showCreateBookModal);
-  
-  // 加载书本列表
   loadBooks();
 }
 
 function bindMainEvents() {
-  // 返回
   document.getElementById('back-to-books')?.addEventListener('click', () => {
     state.currentBook = null;
     state.currentView = 'welcome';
     renderApp();
   });
   
-  // 导航切换
   document.querySelectorAll('.nav-item').forEach(el => {
     el.addEventListener('click', () => {
       state.currentView = el.dataset.view;
@@ -366,31 +396,19 @@ function bindMainEvents() {
     });
   });
   
-  // 语言切换
-  document.getElementById('lang-select')?.addEventListener('change', async (e) => {
-    await initI18n();
-    renderApp();
-  });
-  
-  // 添加角色
   document.getElementById('add-role-btn')?.addEventListener('click', showCreateRoleModal);
-  
-  // 添加物品
   document.getElementById('add-item-btn')?.addEventListener('click', showCreateItemModal);
-  
-  // 添加地点
   document.getElementById('add-location-btn')?.addEventListener('click', showCreateLocationModal);
-  
-  // 添加章节
   document.getElementById('add-chapter-btn')?.addEventListener('click', showCreateChapterModal);
-  
-  // 写作相关
   document.getElementById('add-scene-btn')?.addEventListener('click', showCreateSceneModal);
   document.getElementById('save-scene-btn')?.addEventListener('click', saveCurrentScene);
   
-  // 实时字数
   document.getElementById('writing-editor')?.addEventListener('input', (e) => {
     document.getElementById('word-count').textContent = e.target.value.length;
+  });
+  
+  document.getElementById('tension-slider')?.addEventListener('input', (e) => {
+    document.getElementById('tension-value').textContent = e.target.value;
   });
 }
 
@@ -416,7 +434,7 @@ function renderBooksList() {
   if (!container) return;
   
   if (state.books.length === 0) {
-    container.innerHTML = `<div class="empty-state">${t('book.noBooks') || '暂无书本，创建一个开始吧'}</div>`;
+    container.innerHTML = `<div class="empty-state">${t('book.noBooks')}</div>`;
     return;
   }
   
@@ -425,13 +443,12 @@ function renderBooksList() {
       <div class="book-title">${book.name}</div>
       <div class="book-meta">${book.description || ''}</div>
       <div class="book-actions">
-        <button class="btn btn-sm" data-action="open">打开</button>
-        <button class="btn btn-sm btn-danger" data-action="delete">${t('common.delete') || '删除'}</button>
+        <button class="btn btn-sm" data-action="open">${t('common.edit')}</button>
+        <button class="btn btn-sm btn-danger" data-action="delete">${t('common.delete')}</button>
       </div>
     </div>
   `).join('');
   
-  // 绑定事件
   container.querySelectorAll('.book-card').forEach(card => {
     const bookId = card.dataset.id;
     
@@ -443,7 +460,7 @@ function renderBooksList() {
     });
     
     card.querySelector('[data-action="delete"]')?.addEventListener('click', async () => {
-      if (confirm(t('book.deleteConfirm') || '确定删除这本书？')) {
+      if (confirm(t('book.deleteConfirm'))) {
         await api(`/projects/${bookId}`, { method: 'DELETE' });
         await loadBooks();
       }
@@ -459,21 +476,21 @@ function showCreateBookModal() {
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header">
-        <h3>${t('book.create') || '创建书本'}</h3>
+        <h3>${t('book.create')}</h3>
         <button class="modal-close">×</button>
       </div>
       <form class="modal-body">
         <div class="form-group">
-          <label>${t('book.title') || '书名'}</label>
-          <input type="text" name="name" class="input" required>
+          <label>${t('book.title')}</label>
+          <input type="text" name="name" class="input" required placeholder="${t('book.title')}">
         </div>
         <div class="form-group">
-          <label>${t('book.description') || '简介'}</label>
-          <textarea name="description" class="input" rows="3"></textarea>
+          <label>${t('book.description')}</label>
+          <textarea name="description" class="input" rows="3" placeholder="${t('book.description')}"></textarea>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn" data-action="cancel">${t('common.cancel') || '取消'}</button>
-          <button type="submit" class="btn btn-primary">${t('common.create') || '创建'}</button>
+          <button type="button" class="btn" data-action="cancel">${t('common.cancel')}</button>
+          <button type="submit" class="btn btn-primary">${t('common.create')}</button>
         </div>
       </form>
     </div>
@@ -502,25 +519,25 @@ function showCreateRoleModal() {
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header">
-        <h3>${t('role.create') || '创建角色'}</h3>
+        <h3>${t('role.create')}</h3>
         <button class="modal-close">×</button>
       </div>
       <form class="modal-body">
         <div class="form-group">
-          <label>${t('role.name') || '姓名'}</label>
+          <label>${t('role.name')}</label>
           <input type="text" name="name" class="input" required>
         </div>
         <div class="form-group">
-          <label>${t('role.type') || '类型'}</label>
+          <label>${t('role.type')}</label>
           <select name="type" class="input">
-            <option value="human">${t('role.types.human') || '人类'}</option>
-            <option value="cyborg">${t('role.types.cyborg') || '机械人'}</option>
-            <option value="creature">${t('role.types.creature') || '异兽'}</option>
-            <option value="ai">${t('role.types.ai') || 'AI'}</option>
+            <option value="human">${t('role.types.human')}</option>
+            <option value="cyborg">${t('role.types.cyborg')}</option>
+            <option value="creature">${t('role.types.creature')}</option>
+            <option value="ai">${t('role.types.ai')}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>${t('role.description') || '描述'}</label>
+          <label>${t('role.description')}</label>
           <textarea name="description" class="input" rows="3"></textarea>
         </div>
         <div class="form-actions">
@@ -557,38 +574,38 @@ function showCreateItemModal() {
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header">
-        <h3>${t('item.create') || '创建物品'}</h3>
+        <h3>${t('item.create')}</h3>
         <button class="modal-close">×</button>
       </div>
       <form class="modal-body">
         <div class="form-group">
-          <label>${t('item.name') || '名称'}</label>
+          <label>${t('item.name')}</label>
           <input type="text" name="name" class="input" required>
         </div>
         <div class="form-group">
-          <label>${t('item.type') || '类型'}</label>
+          <label>${t('item.type')}</label>
           <select name="type" class="input">
-            <option value="weapon">${t('item.types.weapon') || '武器'}</option>
-            <option value="armor">${t('item.types.armor') || '防具'}</option>
-            <option value="potion">${t('item.types.potion') || '药水'}</option>
-            <option value="accessory">${t('item.types.accessory') || '饰品'}</option>
-            <option value="material">${t('item.types.material') || '材料'}</option>
-            <option value="keyItem">${t('item.types.keyItem') || '关键物品'}</option>
-            <option value="misc">${t('item.types.misc') || '杂物'}</option>
+            <option value="weapon">${t('item.types.weapon')}</option>
+            <option value="armor">${t('item.types.armor')}</option>
+            <option value="potion">${t('item.types.potion')}</option>
+            <option value="accessory">${t('item.types.accessory')}</option>
+            <option value="material">${t('item.types.material')}</option>
+            <option value="keyItem">${t('item.types.keyItem')}</option>
+            <option value="misc">${t('item.types.misc')}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>${t('item.rarity') || '稀有度'}</label>
+          <label>${t('item.rarity')}</label>
           <select name="rarity" class="input">
-            <option value="common">${t('item.rarities.common') || '普通'}</option>
-            <option value="uncommon">${t('item.rarities.uncommon') || '优秀'}</option>
-            <option value="rare">${t('item.rarities.rare') || '稀有'}</option>
-            <option value="epic">${t('item.rarities.epic') || '史诗'}</option>
-            <option value="legendary">${t('item.rarities.legendary') || '传说'}</option>
+            <option value="common">${t('item.rarities.common')}</option>
+            <option value="uncommon">${t('item.rarities.uncommon')}</option>
+            <option value="rare">${t('item.rarities.rare')}</option>
+            <option value="epic">${t('item.rarities.epic')}</option>
+            <option value="legendary">${t('item.rarities.legendary')}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>${t('item.description') || '描述'}</label>
+          <label>${t('item.description')}</label>
           <textarea name="description" class="input" rows="3"></textarea>
         </div>
         <div class="form-actions">
@@ -626,29 +643,29 @@ function showCreateLocationModal() {
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header">
-        <h3>${t('location.create') || '创建地点'}</h3>
+        <h3>${t('location.create')}</h3>
         <button class="modal-close">×</button>
       </div>
       <form class="modal-body">
         <div class="form-group">
-          <label>${t('location.name') || '名称'}</label>
+          <label>${t('location.name')}</label>
           <input type="text" name="name" class="input" required>
         </div>
         <div class="form-group">
-          <label>${t('location.type') || '类型'}</label>
+          <label>${t('location.type')}</label>
           <select name="type" class="input">
-            <option value="city">${t('location.types.city') || '城市'}</option>
-            <option value="town">${t('location.types.town') || '城镇'}</option>
-            <option value="village">${t('location.types.village') || '村庄'}</option>
-            <option value="indoor">${t('location.types.indoor') || '室内'}</option>
-            <option value="wilderness">${t('location.types.wilderness') || '荒野'}</option>
-            <option value="forest">${t('location.types.forest') || '森林'}</option>
-            <option value="mountain">${t('location.types.mountain') || '山脉'}</option>
-            <option value="water">${t('location.types.water') || '水域'}</option>
+            <option value="city">${t('location.types.city')}</option>
+            <option value="town">${t('location.types.town')}</option>
+            <option value="village">${t('location.types.village')}</option>
+            <option value="indoor">${t('location.types.indoor')}</option>
+            <option value="wilderness">${t('location.types.wilderness')}</option>
+            <option value="forest">${t('location.types.forest')}</option>
+            <option value="mountain">${t('location.types.mountain')}</option>
+            <option value="water">${t('location.types.water')}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>${t('location.description') || '描述'}</label>
+          <label>${t('location.description')}</label>
           <textarea name="description" class="input" rows="3"></textarea>
         </div>
         <div class="form-actions">
@@ -685,12 +702,12 @@ function showCreateChapterModal() {
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header">
-        <h3>${t('chapter.create') || '创建章节'}</h3>
+        <h3>${t('chapter.create')}</h3>
         <button class="modal-close">×</button>
       </div>
       <form class="modal-body">
         <div class="form-group">
-          <label>${t('chapter.title') || '标题'}</label>
+          <label>${t('chapter.title')}</label>
           <input type="text" name="title" class="input" required>
         </div>
         <div class="form-actions">
@@ -725,36 +742,36 @@ function showCreateSceneModal() {
   modal.innerHTML = `
     <div class="modal">
       <div class="modal-header">
-        <h3>${t('scene.create') || '创建场景'}</h3>
+        <h3>${t('scene.create')}</h3>
         <button class="modal-close">×</button>
       </div>
       <form class="modal-body">
         <div class="form-group">
-          <label>${t('scene.title') || '标题'}</label>
+          <label>${t('scene.title')}</label>
           <input type="text" name="title" class="input" required>
         </div>
         <div class="form-group">
-          <label>${t('scene.type') || '类型'}</label>
+          <label>${t('scene.type')}</label>
           <select name="sceneType" class="input">
-            <option value="scene">${t('scene.types.scene') || '场景'}</option>
-            <option value="chapterStart">${t('scene.types.chapterStart') || '章节开头'}</option>
-            <option value="chapterEnd">${t('scene.types.chapterEnd') || '章节结尾'}</option>
-            <option value="transition">${t('scene.types.transition') || '过渡'}</option>
+            <option value="scene">${t('scene.types.scene')}</option>
+            <option value="chapterStart">${t('scene.types.chapterStart')}</option>
+            <option value="chapterEnd">${t('scene.types.chapterEnd')}</option>
+            <option value="transition">${t('scene.types.transition')}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>${t('scene.tension') || '张力'}: <span id="modal-tension-value">50</span></label>
+          <label>${t('scene.tension')}: <span id="modal-tension-value">50</span></label>
           <input type="range" name="tension" min="0" max="100" value="50" id="modal-tension-slider">
         </div>
         <div class="form-group">
-          <label>${t('scene.emotion') || '情感'}</label>
+          <label>${t('scene.emotion')}</label>
           <select name="emotion" class="input">
-            <option value="neutral">${t('scene.emotions.neutral') || '平静'}</option>
-            <option value="happy">${t('scene.emotions.happy') || '开心'}</option>
-            <option value="sad">${t('scene.emotions.sad') || '悲伤'}</option>
-            <option value="tense">${t('scene.emotions.tense') || '紧张'}</option>
-            <option value="angry">${t('scene.emotions.angry') || '愤怒'}</option>
-            <option value="romantic">${t('scene.emotions.romantic') || '浪漫'}</option>
+            <option value="neutral">${t('scene.emotions.neutral')}</option>
+            <option value="happy">${t('scene.emotions.happy')}</option>
+            <option value="sad">${t('scene.emotions.sad')}</option>
+            <option value="tense">${t('scene.emotions.tense')}</option>
+            <option value="angry">${t('scene.emotions.angry')}</option>
+            <option value="romantic">${t('scene.emotions.romantic')}</option>
           </select>
         </div>
         <div class="form-actions">
@@ -767,7 +784,6 @@ function showCreateSceneModal() {
   
   document.body.appendChild(modal);
   
-  // 张力滑块显示
   const slider = modal.querySelector('#modal-tension-slider');
   const value = modal.querySelector('#modal-tension-value');
   slider?.addEventListener('input', () => { value.textContent = slider.value; });
@@ -792,8 +808,7 @@ function showCreateSceneModal() {
 }
 
 async function saveCurrentScene() {
-  // 实现保存逻辑
-  alert(t('writing.saved') || '已保存');
+  alert(t('writing.saved'));
 }
 
 // ============ 辅助函数 ============
@@ -815,9 +830,8 @@ function getLocationIcon(type) {
 
 // ============ 初始化 ============
 
-async function init() {
-  console.log('🚀 绘梦 SoulWriter 启动');
-  await initI18n();
+function init() {
+  console.log('🚀 SoulWriter 启动 | Lang:', getLang());
   renderApp();
 }
 

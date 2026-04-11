@@ -1,25 +1,13 @@
 {
-  "project": "绘梦 SoulWriter API",
-  "created": "2026-04-10",
-  "status": "in_progress",
-  "phases": {
-    "phase1": {"name": "API基础设施", "status": "completed"},
-    "phase2": {"name": "实体CRUD", "status": "completed"},
-    "phase3": {"name": "AI配置接口", "status": "completed"},
-    "phase4": {"name": "女娲推演引擎", "status": "completed", "note": "框架完成，待AI配置"},
-    "phase5": {"name": "创世树", "status": "pending"},
-    "phase6": {"name": "导出功能", "status": "pending"}
+  project: 绘梦 SoulWriter API,
+  created: 2026-04-10,
+  status: in_progress,
+  phases: {
+    phase1: {name: API基础设施, status: completed},
+    phase2: {name: 实体CRUD, status: completed},
+    phase3: {name: AI配置接口, status: completed},
+    phase4: {name: 女娲推演引擎, status: completed},
+    phase5: {name: 创世树, status: completed}
   },
-  "blocking": [
-    {
-      "issue": "AI API Key未配置",
-      "impact": "无法测试推演功能",
-      "solution": "配置apimark.omnihex.xyz的API Key"
-    }
-  ],
-  "next_steps": [
-    "配置AI API Key",
-    "测试女娲推演",
-    "开发创世树"
-  ]
+  next_steps: [AI API Key配置, 导出功能]
 }

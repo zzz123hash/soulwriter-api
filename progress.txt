@@ -1,33 +1,26 @@
 # 绘梦API开发进度
 
-## 2026-04-11 09:34
+## 2026-04-11 10:04
 
 ### 进度总览
 - ✅ Phase 1: API基础设施 - 完成
 - ✅ Phase 2: 实体CRUD - 完成
 - ✅ Phase 3: AI配置接口 - 完成
-- ✅ Phase 4: 女娲推演引擎 - 框架完成 (09:15)
-- 🔄 Phase 5: 创世树 - 待开始
-- ⬜ Phase 6: 导出功能 - 待开始
+- ✅ Phase 4: 女娲推演引擎 - 框架完成
+- ✅ Phase 5: 创世树 - 完成 (10:04)
 
-### 已实现端点 (共35个)
+### 已实现端点 (共45+个)
 基础CRUD: Project/Role/Item/Location/Setting
 女娲推演: nvwa/characters/souls/world/logs/events/simulate
+创世树: genesis/seeds/nodes/edges/tree
 AI配置: ai/config/ai/run
 
-### 女娲推演引擎功能
-- 角色管理 (nvwa_souls表)
-- 属性K线 (nvwa_souls_klines表)
-- 世界变量 (nvwa_world_vars表)
-- 推演日志 (nvwa_logs表)
-- 张力焦点计算 (calculateTensionFocus)
-
-### 待解决
-- AI API Key配置（当前apimark.omnihex.xyz需要Key）
-
 ### Git提交
-- 2c8b175 feat: 女娲推演引擎Nvwa框架
-- 7b4f1aa feat: AI配置接口 + 本地/云端引擎支持
+cbce1ca feat: 创世树GenesisTree模块
+2c8b175 feat: 女娲推演引擎Nvwa框架
 
 ### 运行
 npm start (端口3000)
+
+### 待解决
+- AI API Key配置

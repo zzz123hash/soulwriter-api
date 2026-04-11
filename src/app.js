@@ -284,3 +284,35 @@ const start = async () => {
   }
 };
 start();
+
+// ============ Export ============
+const { exportProjectToTxt, exportProjectToJson, exportProjectToMarkdown, exportNvwaToTxt, exportGenesisToTxt } = require('./export_module');
+
+fastify.get('/api/v1/export/project/:id/txt', (req) => {
+  const content = exportProjectToTxt(db, req.params.id);
+  if (!content) return { error: 'Project not found' };
+  return { content, filename: 'project.txt' };
+});
+
+fastify.get('/api/v1/export/project/:id/json', (req) => {
+  const data = exportProjectToJson(db, req.params.id);
+  if (!data) return { error: 'Project not found' };
+  return data;
+});
+
+fastify.get('/api/v1/export/project/:id/md', (req) => {
+  const content = exportProjectToMarkdown(db, req.params.id);
+  if (!content) return { error: 'Project not found' };
+  return { content, filename: 'project.md' };
+});
+
+fastify.get('/api/v1/export/nvwa/txt', (req) => {
+  const content = exportNvwaToTxt(db);
+  return { content, filename: 'nvwa.txt' };
+});
+
+fastify.get('/api/v1/export/genesis/:id/txt', (req) => {
+  const content = exportGenesisToTxt(db, req.params.id);
+  if (!content) return { error: 'Seed not found' };
+  return { content, filename: 'genesis.txt' };
+});

@@ -298,7 +298,7 @@ function renderWriting() {
 
 // ============ 其他视图 ============
 
-function renderGenesis() { return `<div class="placeholder-view"><h2>🌳 ${t('nav.genesis')}</h2><p>开发中...</p></div>`; }
+function renderGenesis() { initGenesisTree(); return `<div class="genesis-container"><div class="genesis-header"><h2 class="view-title">🌳 创世树</h2><div class="genesis-actions"><button class="btn btn-primary" id="genesis-add-root">+ 核心</button><button class="btn" id="genesis-auto">🤖 AI生成</button></div></div><div class="genesis-layout"><div class="genesis-tree" id="genesis-tree"><div class="tree-loading">🌱 加载中...</div></div><div class="genesis-panel" id="genesis-panel"><div class="panel-empty"><div class="panel-icon">🌿</div><h3>创世树</h3><p>点击节点查看详情</p></div></div></div></div>`; bindGenesisEvents(); }
 function renderNvwa() { return `<div class="placeholder-view"><h2>🔮 ${t('nav.nvwa')}</h2><p>开发中...</p></div>`; }
 function renderRelationships() { return `<div class="placeholder-view"><h2>🔗 ${t('nav.relationships')}</h2><p>开发中...</p></div>`; }
 function renderSettings() { return `<div class="placeholder-view"><h2>⚙️ ${t('nav.settings')}</h2><p>SoulWriter v1.0</p></div>`; }

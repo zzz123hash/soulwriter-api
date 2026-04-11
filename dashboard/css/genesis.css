@@ -1,0 +1,317 @@
+/* ============ 创世树样式 ============ */
+
+.genesis-container {
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+}
+
+.genesis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.genesis-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.genesis-layout {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============ 树区域 ============ */
+.genesis-tree {
+  flex: 1;
+  background: var(--bg2);
+  border-radius: 16px;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.tree-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tree-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px;
+}
+
+.empty-tree-icon {
+  font-size: 5em;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.tree-empty h3 {
+  font-size: 1.5em;
+  margin-bottom: 12px;
+}
+
+.tree-empty p {
+  color: var(--text2);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.tree-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 1.2em;
+  color: var(--text2);
+}
+
+/* ============ 树节点 ============ */
+.tree-node {
+  margin-bottom: 4px;
+}
+
+.node-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--bg3);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  max-width: 500px;
+}
+
+.node-card:hover {
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+.node-card.character { border-left: 4px solid #3b82f6; }
+.node-card.plot { border-left: 4px solid #e94560; }
+.node-card.world { border-left: 4px solid #22c55e; }
+.node-card.theme { border-left: 4px solid #a855f7; }
+.node-card.event { border-left: 4px solid #f59e0b; }
+.node-card.item { border-left: 4px solid #06b6d4; }
+.node-card.location { border-left: 4px solid #84cc16; }
+
+.node-expand {
+  width: 20px;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.node-expand.hidden {
+  visibility: hidden;
+}
+
+.node-icon {
+  font-size: 1.4em;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+}
+
+.node-info {
+  flex: 1;
+}
+
+.node-name {
+  font-weight: 600;
+  font-size: 1em;
+  margin-bottom: 2px;
+}
+
+.node-type {
+  font-size: 0.8em;
+  color: var(--text2);
+}
+
+.node-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.node-card:hover .node-actions {
+  opacity: 1;
+}
+
+.node-btn {
+  padding: 4px 8px;
+  background: var(--bg);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.node-btn:hover {
+  background: var(--accent);
+}
+
+.node-children {
+  margin-left: 12px;
+  border-left: 2px dashed var(--border);
+  padding-left: 12px;
+}
+
+/* ============ 详情面板 ============ */
+.genesis-panel {
+  width: 380px;
+  background: var(--bg2);
+  border-radius: 16px;
+  padding: 24px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: var(--text2);
+}
+
+.panel-icon {
+  font-size: 3em;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.panel-empty h3 {
+  font-size: 1.2em;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.panel-empty p {
+  line-height: 1.6;
+}
+
+/* ============ 节点详情 ============ */
+.node-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.detail-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8em;
+}
+
+.detail-title h3 {
+  font-size: 1.3em;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.detail-type {
+  font-size: 0.85em;
+  color: var(--text2);
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-section label {
+  display: block;
+  font-size: 0.8em;
+  color: var(--text2);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.detail-section p,
+.detail-content {
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.detail-attrs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.attr {
+  padding: 4px 10px;
+  background: var(--bg3);
+  border-radius: 6px;
+  font-size: 0.85em;
+}
+
+.detail-children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.child-tag {
+  padding: 4px 10px;
+  background: var(--bg);
+  border-radius: 6px;
+  font-size: 0.85em;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ============ AI加载 ============ */
+.ai-loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2em;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

@@ -42,7 +42,7 @@ class SoulWriterLogger {
     // 工具栏
     const toolbar = document.createElement('div');
     toolbar.id = 'sw-toolbar';
-    toolbar.innerHTML = '<div class="toolbar-left"><span class="toolbar-logo">SoulWriter</span></div><div class="toolbar-right"><button class="toolbar-btn" id="btn-log"><span>📋</span><span class="btn-text">日志</span></button><button class="toolbar-btn" id="btn-settings"><span>⚙️</span><span class="btn-text">设置</span></button><select id="lang-select" class="toolbar-lang"><option value="zh-CN">🇨🇳 中文</option><option value="en-US">🇺🇸 EN</option></select></div>';
+    toolbar.innerHTML = '<div class="toolbar-left"><span class="toolbar-logo">SoulWriter</span></div><div class="toolbar-right"><button class="toolbar-btn" id="btn-log"><span>📋</span><span class="btn-text">日志</span></button><button class="toolbar-btn" id="btn-docs"><span>📖</span><span class="btn-text">文档</span></button><button class="toolbar-btn" id="btn-docs"><span>📖</span><span class="btn-text">文档</span></button><button class="toolbar-btn" id="btn-settings"><span>⚙️</span><span class="btn-text">设置</span></button><select id="lang-select" class="toolbar-lang"><option value="zh-CN">🇨🇳 中文</option><option value="en-US">🇺🇸 EN</option></select></div>';
     document.body.insertBefore(toolbar, document.body.firstChild);
     
     // 样式
@@ -64,6 +64,7 @@ class SoulWriterLogger {
     
     // 事件
     document.getElementById('btn-log').addEventListener('click', () => this.toggle());
+    document.getElementById('btn-docs').addEventListener('click', () => window.open('https://github.com/zzz123hash/soulwriter-api', '_blank'));
     document.getElementById('btn-settings').addEventListener('click', () => this.toggleSettings());
     document.getElementById('log-close-btn').addEventListener('click', () => this.close());
     document.getElementById('log-clear-btn').addEventListener('click', () => this.clear());

@@ -36,3 +36,63 @@
 - [ ] 女娲推演界面
 - [ ] 3D关系图谱
 - [ ] 完整API实现
+
+## 18:40 任务 - 添加文档按钮
+
+### 任务内容
+1. 在右上角工具栏添加"📖 文档"按钮
+2. 点击打开文档链接（GitHub仓库或本地文档页面）
+3. 更新进度记录
+
+### 修改文件
+- dashboard/js/logger.js (toolbar部分)
+
+### 参考
+- GitHub文档: https://github.com/zzz123hash/soulwriter-api
+- 本地文档: http://192.168.0.128:3000/docs/用户手册.md
+
+## 19:03 Books模块开发
+
+### 已完成
+- ✅ Books核心服务 (src/services/books_service.js)
+- ✅ Books路由 (src/books_routes.js) - Action风格
+- ✅ 每个书本独立.soul文件存储
+- ✅ 书架CRUD API
+- ✅ 书本CRUD API (create/list/get/update/delete)
+- ✅ 章节CRUD API
+- ✅ 记忆宫殿节点API
+
+### 数据库设计
+- bookshelves: 书架表
+- books: 书本表（每个书本独立.soul文件）
+- chapters: 章节表
+- palace_nodes: 记忆宫殿节点表
+- vector_cache: 向量缓存表（待实现）
+
+### API风格
+统一POST /api/books，action参数区分操作
+- action: create | list | get | update | delete
+
+### 下一步
+- [ ] Books页面UI (dashboard/books.html)
+- [ ] 向量生成（transformers.js集成）
+- [ ] 语义搜索功能
+
+## 19:32 Books页面UI完成 + 路由修复
+
+### 已完成
+- ✅ Books页面UI (dashboard/books.html)
+- ✅ /books 路由访问正常
+- ✅ 向量缓存表设计就绪
+
+### 当前状态
+- Books模块核心功能已完成
+- 可通过 http://192.168.0.128:3000/books 访问
+
+### 待完善
+- [ ] transformers.js向量生成集成
+- [ ] 语义搜索功能
+- [ ] 导入/导出.soul文件
+
+### task.json 更新
+- phase7: Books模块 - 进行中

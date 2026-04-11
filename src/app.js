@@ -3,6 +3,7 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const booksRoutes = require('./books_routes');
 
 const db = new Database(path.join(__dirname, '..', 'data.db'));
 
@@ -378,7 +379,9 @@ fastify.get('/dashboard/*', (req, reply) => {
 // ============ Start ============
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000, host: '0.0.0.0' });
+    fastify.register(booksRoutes);
+
+await fastify.listen({ port: 3000, host: '0.0.0.0' });
     console.log('Server running at http://localhost:3000');
   } catch (err) {
     fastify.log.error(err);
@@ -453,9 +456,21 @@ select,input{background:#252552;border:1px solid #333;color:#fff;padding:10px;bo
 <div class="b"><div class="v">v1.0</div><div class="l">版本</div></div>
 </div>
 <div class="grid">
+<div class="m" onclick="showBooks()"><h3>📚 Books</h3><p>书本管理</p></div>
 <div class="m"><h3>🎭 女娲推演</h3><p>角色量子纠缠引擎</p></div>
 <div class="m"><h3>🌳 创世树</h3><p>剧情分支管理</p></div>
 <div class="m"><h3>📤 导出</h3><p>TXT/JSON/MD</p></div>
+</div>
+<div id="books-section" style="display:none;">
+<div class="test">
+<h3>📚 Books 管理</h3>
+<div style="display:flex;gap:10px;margin:10px 0">
+<input id="book-title" placeholder="书名" style="flex:1">
+<input id="book-author" placeholder="作者" style="flex:1">
+<button class="btn" onclick="createBook()">新建书本</button>
+</div>
+<div id="books-list" style="margin-top:15px"></div>
+</div>
 </div>
 <div class="test">
 <h3>🔧 API测试</h3>
@@ -510,6 +525,56 @@ async function refresh() {
 }
 const eps = ["/health","/api/v1/projects","/api/v1/nvwa/status","/api/v1/ai/config","/api/v1/genesis/seeds"];
 document.getElementById("eps").innerHTML = eps.map(e=>'<span>'+e+'</span>').join("");
+// Books functions
+let books = [];
+let shelves = [];
+
+async function loadBooks() {
+  const r = await api("/api/bookshelves");
+  shelves = r.data || [];
+  const r2 = await api("/api/books", "POST", {action:"list"});
+  books = r2.data || [];
+  renderBooks();
+}
+
+async function api(p, m, b) {
+  try {
+    const opts = {method: m || "GET", headers: {"Content-Type":"application/json"}};
+    if (b) opts.body = JSON.stringify(b);
+    const r = await fetch(API + p, opts);
+    return await r.json();
+  } catch(e) { return {error: e.message}; }
+}
+
+function renderBooks() {
+  const el = document.getElementById("books-list");
+  if (!books.length) { el.innerHTML = '<p style="color:#888">暂无书本</p>'; return; }
+  el.innerHTML = books.map(b => '<div style="background:#252552;padding:12px;margin:8px 0;border-radius:8px"><b>' + b.title + '</b> <span style="color:#888">by ' + (b.author||'未知') + '</span></div>').join('');
+}
+
+async function createBook() {
+  const title = document.getElementById("book-title").value.trim();
+  const author = document.getElementById("book-author").value.trim();
+  if (!title) { alert("请输入书名"); return; }
+  const r = await api("/api/books", "POST", {action:"create", title, author});
+  if (r.success) {
+    document.getElementById("book-title").value = "";
+    document.getElementById("book-author").value = "";
+    loadBooks();
+    log("书本创建成功: " + title, "ok");
+  }
+}
+
+function showBooks() {
+  const el = document.getElementById("books-section");
+  if (el.style.display === "none") {
+    el.style.display = "block";
+    loadBooks();
+  } else {
+    el.style.display = "none";
+  }
+}
+
 refresh();
 setInterval(refresh, 15000);
 </script>

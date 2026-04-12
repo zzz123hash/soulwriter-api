@@ -1,0 +1,513 @@
+/**
+ * SoulWriter - 层级抽屉系统 v2
+ * 
+ * 设计：
+ * - 左侧第一层抽屉（主分类，+前缀）
+ * - 右侧可展开子抽屉（++前缀，点击主分类后滑出）
+ * - 详情用弹窗显示，不是固定面板
+ */
+
+/* ============================================
+   1. 抽屉容器布局
+   ============================================ */
+.drawer-container {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 第一层抽屉（左侧主菜单） */
+.drawer-level-1 {
+  width: 200px;
+  min-width: 200px;
+  height: 100%;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.drawer-level-1.collapsed {
+  width: 56px;
+  min-width: 56px;
+}
+
+/* 第二层抽屉（子菜单，可滑出） */
+.drawer-level-2 {
+  position: absolute;
+  left: 200px;
+  top: 0;
+  width: 200px;
+  height: 100%;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 50;
+}
+
+.drawer-level-2.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* 第三层抽屉（详情，可滑出） */
+.drawer-level-3 {
+  position: absolute;
+  left: 400px;
+  top: 0;
+  width: 320px;
+  height: 100%;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 60;
+}
+
+.drawer-level-3.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* 遮罩层 */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 40;
+}
+
+.drawer-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================================
+   2. 抽屉头部
+   ============================================ */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  min-height: 52px;
+}
+
+.drawer-header-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.drawer-header-back {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text2);
+}
+
+.drawer-header-back:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* ============================================
+   3. 抽屉内容区
+   ============================================ */
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+/* ============================================
+   4. 层级菜单项
+   ============================================ */
+
+/* 第一层菜单项（带+前缀） */
+.drawer-item-level-1 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text);
+  font-size: 13px;
+  margin-bottom: var(--space-xs);
+}
+
+.drawer-item-level-1:hover {
+  background: var(--bg3);
+}
+
+.drawer-item-level-1.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+}
+
+.drawer-item-level-1 .prefix {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  width: 20px;
+}
+
+.drawer-item-level-1.active .prefix {
+  color: white;
+}
+
+.drawer-item-level-1 .icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer-item-level-1 .icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.drawer-item-level-1 .label {
+  flex: 1;
+}
+
+.drawer-item-level-1 .arrow {
+  font-size: 10px;
+  opacity: 0.5;
+  transition: transform 0.2s;
+}
+
+.drawer-item-level-1.has-children:hover .arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* 第二层菜单项（带++前缀） */
+.drawer-item-level-2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  padding-left: var(--space-lg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text2);
+  font-size: 13px;
+  margin-bottom: var(--space-xs);
+}
+
+.drawer-item-level-2:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.drawer-item-level-2.active {
+  background: var(--accent);
+  color: white;
+}
+
+.drawer-item-level-2 .prefix {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.drawer-item-level-2.active .prefix {
+  color: white;
+}
+
+/* 子菜单容器 */
+.drawer-submenu {
+  padding-left: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+/* ============================================
+   5. 抽屉分组
+   ============================================ */
+.drawer-section {
+  margin-bottom: var(--space-md);
+}
+
+.drawer-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-xs);
+}
+
+/* ============================================
+   6. 详情弹窗
+   ============================================ */
+.detail-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.detail-modal.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.detail-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.detail-modal-container {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.detail-modal.open .detail-modal-container {
+  transform: scale(1);
+}
+
+.detail-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.detail-modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.detail-modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text2);
+  font-size: 16px;
+}
+
+.detail-modal-close:hover {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.detail-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-lg);
+}
+
+.detail-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg3);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* ============================================
+   7. 表单字段（在弹窗里）
+   ============================================ */
+.form-field {
+  margin-bottom: var(--space-md);
+}
+
+.form-field__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: var(--space-xs);
+}
+
+.form-field__input,
+.form-field__textarea,
+.form-field__select {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.form-field__input:focus,
+.form-field__textarea:focus,
+.form-field__select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-field__textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+/* ============================================
+   8. 面包屑导航
+   ============================================ */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 12px;
+  color: var(--text2);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.breadcrumb__item {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.breadcrumb__item:hover {
+  color: var(--accent);
+}
+
+.breadcrumb__separator {
+  opacity: 0.5;
+}
+
+.breadcrumb__current {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ============================================
+   9. 动画效果
+   ============================================ */
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   10. 实用工具类
+   ============================================ */
+.text-primary { color: var(--accent); }
+.text-muted { color: var(--text2); }
+.text-success { color: #22c55e; }
+.text-warning { color: #f59e0b; }
+.text-danger { color: #ef4444; }
+
+.bg-primary { background: var(--accent); }
+.bg-success { background: #22c55e; }
+.bg-warning { background: #f59e0b; }
+.bg-danger { background: #ef4444; }
+
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }

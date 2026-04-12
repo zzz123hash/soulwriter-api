@@ -57,7 +57,7 @@ const nvwaEngine = new NvwaEngine({ db });
 
 // Plugin system
 const pluginManager = require('./services/plugin_manager');
-pluginManager.loadPlugins();
+pluginManager.init();
 
 // ============ AI Functions ============
 const DEFAULT_CLOUD_URL = 'https://api.openai.com/v1/chat/completions';
@@ -245,6 +245,7 @@ fastify.post('/api/v1/ai/run', async (req) => {
 
 // ============ GenesisTree ============
 const { initGenesisDB, createSeed, getSeed, createNode, getNode, getChildNodes, updateNode, createEdge, buildTree, deleteNode } = require('./genesis_tree');
+const genesisNvwaRoutes = require('./routes/genesis_nvwa_routes');
 initGenesisDB(db);
 
 fastify.post('/api/genesis/seeds', (req) => {
@@ -298,6 +299,7 @@ db.exec("CREATE TABLE IF NOT EXISTS scenes (id TEXT PRIMARY KEY, projectId TEXT 
 fastify.get('/api/v1/projects/:projectId/chapters', (req) => {
   return db.prepare('SELECT * FROM chapters WHERE projectId = ? ORDER BY orderIndex').all(req.params.projectId);
 });
+    fastify.register(genesisNvwaRoutes, { db });
 
 fastify.post('/api/v1/chapters', async (req) => {
   const { projectId, title, orderIndex } = req.body;

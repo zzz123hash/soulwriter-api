@@ -1755,18 +1755,32 @@ function bindTabContentEvents() {
 
   // 实体列表项点击 → 打开详情
 
-  // 实体列表项点击 → 打开详情 (使用事件委托)
-  document.addEventListener("click", function(e) {
-    var item = e.target.closest(".entity-list-item");
-    if (!item) return;
-    var id = item.dataset.id;
-    var type = state.currentEntity;
-    var entityMap = { roles: state.roles, items: state.items, locations: state.locations };
-    var list = entityMap[type] || [];
-    var entity = list.find(function(e) { return e.id === id; });
-    if (entity) {
-      DrawerApp.showEntityModal(type, id);
-    }
+  document.querySelectorAll('.entity-list-item').forEach(function(item) {
+
+    item.addEventListener('click', function() {
+
+      var id = this.dataset.id;
+
+      var type = state.currentEntity;
+
+      var entityMap = { roles: state.roles, items: state.items, locations: state.locations };
+
+      var list = entityMap[type] || [];
+
+      var entity = list.find(function(e) { return e.id === id; });
+
+      if (entity) {
+
+        state.selectedEntity = entity;
+
+        var dp = document.getElementById('detail-panel');
+
+        if (dp) { dp.classList.add('open'); document.getElementById('detail-content').innerHTML = renderEntityDetail(); bindDetailEvents(); }
+
+      }
+
+    });
+
   });
 
 

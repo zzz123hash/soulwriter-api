@@ -679,3 +679,17 @@
 .event-node-card {
   transition: all 0.2s ease;
 }
+
+
+/* 强制隐藏旧的右侧详情面板 - 确保最高优先级 */
+body .right-drawer,
+body #detail-panel,
+aside.right-drawer,
+#detail-panel {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  overflow: hidden !important;
+}

@@ -8,6 +8,7 @@ const nvwa = require('./nvwa_engine');
 const worksStorage = require('./services/works_storage');
 const worksRoutes = require('./routes/works_routes');
 const uploadRoutes = require('./routes/upload_routes');
+const eventsRoutes = require('./routes/events_routes');
 const db = new Database(path.join(__dirname, '..', 'data.db'));
 
 // ============ Init DB ============
@@ -41,6 +42,13 @@ db.exec(`
     id TEXT PRIMARY KEY, type TEXT DEFAULT 'cloud', baseUrl TEXT DEFAULT 'https://api.openai.com/v1',
     model TEXT DEFAULT 'gpt-4o', apiKey TEXT DEFAULT '',
     localPort INTEGER DEFAULT 42897, localModel TEXT DEFAULT 'qwen-1.5b',
+    createdAt TEXT DEFAULT CURRENT_TIMESTAMP, updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE TABLE IF NOT EXISTS events (
+    id TEXT PRIMARY KEY, bookId TEXT, title TEXT, cause TEXT, process TEXT, result TEXT,
+    arc TEXT DEFAULT '主线', characters TEXT, locations TEXT, items TEXT,
+    chapter TEXT, timestamp INTEGER DEFAULT 0, isKeyEvent INTEGER DEFAULT 0,
+    tension INTEGER DEFAULT 50, status TEXT DEFAULT 'open',
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP, updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
   );
 `);
@@ -300,6 +308,7 @@ fastify.get('/api/v1/projects/:projectId/chapters', (req) => {
   return db.prepare('SELECT * FROM chapters WHERE projectId = ? ORDER BY orderIndex').all(req.params.projectId);
 });
     fastify.register(uploadRoutes, { db });
+    fastify.register(eventsRoutes, { db });
     fastify.register(genesisNvwaRoutes, { db });
 
 fastify.post('/api/v1/chapters', async (req) => {

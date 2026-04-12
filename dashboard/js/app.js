@@ -37,14 +37,26 @@ function renderToolbar() {
   const langOptions = ['zh-CN', 'en-US'].map(function(l) {
     return '<option value="' + l + '"' + (lang === l ? ' selected' : '') + '>' + (l === 'zh-CN' ? '中文' : 'English') + '</option>';
   }).join('');
+  const themes = [
+    { value: 'dark', label: '🌙 暗色' },
+    { value: 'soft', label: '🌤️ 柔和' },
+    { value: 'blue', label: '💙 蓝色' },
+    { value: 'green', label: '🌿 绿色' }
+  ];
+  const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+  const themeOptions = themes.map(function(t) {
+    return '<option value="' + t.value + '"' + (currentTheme === t.value ? ' selected' : '') + '>' + t.label + '</option>';
+  }).join('');
   return '<div id="sw-toolbar">' +
     '<div class="toolbar-left">' +
       '<span class="toolbar-logo">SoulWriter</span>' +
     '</div>' +
     '<div class="toolbar-right">' +
-      '<select class="toolbar-select" id="lang-select">' + langOptions + '</select>' +
+      '<select class="toolbar-select" id="btn-theme">' + themeOptions + '</select>' +
+      '<select class="toolbar-select" id="btn-lang">' + langOptions + '</select>' +
+      '<button class="toolbar-btn" id="btn-log">📋</button>' +
+      '<button class="toolbar-btn" id="btn-docs">📖</button>' +
       '<button class="toolbar-btn" id="upload-btn" title="上传分析">' + icon('upload') + '</button>' +
-      '<button class="toolbar-btn" id="theme-toggle" title="切换主题">' + icon('settings') + '</button>' +
     '</div>' +
   '</div>';
 }
@@ -169,10 +181,7 @@ function renderLeftDrawer() {
     <nav class="entity-nav">
       ${navItems.map(item => `<div class="entity-nav-item ${state.currentEntity === item.key ? 'active' : ''}" data-entity="${item.key}" title="${t('nav.' + item.key)}">${icon(item.icon)}<span class="nav-label">${t('nav.' + item.key)}</span></div>`).join('')}
     </nav>
-    <div class="entity-list-section" id="entity-list-section">
-      <div class="entity-list-header" id="toggle-entity-list">${t('nav.' + state.currentEntity)} <span class="entity-count-badge" id="entity-count">${entityCount}</span></div>
-      <div class="entity-list-wrap" id="entity-list-wrap">${listHtml}</div>
-    </div>
+
   </aside>`;
 }
 function renderMainCanvas() {
@@ -244,7 +253,7 @@ function renderGenesisTab() {
 }
 
 function renderEventTab() {
-  return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="margin-bottom:12px;font-size:2em;">' + icon('event') + '</div><div style="margin-bottom:8px;">事件线</div><div style="font-size:12px;">功能开发中...</div></div>';
+  return '<div class="event-tab-root" id="event-tab-root"><div class="event-toolbar"><div class="event-arcs-filter" id="event-arcs-filter"></div><button class="event-add-btn" id="event-add-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 新增事件</button></div><div class="event-timeline" id="event-timeline"><div class="event-empty" style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('event') + '</div><div style="margin-bottom:8px;">加载中...</div></div></div></div>';
 }
 
 function renderNvwaTab() {
@@ -291,20 +300,35 @@ async function loadBookData() {
 }
 
 function bindToolbarEvents() {
-  const langSelect = document.getElementById('lang-select');
+  // Language switch
+  const langSelect = document.getElementById('btn-lang');
   if (langSelect) {
     langSelect.addEventListener('change', function() {
       localStorage.setItem('soulwriter-lang', this.value);
       renderApp();
     });
   }
-  const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', function() {
-      const isDark = document.body.getAttribute('data-theme') !== 'light';
-      document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      logger.applyTheme(isDark ? 'light' : 'dark');
+  // Theme switch
+  const themeSelect = document.getElementById('btn-theme');
+  if (themeSelect) {
+    themeSelect.addEventListener('change', function() {
+      var theme = this.value;
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('soulwriter-theme', theme);
+      if (typeof logger !== 'undefined' && logger.applyTheme) logger.applyTheme(theme);
     });
+  }
+  // Log button
+  var logBtn = document.getElementById('btn-log');
+  if (logBtn && !logBtn.dataset.bound) {
+    logBtn.dataset.bound = '1';
+    logBtn.addEventListener('click', function() { window.open('/dashboard/logs.html', '_blank'); });
+  }
+  // Docs button
+  var docsBtn = document.getElementById('btn-docs');
+  if (docsBtn && !docsBtn.dataset.bound) {
+    docsBtn.dataset.bound = '1';
+    docsBtn.addEventListener('click', function() { window.open('https://github.com/zzz123hash/soulwriter-api', '_blank'); });
   }
 }
 
@@ -316,6 +340,26 @@ function bindWelcomeEvents() {
 
 function bindBookEvents() {
   bindUploadModal();
+  // Bind entity nav clicks (角色/物品/地点 etc)
+  document.querySelectorAll('.entity-nav-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var entity = this.dataset.entity;
+      state.currentEntity = entity;
+      state.selectedEntity = null;
+      document.querySelectorAll('.entity-nav-item').forEach(function(i) { i.classList.remove('active'); });
+      this.classList.add('active');
+      // Re-render left drawer and main canvas
+      var leftDrawer = document.getElementById('left-drawer');
+      var mainCanvas = document.getElementById('main-canvas');
+      if (leftDrawer && mainCanvas) {
+        leftDrawer.outerHTML = renderLeftDrawer();
+        mainCanvas.querySelector('.tab-canvas').innerHTML = renderTabContent();
+        bindEntityListInDrawer();
+      } else {
+        renderApp();
+      }
+    });
+  });
   // Bind entity list clicks
   bindEntityListInDrawer();
 
@@ -328,7 +372,8 @@ function bindBookEvents() {
       tab.classList.add('active');
       state.currentTab = tab.dataset.tab;
       state.selectedEntity = null;
-      renderApp();
+      if (tab.dataset.tab === 'event') { renderApp(); loadEventTimeline(); }
+      else renderApp();
     });
   });
   const toggleBtn = document.getElementById('toggle-left');
@@ -627,4 +672,261 @@ function resetUploadModal() {
   if (dz) dz.classList.remove('hidden');
   if (loading) loading.classList.add('hidden');
   if (result) { result.classList.add('hidden'); result.innerHTML = ''; }
+}
+function renderEventTab() {
+  return '<div class="event-tab-root" id="event-tab-root">' +
+    '<div class="event-toolbar">' +
+      '<div class="event-arcs" id="event-arcs-filter"></div>' +
+      '<button class="event-add-btn" id="event-add-btn">' + icon('plus') + ' 新增事件</button>' +
+    '</div>' +
+    '<div class="event-timeline" id="event-timeline">' +
+      '<div class="event-loading">加载中...</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderEventTimeline(events, arcs) {
+  if (!events || events.length === 0) {
+    return '<div class="event-empty">' +
+      '<div style="font-size:2em;margin-bottom:12px;">' + icon('event') + '</div>' +
+      '<div style="margin-bottom:8px;">暂无事件</div>' +
+      '<div style="font-size:12px;color:var(--text2);">点击右上角"新增事件"开始构建故事线</div>' +
+    '</div>';
+  }
+
+  var arcNames = Object.keys(arcs);
+  var currentArc = state.currentEventArc || 'all';
+
+  // Arc filter tabs
+  var arcTabsHtml = '<div class="event-arc-tabs">';
+  arcTabsHtml += '<button class="event-arc-tab ' + (currentArc === 'all' ? 'active' : '') + '" data-arc="all">全部</button>';
+  arcNames.forEach(function(arc) {
+    arcTabsHtml += '<button class="event-arc-tab ' + (currentArc === arc ? 'active' : '') + '" data-arc="' + escapeHtml(arc) + '">' + escapeHtml(arc) + ' (' + arcs[arc].length + ')</button>';
+  });
+  arcTabsHtml += '</div>';
+
+  // Timeline
+  var filteredEvents = currentArc === 'all' ? events : (arcs[currentArc] || []);
+  var timelineHtml = '<div class="event-list">';
+
+  filteredEvents.forEach(function(ev) {
+    var chars = [];
+    try { chars = JSON.parse(ev.characters || '[]'); } catch(e) {}
+    var locs = [];
+    try { locs = JSON.parse(ev.locations || '[]'); } catch(e) {}
+
+    var tensionClass = ev.tension >= 70 ? 'high' : (ev.tension >= 40 ? 'mid' : 'low');
+    var statusBadge = ev.status === 'open' ? '<span class="event-status open">进行中</span>' : '<span class="event-status closed">已解决</span>';
+    var keyBadge = ev.isKeyEvent ? '<span class="event-key">关键</span>' : '';
+
+    timelineHtml += '<div class="event-card ' + (ev.isKeyEvent ? 'key' : '') + '" data-id="' + ev.id + '">' +
+      '<div class="event-card-left">' +
+        '<div class="event-tension-bar ' + tensionClass + '" style="height:' + ev.tension + '%;"></div>' +
+      '</div>' +
+      '<div class="event-card-body">' +
+        '<div class="event-card-header">' +
+          '<span class="event-chapter">' + escapeHtml(ev.chapter || '') + '</span>' +
+          '<b class="event-title">' + escapeHtml(ev.title) + '</b>' +
+          statusBadge + keyBadge +
+        '</div>' +
+        '<div class="event-card-meta">' +
+          (chars.length ? '<span class="event-meta-item">' + icon('roles') + ' ' + chars.join(', ') + '</span>' : '') +
+          (locs.length ? '<span class="event-meta-item">' + icon('locations') + ' ' + locs.join(', ') + '</span>' : '') +
+          '<span class="event-meta-item tension-badge ' + tensionClass + '">张力 ' + ev.tension + '%</span>' +
+        '</div>' +
+        '<div class="event-result">' + escapeHtml(ev.result || '') + '</div>' +
+      '</div>' +
+    '</div>';
+  });
+
+  timelineHtml += '</div>';
+
+  return arcTabsHtml + timelineHtml;
+}
+
+function bindEventTabEvents() {
+  // Arc filter clicks
+  document.querySelectorAll('.event-arc-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      state.currentEventArc = this.dataset.arc;
+      loadEventTimeline();
+    });
+  });
+
+  // Add event button
+  var addBtn = document.getElementById('event-add-btn');
+  if (addBtn && !addBtn.dataset.bound) {
+    addBtn.dataset.bound = '1';
+    addBtn.addEventListener('click', function() {
+      state.selectedEntity = { __isNew: true, id: null, title: '', cause: '', process: '', result: '', arc: '主线', chapter: '', timestamp: 0, isKeyEvent: false, tension: 50, status: 'open', characters: [], locations: [], items: [] };
+      state.currentEntity = 'events';
+      renderApp();
+    });
+  }
+
+  // Event card clicks
+  document.querySelectorAll('.event-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var id = this.dataset.id;
+      var eventData = (state.events || []).find(function(e) { return e.id === id; });
+      if (eventData) {
+        state.selectedEntity = eventData;
+        state.currentEntity = 'events';
+        document.querySelectorAll('.event-card').forEach(function(c) { c.classList.remove('active'); });
+        this.classList.add('active');
+        // Show detail panel
+        var dp = document.getElementById('detail-panel');
+        if (dp) {
+          dp.classList.remove('hidden');
+          dp.innerHTML = renderEventDetail(eventData);
+          bindEventDetailEvents();
+        }
+      }
+    });
+  });
+}
+
+function renderEventDetail(ev) {
+  var chars = [];
+  try { chars = JSON.parse(ev.characters || '[]'); } catch(e) { chars = []; }
+  var locs = [];
+  try { locs = JSON.parse(ev.locations || '[]'); } catch(e) { locs = []; }
+  var isNew = ev.__isNew;
+
+  return '<div class="drawer-header">' +
+    '<span class="drawer-title">' + (isNew ? '新增事件' : '事件详情') + '</span>' +
+    '<button class="drawer-toggle" id="close-detail">' + icon('close') + '</button>' +
+  '</div>' +
+  '<div class="drawer-content">' +
+    '<div class="detail-field"><label>标题</label><input class="detail-input" id="ev-title" value="' + escapeHtml(ev.title || '') + '" placeholder="事件标题"></div>' +
+    '<div class="detail-field"><label>章节/位置</label><input class="detail-input" id="ev-chapter" value="' + escapeHtml(ev.chapter || '') + '" placeholder="第X回"></div>' +
+    '<div class="detail-row">' +
+      '<div class="detail-field"><label>剧情线</label>' +
+        '<select class="detail-input" id="ev-arc"><option value="主线"' + (ev.arc === '主线' ? ' selected' : '') + '>主线</option><option value="支线"' + (ev.arc === '支线' ? ' selected' : '') + '>支线</option><option value="暗线"' + (ev.arc === '暗线' ? ' selected' : '') + '>暗线</option><option value="感情线"' + (ev.arc === '感情线' ? ' selected' : '') + '>感情线</option><option value="成长线"' + (ev.arc === '成长线' ? ' selected' : '') + '>成长线</option></select>' +
+      '</div>' +
+      '<div class="detail-field"><label>序号</label><input class="detail-input" id="ev-timestamp" type="number" value="' + (ev.timestamp || 0) + '"></div>' +
+    '</div>' +
+    '<div class="detail-field"><label>起因</label><textarea class="detail-textarea" id="ev-cause" rows="2" placeholder="事件起因...">' + escapeHtml(ev.cause || '') + '</textarea></div>' +
+    '<div class="detail-field"><label>经过</label><textarea class="detail-textarea" id="ev-process" rows="3" placeholder="事件经过...">' + escapeHtml(ev.process || '') + '</textarea></div>' +
+    '<div class="detail-field"><label>结果</label><textarea class="detail-textarea" id="ev-result" rows="2" placeholder="事件结果...">' + escapeHtml(ev.result || '') + '</textarea></div>' +
+    '<div class="detail-row">' +
+      '<div class="detail-field"><label>张力</label><input class="detail-input" id="ev-tension" type="range" min="0" max="100" value="' + (ev.tension || 50) + '"><span id="ev-tension-val">' + (ev.tension || 50) + '</span></div>' +
+      '<div class="detail-field"><label>状态</label>' +
+        '<select class="detail-input" id="ev-status"><option value="open"' + (ev.status === 'open' ? ' selected' : '') + '>进行中</option><option value="closed"' + (ev.status === 'closed' ? ' selected' : '') + '>已解决</option></select>' +
+      '</div>' +
+    '</div>' +
+    '<div class="detail-field"><label>关键事件</label><input type="checkbox" id="ev-isKeyEvent"' + (ev.isKeyEvent ? ' checked' : '') + '></div>' +
+    '<div class="detail-field"><label>涉及角色（逗号分隔）</label><input class="detail-input" id="ev-characters" value="' + escapeHtml(chars.join(', ')) + '" placeholder="贾宝玉, 林黛玉"></div>' +
+    '<div class="detail-field"><label>涉及地点（逗号分隔）</label><input class="detail-input" id="ev-locations" value="' + escapeHtml(locs.join(', ')) + '" placeholder="荣国府, 大观园"></div>' +
+    '<div class="detail-actions">' +
+      '<button class="btn-save" id="ev-save-btn">' + icon('save') + ' 保存</button>' +
+      (!isNew ? '<button class="btn-delete" id="ev-delete-btn">' + icon('trash') + ' 删除</button>' : '') +
+    '</div>' +
+  '</div>';
+}
+
+function bindEventDetailEvents() {
+  var closeBtn = document.getElementById('close-detail');
+  if (closeBtn) closeBtn.addEventListener('click', function() {
+    var dp = document.getElementById('detail-panel');
+    if (dp) dp.classList.add('hidden');
+  });
+
+  var tensionInput = document.getElementById('ev-tension');
+  if (tensionInput) {
+    tensionInput.addEventListener('input', function() {
+      var val = document.getElementById('ev-tension-val');
+      if (val) val.textContent = this.value;
+    });
+  }
+
+  var saveBtn = document.getElementById('ev-save-btn');
+  if (saveBtn && !saveBtn.dataset.bound) {
+    saveBtn.dataset.bound = '1';
+    saveBtn.addEventListener('click', saveEvent);
+  }
+
+  var deleteBtn = document.getElementById('ev-delete-btn');
+  if (deleteBtn && !deleteBtn.dataset.bound) {
+    deleteBtn.dataset.bound = '1';
+    deleteBtn.addEventListener('click', function() {
+      if (!state.selectedEntity || !state.selectedEntity.id) return;
+      if (!confirm('确认删除此事件？')) return;
+      booksApi('delete_event', { id: state.selectedEntity.id }).then(function(res) {
+        if (res.success) {
+          state.selectedEntity = null;
+          loadEventTimeline();
+          var dp = document.getElementById('detail-panel');
+          if (dp) dp.classList.add('hidden');
+        }
+      });
+    });
+  }
+}
+
+async function saveEvent() {
+  var ev = state.selectedEntity;
+  if (!ev) return;
+  var data = {
+    title: document.getElementById('ev-title').value,
+    chapter: document.getElementById('ev-chapter').value,
+    arc: document.getElementById('ev-arc').value,
+    timestamp: parseInt(document.getElementById('ev-timestamp').value) || 0,
+    cause: document.getElementById('ev-cause').value,
+    process: document.getElementById('ev-process').value,
+    result: document.getElementById('ev-result').value,
+    tension: parseInt(document.getElementById('ev-tension').value) || 50,
+    status: document.getElementById('ev-status').value,
+    isKeyEvent: document.getElementById('ev-isKeyEvent').checked,
+    characters: document.getElementById('ev-characters').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+    locations: document.getElementById('ev-locations').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
+  };
+
+  var res;
+  if (ev.__isNew) {
+    data.bookId = state.currentBook.id;
+    res = await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function(r) { return r.json(); });
+  } else {
+    res = await fetch('/api/events/' + ev.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function(r) { return r.json(); });
+  }
+
+  if (res.success) {
+    state.selectedEntity = null;
+    loadEventTimeline();
+    var dp = document.getElementById('detail-panel');
+    if (dp) dp.classList.add('hidden');
+  } else {
+    alert('保存失败: ' + res.message);
+  }
+}
+
+async function loadEventTimeline() {
+  if (!state.currentBook) return;
+  try {
+    var res = await fetch('/api/events/timeline/' + state.currentBook.id);
+    var result = await res.json();
+    if (result.success) {
+      state.events = result.data.events;
+      state.arcs = result.data.arcs;
+      var timeline = document.getElementById('event-timeline');
+      if (timeline) {
+        if (!state.events || state.events.length === 0) {
+          timeline.innerHTML = '<div class="event-empty" style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('event') + '</div><div style="margin-bottom:8px;">暂无事件</div><div style="font-size:12px;color:var(--text2);">点击右上角"新增事件"开始构建故事线</div></div>';
+        } else {
+          timeline.innerHTML = renderEventTimeline(state.events, state.arcs);
+          bindEventTabEvents();
+        }
+      }
+    }
+  } catch (e) {
+    console.error('loadEventTimeline error:', e);
+  }
 }

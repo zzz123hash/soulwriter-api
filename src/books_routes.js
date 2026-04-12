@@ -12,7 +12,7 @@ async function booksRoutes(fastify) {
     return { success: true, data: shelves };
   });
 
-  // Book APIs (Action style)
+  // Book APIs
   fastify.post('/api/books', async (req, reply) => {
     const { action, ...data } = req.body;
     switch (action) {
@@ -42,6 +42,57 @@ async function booksRoutes(fastify) {
     return { success: true, data: BooksService.deleteBook(req.params.id) };
   });
 
+  // Role APIs
+  fastify.post('/api/roles', async (req, reply) => {
+    const { action, bookId, ...data } = req.body;
+    switch (action) {
+      case 'create':
+        return { success: true, data: BooksService.createRole(bookId, data) };
+      case 'list':
+        return { success: true, data: BooksService.getRoles(bookId) };
+      case 'update':
+        return { success: true, data: BooksService.updateRole(bookId, data.id, data) };
+      case 'delete':
+        return { success: true, data: BooksService.deleteRole(bookId, data.id) };
+      default:
+        return { success: true, data: BooksService.createRole(bookId, req.body) };
+    }
+  });
+
+  // Item APIs
+  fastify.post('/api/items', async (req, reply) => {
+    const { action, bookId, ...data } = req.body;
+    switch (action) {
+      case 'create':
+        return { success: true, data: BooksService.createItem(bookId, data) };
+      case 'list':
+        return { success: true, data: BooksService.getItems(bookId) };
+      case 'update':
+        return { success: true, data: BooksService.updateItem(bookId, data.id, data) };
+      case 'delete':
+        return { success: true, data: BooksService.deleteItem(bookId, data.id) };
+      default:
+        return { success: true, data: BooksService.createItem(bookId, req.body) };
+    }
+  });
+
+  // Location APIs
+  fastify.post('/api/locations', async (req, reply) => {
+    const { action, bookId, ...data } = req.body;
+    switch (action) {
+      case 'create':
+        return { success: true, data: BooksService.createLocation(bookId, data) };
+      case 'list':
+        return { success: true, data: BooksService.getLocations(bookId) };
+      case 'update':
+        return { success: true, data: BooksService.updateLocation(bookId, data.id, data) };
+      case 'delete':
+        return { success: true, data: BooksService.deleteLocation(bookId, data.id) };
+      default:
+        return { success: true, data: BooksService.createLocation(bookId, req.body) };
+    }
+  });
+
   // Chapter APIs
   fastify.post('/api/chapters', async (req, reply) => {
     const { action, bookId, ...data } = req.body;
@@ -52,6 +103,8 @@ async function booksRoutes(fastify) {
         return { success: true, data: BooksService.updateChapter(bookId, data.id, data) };
       case 'delete':
         return { success: true, data: BooksService.deleteChapter(bookId, data.id) };
+      default:
+        return { success: true, data: BooksService.createChapter(bookId, req.body) };
     }
   });
 

@@ -64,7 +64,11 @@
     "noItems": "暂无内容",
     "createFirst": "创建第一个",
     "aiTitle": "⚡ AI 助手",
-    "longTextPlaceholder": "粘贴要分析的文字..."
+    "longTextPlaceholder": "粘贴要分析的文字...",
+    "analyzeDepth": "分析深度",
+    "quickAnalyze": "快速（提取主要角色和地点）",
+    "normalAnalyze": "标准",
+    "deepAnalyze": "深度"
   },
   "translate": {
     "title": "语种翻译",
@@ -129,7 +133,7 @@
     "archival": "归档",
     "summary": "角色摘要",
     "addMemory": "添加记忆",
-    "memoryContent": "内容",
+    "memoryContent": "记忆内容...",
     "importance": "重要性",
     "layer": "层级",
     "selectLayer": "选择层级",
@@ -176,7 +180,8 @@
     "required": "此项为必填",
     "confirmDelete": "确定删除？此操作不可撤销",
     "analyzing": "AI 分析中",
-    "developing": "功能开发中"
+    "developing": "功能开发中",
+    "loading": "加载中..."
   },
   "welcome": {
     "bookshelf": "书柜",

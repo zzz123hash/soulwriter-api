@@ -138,7 +138,7 @@ function renderToolbar() {
 function renderWelcome() {
   return renderToolbar() + '<div class="welcome-page">'; +
     '<div class="welcome-logo"><h1 class="app-logo">SoulWriter</h1><p class="app-slogan">灵魂创作者</p></div>' +
-    '<section class="bookshelf-section"><h2 class="section-title">书架</h2><div class="bookshelf" id="books-list"><div class="loading-text">加载中...</div></div></section>' +
+    '<section class="bookshelf-section"><h2 class="section-title">书架</h2><div class="bookshelf" id="books-list"><div class="loading-text">'+t('errors.loading')+'</div></div></section>' +
     '<div class="create-book-area"><button class="btn-create-book" id="create-book-btn"><span class="btn-icon">+</span><span class="btn-text">创建新书</span></button></div>' +
   '</div>';
 }
@@ -163,7 +163,7 @@ function renderBookView() {
     '<div class="book-body">' +
       '<aside class="left-drawer ' + (state.leftDrawerOpen ? 'open' : 'collapsed') + '" id="left-drawer">' +
         '<div class="drawer-header">' +
-          '<span class="drawer-title">导航</span>' +
+          '<span class="drawer-title">'+t('nav.home')+'</span>' +
           '<button class="drawer-toggle" id="toggle-left">' + icon('chevronLeft') + '</button>' +
         '</div>' +
         '<nav class="drawer-nav-tree" id="drawer-nav-tree">' + renderLeftDrawerNav() + '</nav>' +
@@ -173,7 +173,7 @@ function renderBookView() {
       '</main>' +
       '<aside class="right-drawer ' + (state.selectedEntity ? 'open' : '') + '" id="detail-panel">' +
         '<div class="drawer-header">' +
-          '<span class="drawer-title">详情</span>' +
+          '<span class="drawer-title">'+t('detail.title')+'</span>' +
           '<button class="drawer-toggle" id="close-detail">' + icon('close') + '</button>' +
         '</div>' +
         '<div class="drawer-content" id="detail-content">' + (state.selectedEntity ? renderEntityDetail() : '<div class="empty-hint">← 点击实体查看详情</div>') + '</div>' +
@@ -416,13 +416,13 @@ function renderEventTab() {
   return '<div class="event-tab-root" id="event-tab-root">' +
     '<div class="event-toolbar"><div class="event-arcs-filter" id="event-arcs-filter"></div>' +
     '<button class="event-add-btn" id="event-add-btn">' + icon('plus') + ' 新增事件</button></div>' +
-    '<div class="event-timeline" id="event-timeline"><div class="event-loading">加载中...</div></div>' +
+    '<div class="event-timeline" id="event-timeline"><div class="event-loading">'+t('errors.loading')+'</div></div>' +
   '</div>';
 }
 
 // ============ 女娲 Tab ============
 function renderNvwaTab() {
-  return '<div class="nvwa-tab-root" id="nvwa-tab-root"><div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">加载中...</div></div>';
+  return '<div class="nvwa-tab-root" id="nvwa-tab-root"><div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">'+t('errors.loading')+'</div></div>';
 }
 
 // ============ 实体详情 ============
@@ -504,8 +504,8 @@ function showCreateBookModal() {
   var modal = document.createElement('div');
   modal.className = 'modal-overlay open';
   modal.innerHTML = '<div class="modal-box"><div class="modal-title">创建新书</div><div class="modal-body">' +
-    '<div class="field"><label>书名</label><input id="new-book-title" type="text" placeholder="输入书名"></div>' +
-    '<div class="field"><label>作者</label><input id="new-book-author" type="text" placeholder="作者名称"></div></div>' +
+    '<div class="field"><label>书名</label><input id="new-book-title" type="text" placeholder="'+t('welcome.bookTitle')+'"></div>' +
+    '<div class="field"><label>作者</label><input id="new-book-author" type="text" placeholder="'+t('welcome.bookAuthor')+'"></div></div>' +
     '<div class="modal-actions"><button class="btn btn-primary" id="do-create-book">创建</button><button class="btn btn-secondary" id="cancel-create-book">取消</button></div></div>';
   document.body.appendChild(modal);
   document.getElementById('do-create-book').addEventListener('click', async function() {
@@ -873,8 +873,8 @@ function renderEventDetail() {
   return '<div class="entity-detail">' +
     '<div class="detail-header"><div class="detail-icon">' + icon('event') + '</div><div class="detail-title">' + (isNew ? '新增事件' : escapeHtml(ev.title)) + '</div></div>' +
     '<div class="detail-body">' +
-      '<div class="detail-field"><label>标题</label><input class="detail-input" id="ev-title" value="' + escapeHtml(ev.title || '') + '" placeholder="事件标题"></div>' +
-      '<div class="detail-field"><label>章节/位置</label><input class="detail-input" id="ev-chapter" value="' + escapeHtml(ev.chapter || '') + '" placeholder="第X回"></div>' +
+      '<div class="detail-field"><label>标题</label><input class="detail-input" id="ev-title" value="' + escapeHtml(ev.title || '') + '" placeholder="'+t('event.eventTitle')+'"></div>' +
+      '<div class="detail-field"><label>章节/位置</label><input class="detail-input" id="ev-chapter" value="' + escapeHtml(ev.chapter || '') + '" placeholder="'+t('event.chapterPlaceholder')+'"></div>' +
       '<div class="detail-row"><div class="detail-field"><label>剧情线</label>' +
         '<select class="detail-input" id="ev-arc"><option value="主线"' + (ev.arc === '主线' ? ' selected' : '') + '>主线</option><option value="支线"' + (ev.arc === '支线' ? ' selected' : '') + '>支线</option><option value="暗线"' + (ev.arc === '暗线' ? ' selected' : '') + '>暗线</option><option value="感情线"' + (ev.arc === '感情线' ? ' selected' : '') + '>感情线</option></select>' +
       '</div><div class="detail-field"><label>序号</label><input class="detail-input" id="ev-timestamp" type="number" value="' + (ev.timestamp || 0) + '"></div></div>' +
@@ -883,8 +883,8 @@ function renderEventDetail() {
       '<div class="detail-field"><label>结果</label><textarea class="detail-textarea" id="ev-result" rows="2">' + escapeHtml(ev.result || '') + '</textarea></div>' +
       '<div class="detail-row"><div class="detail-field"><label>张力</label><input class="detail-input" id="ev-tension" type="range" min="0" max="100" value="' + (ev.tension || 50) + '"><span id="ev-tension-val">' + (ev.tension || 50) + '</span></div>' +
       '<div class="detail-field"><label>状态</label><select class="detail-input" id="ev-status"><option value="open"' + (ev.status === 'open' ? ' selected' : '') + '>进行中</option><option value="closed"' + (ev.status === 'closed' ? ' selected' : '') + '>已解决</option></select></div></div>' +
-      '<div class="detail-field"><label>涉及角色（逗号分隔）</label><input class="detail-input" id="ev-characters" value="' + escapeHtml(chars.join(', ')) + '"></div>' +
-      '<div class="detail-field"><label>涉及地点（逗号分隔）</label><input class="detail-input" id="ev-locations" value="' + escapeHtml(locs.join(', ')) + '"></div>' +
+      '<div class="detail-field"><label>'+t('event.charactersHint')+'</label><input class="detail-input" id="ev-characters" value="' + escapeHtml(chars.join(', ')) + '"></div>' +
+      '<div class="detail-field"><label>'+t('event.locationsHint')+'</label><input class="detail-input" id="ev-locations" value="' + escapeHtml(locs.join(', ')) + '"></div>' +
     '</div>' +
     '<div class="detail-actions">' +
       '<button class="btn-save-detail" id="ev-save-btn">' + icon('save') + ' 保存</button>' +
@@ -1023,9 +1023,9 @@ function showNvwaAddModal() {
   var modal = document.createElement('div');
   modal.className = 'modal-overlay open';
   modal.innerHTML = '<div class="modal-box"><div class="modal-title">添加记忆</div><div class="modal-body">' +
-    '<div class="field"><label>内容</label><textarea id="nvwa-new-content" rows="5" placeholder="记忆内容..."></textarea></div>' +
+    '<div class="field"><label>内容</label><textarea id="nvwa-new-content" rows="5" placeholder="'+t('nvwa.memoryContent')+'"></textarea></div>' +
     '<div class="detail-row"><div class="detail-field"><label>重要性</label><input id="nvwa-new-imp" type="range" min="1" max="10" value="5"><span id="nvwa-imp-val">5</span></div>' +
-    '<div class="detail-field"><label>层级</label><select id="nvwa-new-status"><option value="buffer">缓冲区</option><option value="core">核心记忆</option><option value="recall">召回</option><option value="archival">归档</option></select></div></div>' +
+    '<div class="detail-field"><label>层级</label><select id="nvwa-new-status"><option value="buffer">'+t('nvwa.buffer')+'</option><option value="core">核心记忆</option><option value="recall">召回</option><option value="archival">归档</option></select></div></div>' +
     '</div><div class="modal-actions"><button class="btn btn-primary" id="nvwa-do-add">保存</button><button class="btn btn-secondary" id="nvwa-cancel-add">取消</button></div></div>';
   document.body.appendChild(modal);
   var el=document.getElementById('nvwa-new-imp');if(el)el.addEventListener('input', function() { document.getElementById('nvwa-imp-val').textContent = this.value; });
@@ -1046,8 +1046,8 @@ function showLongTextAnalyzeModal() {
   var modal = document.createElement('div');
   modal.className = 'modal-overlay open';
   modal.innerHTML = '<div class="modal-box" style="width:560px;"><div class="modal-title">长文本分析</div><div class="modal-body">' +
-    '<div class="field"><label>粘贴文本</label><textarea id="lt-content" rows="8" placeholder="粘贴要分析的文字..." style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:6px;font-size:13px;resize:vertical;font-family:inherit;"></textarea></div>' +
-    '<div class="field"><label>分析深度</label><select id="lt-depth" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;"><option value="quick">快速（提取主要角色和地点）</option><option value="normal" selected>标准</option><option value="deep">深度</option></select></div>' +
+    '<div class="field"><label>粘贴文本</label><textarea id="lt-content" rows="8" placeholder="'+t('home.longTextPlaceholder')+'" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:6px;font-size:13px;resize:vertical;font-family:inherit;"></textarea></div>' +
+    '<div class="field"><label>'+t('home.analyzeDepth')+'</label><select id="lt-depth" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;"><option value="quick">'+t('home.quickAnalyze')+'</option><option value="normal" selected>'+t('home.normalAnalyze')+'</option><option value="deep">'+t('home.deepAnalyze')+'</option></select></div>' +
     '<div id="lt-result" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;max-height:300px;overflow-y:auto;font-size:13px;line-height:1.8;"></div>' +
     '</div><div class="modal-actions"><button class="btn btn-primary" id="lt-analyze-btn">分析</button><button class="btn btn-secondary" id="lt-close-btn">关闭</button></div></div>';
   document.body.appendChild(modal);
@@ -1060,7 +1060,7 @@ function showLongTextAnalyzeModal() {
     btn.disabled = true; btn.textContent = '分析中...';
     var resultEl = document.getElementById('lt-result');
     resultEl.style.display = 'block';
-    resultEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">AI 分析中...</div>';
+    resultEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">'+t('errors.analyzing')+'...</div>';
     try {
       var res = await fetch('/api/split', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: content, depth: depth, bookId: state.currentBook ? state.currentBook.id : '' }) });
       var result = await res.json();
@@ -1073,7 +1073,7 @@ function showLongTextAnalyzeModal() {
         if (html === '<div>') html = '<div style="color:var(--text2);">未提取到信息</div>';
         html += '</div>';
         resultEl.innerHTML = html;
-      } else { resultEl.innerHTML = '<div style="color:#ef4444;">分析失败</div>'; }
+      } else { resultEl.innerHTML = '<div style="color:#ef4444;">'+t('errors.saveFailed')+'</div>'; }
     } catch(e) { resultEl.innerHTML = '<div style="color:#ef4444;">请求失败：' + e.message + '</div>'; }
     btn.disabled = false; btn.textContent = '分析';
   });

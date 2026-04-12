@@ -67,13 +67,13 @@ const i18n = {
   'zh-CN': {
     app: { name: 'SoulWriter', subtitle: '灵魂创作者 · 内容塑魂师' },
     nav: { roles: '角色', items: '物品', locations: '地点', chapters: '章节', writing: '写作', genesis: '创世树' },
-    book: { create: '创建新书', noBooks: '书架空空如也，创建第一本书吧' },
+    book: { create: '创建新书', import: '导入', noBooks: '书架空空如也，创建第一本书吧' },
     common: { bookshelf: '书架', back: '返回', loading: '加载中...' }
   },
   'en-US': {
     app: { name: 'SoulWriter', subtitle: 'Soul Creator · Content Shaper' },
     nav: { roles: 'Roles', items: 'Items', locations: 'Locations', chapters: 'Chapters', writing: 'Writing', genesis: 'Genesis' },
-    book: { create: 'Create Book', noBooks: 'Your bookshelf is empty. Create your first book!' },
+    book: { create: 'Create Book', import: 'Import', noBooks: 'Your bookshelf is empty. Create your first book!' },
     common: { bookshelf: 'Bookshelf', back: 'Back', loading: 'Loading...' }
   }
 };
@@ -102,14 +102,55 @@ function renderApp() {
 
 // ============ 欢迎页 ============
 function renderWelcome() {
-  return '<div class="welcome-page"><header class="welcome-header"><h1 class="app-logo">SoulWriter</h1><p class="app-slogan">'+t('app.subtitle')+'</p></header><section class="bookshelf-section"><h2 class="section-title">📚 '+t('common.bookshelf')+'</h2><div class="bookshelf" id="books-list"><div class="loading-text">'+t('common.loading')+'</div></div></section><div class="create-book-area"><button class="btn-create-book" id="create-book-btn"><span class="btn-icon">+</span><span class="btn-text">'+t('book.create')+'</span></button>
-<button class="btn-create-book" id="import-book-btn" style="background:#4f46e5"><span class="btn-icon">📥</span><span class="btn-text">导入</span></button>
-</div></div>';
+  return `<div class="welcome-page">
+    <header class="welcome-header">
+      <h1 class="app-logo">SoulWriter</h1>
+      <p class="app-slogan">${t('app.subtitle')}</p>
+    </header>
+    <section class="bookshelf-section">
+      <h2 class="section-title">📚 ${t('common.bookshelf')}</h2>
+      <div class="bookshelf" id="books-list"><div class="loading-text">${t('common.loading')}</div></div>
+    </section>
+    <div class="create-book-area">
+      <button class="btn-create-book" id="create-book-btn">
+        <span class="btn-icon">+</span>
+        <span class="btn-text">${t('book.create')}</span>
+      </button>
+      <button class="btn-create-book" id="import-book-btn" style="background:#4f46e5">
+        <span class="btn-icon">📥</span>
+        <span class="btn-text">${t('book.import')}</span>
+      </button>
+    </div>
+  </div>`;
 }
 
-// ============ 主布局 ============
+// ============ 主界面布局 ============
 function renderMainLayout() {
-  return '<div class="main-layout"><aside class="sidebar"><div class="sidebar-header"><h2 class="book-title">'+(state.currentBook?.title || '')+'</h2><button class="btn btn-sm" id="back-to-books">← '+t('common.back')+'</button></div><nav class="sidebar-nav"><div class="nav-item" data-view="roles">📁 '+t('nav.roles')+'</div><div class="nav-item" data-view="items">🎁 '+t('nav.items')+'</div><div class="nav-item" data-view="locations">📍 '+t('nav.locations')+'</div><div class="nav-item" data-view="chapters">📖 '+t('nav.chapters')+'</div><div class="nav-item" data-view="writing">✍️ '+t('nav.writing')+'</div><div class="nav-item" data-view="genesis">🌳 '+t('nav.genesis')+'</div></nav></aside><main class="main-content" id="main-content">'+renderContent()+'</main></div>';
+  return `
+    <div class="app-layout">
+      <header class="app-header">
+        <button class="btn-back" id="back-to-books">← 📚</button>
+        <h1 class="book-title">${state.currentBook?.title || '无标题'}</h1>
+      </header>
+      <nav class="nav-sidebar">
+        <button class="nav-item ${state.currentView === 'chapters' ? 'active' : ''}" data-view="chapters">📖 章节</button>
+        <button class="nav-item ${state.currentView === 'roles' ? 'active' : ''}" data-view="roles">👤 角色</button>
+        <button class="nav-item ${state.currentView === 'items' ? 'active' : ''}" data-view="items">🎁 物品</button>
+        <button class="nav-item ${state.currentView === 'locations' ? 'active' : ''}" data-view="locations">🗺️ 地点</button>
+        <button class="nav-item ${state.currentView === 'relationships' ? 'active' : ''}" data-view="relationships">🔗 关系</button>
+        <button class="nav-item ${state.currentView === 'genesis' ? 'active' : ''}" data-view="genesis">🌱 创世</button>
+      </nav>
+      <main class="main-content" id="main-content">
+        ${renderContent()}
+      </main>
+      <footer class="app-footer">
+        <button class="btn btn-primary" id="add-role-btn">+ 角色</button>
+        <button class="btn btn-primary" id="add-item-btn">+ 物品</button>
+        <button class="btn btn-primary" id="add-location-btn">+ 地点</button>
+        <button class="btn btn-primary" id="add-chapter-btn">+ 章节</button>
+      </footer>
+    </div>
+  `;
 }
 
 function renderContent() {

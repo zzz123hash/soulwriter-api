@@ -1,0 +1,12 @@
+{
+  "id": "nvwa-tension-monitor",
+  "name": "张力监控器",
+  "version": "1.0.0",
+  "author": "SoulWriter",
+  "description": "监控女娲推演中的张力变化，提供实时反馈",
+  "main": "index.js",
+  "hooks": [
+    "nvwa:before_tick",
+    "nvwa:after_tick"
+  ]
+}

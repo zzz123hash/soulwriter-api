@@ -55,7 +55,7 @@ function renderToolbar() {
       '<select class="toolbar-select" id="btn-theme">' + themeOptions + '</select>' +
       '<select class="toolbar-select" id="btn-lang">' + langOptions + '</select>' +
       '<button class="toolbar-btn" id="btn-log">📋</button>' +
-      '<button class="toolbar-btn" id="btn-docs">📖</button>' +
+      '<button class="toolbar-btn" id="btn-settings">⚙️</button>' +
       '<button class="toolbar-btn" id="upload-btn" title="上传分析">' + icon('upload') + '</button>' +
     '</div>' +
   '</div>';
@@ -326,10 +326,10 @@ function bindToolbarEvents() {
     logBtn.addEventListener('click', function() { window.open('/dashboard/logs.html', '_blank'); });
   }
   // Docs button
-  var docsBtn = document.getElementById('btn-docs');
+  var settingsBtn = document.getElementById('btn-settings');
   if (docsBtn && !docsBtn.dataset.bound) {
     docsBtn.dataset.bound = '1';
-    docsBtn.addEventListener('click', function() { window.open('https://github.com/zzz123hash/soulwriter-api', '_blank'); });
+    docsBtn.addEventListener('click', function() { location.href = '/dashboard/settings.html'; });
   }
 }
 

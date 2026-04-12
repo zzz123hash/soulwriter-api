@@ -235,6 +235,9 @@ const DrawerSystem = {
       case 'events':
         bodyHtml = this.renderEventsDetail();
         break;
+      case 'event_new':
+        bodyHtml = this.renderNewEventForm();
+        break;
       case 'chapters':
         bodyHtml = this.renderChaptersDetail();
         break;

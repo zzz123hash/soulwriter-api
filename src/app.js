@@ -237,43 +237,43 @@ fastify.post('/api/v1/ai/run', async (req) => {
 const { initGenesisDB, createSeed, getSeed, createNode, getNode, getChildNodes, updateNode, createEdge, buildTree, deleteNode } = require('./genesis_tree');
 initGenesisDB(db);
 
-fastify.post('/api/v1/genesis/seeds', (req) => {
+fastify.post('/api/genesis/seeds', (req) => {
   const id = createSeed(db, req.body);
   return { success: true, id };
 });
-fastify.get('/api/v1/genesis/seeds', () => db.prepare('SELECT * FROM genesis_seeds ORDER BY createdAt DESC').all());
-fastify.get('/api/v1/genesis/seeds/:id', (req) => {
+fastify.get('/api/genesis/seeds', () => db.prepare('SELECT * FROM genesis_seeds ORDER BY createdAt DESC').all());
+fastify.get('/api/genesis/seeds/:id', (req) => {
   const seed = getSeed(db, req.params.id);
   if (!seed) return { error: 'Seed not found' };
   return seed;
 });
-fastify.post('/api/v1/genesis/nodes', (req) => {
+fastify.post('/api/genesis/nodes', (req) => {
   const { seedId, parentId, type, label, description, positionX, positionY, metadata } = req.body;
   if (!seedId || !label) return { error: 'seedId and label required' };
   const id = createNode(db, { seedId, parentId, type, label, description, positionX, positionY, metadata });
   return { success: true, id };
 });
-fastify.get('/api/v1/genesis/nodes/:id', (req) => {
+fastify.get('/api/genesis/nodes/:id', (req) => {
   const node = getNode(db, req.params.id);
   if (!node) return { error: 'Node not found' };
   return node;
 });
-fastify.get('/api/v1/genesis/nodes/:id/children', (req) => getChildNodes(db, req.params.id));
-fastify.put('/api/v1/genesis/nodes/:id', (req) => {
+fastify.get('/api/genesis/nodes/:id/children', (req) => getChildNodes(db, req.params.id));
+fastify.put('/api/genesis/nodes/:id', (req) => {
   updateNode(db, req.params.id, req.body);
   return { success: true };
 });
-fastify.delete('/api/v1/genesis/nodes/:id', (req) => {
+fastify.delete('/api/genesis/nodes/:id', (req) => {
   deleteNode(db, req.params.id);
   return { success: true };
 });
-fastify.post('/api/v1/genesis/edges', (req) => {
+fastify.post('/api/genesis/edges', (req) => {
   const { sourceId, targetId, type, label, metadata } = req.body;
   if (!sourceId || !targetId) return { error: 'sourceId and targetId required' };
   const id = createEdge(db, sourceId, targetId, { type, label, metadata });
   return { success: true, id };
 });
-fastify.get('/api/v1/genesis/seeds/:id/tree', (req) => buildTree(db, req.params.id));
+fastify.get('/api/genesis/seeds/:id/tree', (req) => buildTree(db, req.params.id));
 
 
 // API根路由
@@ -479,7 +479,7 @@ select,input{background:#252552;border:1px solid #333;color:#fff;padding:10px;bo
 <option value="/api/v1/projects">/api/v1/projects</option>
 <option value="/api/v1/nvwa/status">/api/v1/nvwa/status</option>
 <option value="/api/v1/ai/config">/api/v1/ai/config</option>
-<option value="/api/v1/genesis/seeds">/api/v1/genesis/seeds</option>
+<option value="/api/genesis/seeds">/api/genesis/seeds</option>
 </select>
 <button class="btn" onclick="test()">发送</button>
 <button class="btn" onclick="refresh()">刷新</button>
@@ -523,7 +523,7 @@ async function refresh() {
     const n = await api("/api/v1/nvwa/status");
     if(n && n.activeCharacters !== undefined) document.getElementById("nvwa").textContent = n.activeCharacters;
 }
-const eps = ["/health","/api/v1/projects","/api/v1/nvwa/status","/api/v1/ai/config","/api/v1/genesis/seeds"];
+const eps = ["/health","/api/v1/projects","/api/v1/nvwa/status","/api/v1/ai/config","/api/genesis/seeds"];
 document.getElementById("eps").innerHTML = eps.map(e=>'<span>'+e+'</span>').join("");
 // Books functions
 let books = [];

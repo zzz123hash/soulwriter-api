@@ -3,7 +3,7 @@
  * 可视化故事宇宙的演化
  */
 
-const API_BASE = 'http://localhost:3000/api/v1';
+const API_BASE = 'http://localhost:3000/api';
 
 // 创世树状态
 const genesisState = {

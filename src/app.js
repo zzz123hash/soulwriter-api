@@ -7,7 +7,7 @@ const booksRoutes = require('./books_routes');
 const nvwa = require('./nvwa_engine');
 const worksStorage = require('./services/works_storage');
 const worksRoutes = require('./routes/works_routes');
-
+const uploadRoutes = require('./routes/upload_routes');
 const db = new Database(path.join(__dirname, '..', 'data.db'));
 
 // ============ Init DB ============
@@ -299,6 +299,7 @@ db.exec("CREATE TABLE IF NOT EXISTS scenes (id TEXT PRIMARY KEY, projectId TEXT 
 fastify.get('/api/v1/projects/:projectId/chapters', (req) => {
   return db.prepare('SELECT * FROM chapters WHERE projectId = ? ORDER BY orderIndex').all(req.params.projectId);
 });
+    fastify.register(uploadRoutes, { db });
     fastify.register(genesisNvwaRoutes, { db });
 
 fastify.post('/api/v1/chapters', async (req) => {

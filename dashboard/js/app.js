@@ -15,6 +15,7 @@ const Icons = {
   genesis: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/></svg>',
   event: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   nvwa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 1 7 7"/><circle cx="12" cy="12" r="3"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
   novel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
@@ -42,6 +43,7 @@ function renderToolbar() {
     '</div>' +
     '<div class="toolbar-right">' +
       '<select class="toolbar-select" id="lang-select">' + langOptions + '</select>' +
+      '<button class="toolbar-btn" id="upload-btn" title="上传分析">' + icon('upload') + '</button>' +
       '<button class="toolbar-btn" id="theme-toggle" title="切换主题">' + icon('settings') + '</button>' +
     '</div>' +
   '</div>';
@@ -307,11 +309,13 @@ function bindToolbarEvents() {
 }
 
 function bindWelcomeEvents() {
+  bindUploadModal();
   document.getElementById('create-book-btn') && document.getElementById('create-book-btn').addEventListener('click', showCreateBookModal);
   loadBooks();
 }
 
 function bindBookEvents() {
+  bindUploadModal();
   // Bind entity list clicks
   bindEntityListInDrawer();
 
@@ -475,4 +479,152 @@ function bindEntityListInDrawer() {
       if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
     });
   }
+}
+// ============ Upload Modal ============
+function renderUploadModal() {
+  return '<div id="upload-modal" class="modal-overlay hidden">' +
+    '<div class="modal-content">' +
+      '<div class="modal-header">' +
+        '<h3>上传分解</h3>' +
+        '<button class="modal-close" id="upload-modal-close">' + icon('close') + '</button>' +
+      '</div>' +
+      '<div class="modal-body" id="upload-modal-body">' +
+        '<div class="upload-drop-zone" id="upload-drop-zone">' +
+          '<div class="upload-icon">' + icon('upload') + '</div>' +
+          '<p>点击选择文件 或 拖拽文件到此处</p>' +
+          '<p class="upload-hint">支持 TXT / MD / DOCX / EPUB</p>' +
+          '<input type="file" id="upload-file-input" accept=".txt,.md,.docx,.epub" style="display:none">' +
+        '</div>' +
+        '<div id="upload-result" class="hidden"></div>' +
+        '<div id="upload-loading" class="hidden">' +
+          '<div class="spinner"></div>' +
+          '<p>AI 分析中，请稍候...</p>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+async function handleFileUpload(file) {
+  if (!state.currentBook) {
+    alert('请先打开一本书');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('file', file);
+  document.getElementById('upload-loading').classList.remove('hidden');
+  document.getElementById('upload-drop-zone').classList.add('hidden');
+  try {
+    var res = await fetch('/api/upload', { method: 'POST', body: formData });
+    var result = await res.json();
+    if (!result.success) throw new Error(result.message);
+    var splitRes = await fetch('/api/split', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: result.data.content || String(result.data.totalLength), bookId: state.currentBook.id })
+    });
+    var split = await splitRes.json();
+    document.getElementById('upload-loading').classList.add('hidden');
+    if (!split.success) throw new Error(split.message);
+    showUploadResult(split.data);
+  } catch (e) {
+    document.getElementById('upload-loading').classList.add('hidden');
+    document.getElementById('upload-drop-zone').classList.remove('hidden');
+    alert('Error: ' + e.message);
+  }
+}
+
+function showUploadResult(data) {
+  var saved = data._saved || {};
+  var chars = data.characters || [];
+  var items = data.items || [];
+  var locs = data.locations || [];
+  document.getElementById('upload-drop-zone').classList.add('hidden');
+  document.getElementById('upload-result').classList.remove('hidden');
+  var html = '<div class="split-summary"><h4>分析完成！</h4>';
+  html += '<div class="split-stats">';
+  html += '<div class="split-stat"><span>' + icon('roles') + '</span><b>' + saved.roles + '</b> 角色</div>';
+  html += '<div class="split-stat"><span>' + icon('items') + '</span><b>' + saved.items + '</b> 物品</div>';
+  html += '<div class="split-stat"><span>' + icon('locations') + '</span><b>' + saved.locations + '</b> 地点</div>';
+  html += '</div>';
+  if (chars.length) {
+    html += '<details class="split-list"><summary>角色 (' + chars.length + ')</summary><ul>';
+    chars.forEach(function(c) { html += '<li><b>' + c.name + '</b> - ' + (c.role || '') + '</li>'; });
+    html += '</ul></details>';
+  }
+  if (items.length) {
+    html += '<details class="split-list"><summary>物品 (' + items.length + ')</summary><ul>';
+    items.forEach(function(i) { html += '<li><b>' + i.name + '</b> - ' + (i.description || '') + '</li>'; });
+    html += '</ul></details>';
+  }
+  if (locs.length) {
+    html += '<details class="split-list"><summary>地点 (' + locs.length + ')</summary><ul>';
+    locs.forEach(function(l) { html += '<li><b>' + l.name + '</b> - ' + (l.description || '') + '</li>'; });
+    html += '</ul></details>';
+  }
+  html += '<p class="split-note">以上实体已自动导入到当前书本</p></div>';
+  document.getElementById('upload-result').innerHTML = html;
+  if (state.currentBook) loadEntities(state.currentBook.id);
+}
+
+function bindUploadModal() {
+  var uploadBtn = document.getElementById('upload-btn');
+
+  if (uploadBtn && !uploadBtn.dataset.bound) {
+    uploadBtn.dataset.bound = '1';
+    uploadBtn.addEventListener('click', function() {
+      var modal = document.getElementById('upload-modal');
+      if (!modal) {
+        document.body.insertAdjacentHTML('beforeend', renderUploadModal());
+        bindUploadModal();
+        modal = document.getElementById('upload-modal');
+      }
+      modal.classList.remove('hidden');
+      resetUploadModal();
+    });
+  }
+
+  var modal = document.getElementById('upload-modal');
+  if (!modal) return;
+  var dropZone = document.getElementById('upload-drop-zone');
+  var fileInput = document.getElementById('upload-file-input');
+  var closeBtn = document.getElementById('upload-modal-close');
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      modal.classList.add('hidden');
+    });
+  }
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) modal.classList.add('hidden');
+  });
+
+  if (dropZone) {
+    dropZone.addEventListener('click', function() { fileInput.click(); });
+    dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('drag-over'); });
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      var f = e.dataTransfer.files[0];
+      if (f) handleFileUpload(f);
+    });
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      var f = e.target.files[0];
+      if (f) handleFileUpload(f);
+    });
+  }
+}
+
+function resetUploadModal() {
+  var dz = document.getElementById('upload-drop-zone');
+  var loading = document.getElementById('upload-loading');
+  var result = document.getElementById('upload-result');
+  if (dz) dz.classList.remove('hidden');
+  if (loading) loading.classList.add('hidden');
+  if (result) { result.classList.add('hidden'); result.innerHTML = ''; }
 }

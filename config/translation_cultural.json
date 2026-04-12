@@ -1,142 +1,678 @@
 {
   "description": "文化要素映射库 - 翻译改编时自动替换文化元素",
-  "version": "1.0",
+  "version": "2.1",
   "mappings": {
     "zh→en": {
       "food": {
-        "米饭": { "target": "rice", "type": "food", "context": "主食" },
-        "白米饭": { "target": "steamed rice", "type": "food" },
-        "面条": { "target": "noodles/pasta", "type": "food" },
-        "粥": { "target": "porridge", "type": "food" },
-        "包子": { "target": "bun/dumpling", "type": "food" },
-        "饺子": { "target": "dumplings", "type": "food" },
-        "馒头": { "target": "steamed bun", "type": "food" },
-        "油条": { "target": "fried dough stick", "type": "food" },
-        "豆浆": { "target": "soy milk", "type": "food" },
-        "豆腐": { "target": "tofu", "type": "food" },
-        "火锅": { "target": "hot pot", "type": "food" },
-        "炒菜": { "target": "stir-fried dishes", "type": "food" },
-        "红烧肉": { "target": "braised pork", "type": "food" },
-        "糖醋排骨": { "target": "sweet and sour ribs", "type": "food" },
-        "鱼香肉丝": { "target": "shredded pork with garlic sauce", "type": "food" },
-        "宫保鸡丁": { "target": "Kung Pao chicken", "type": "food" },
-        "麻婆豆腐": { "target": "mapo tofu", "type": "food" },
-        "小笼包": { "target": "soup dumpling", "type": "food" },
-        "烧麦": { "target": "shaomai/steamed dumpling", "type": "food" },
-        "春卷": { "target": "spring roll", "type": "food" },
-        "月饼": { "target": "mooncake", "type": "food" },
-        "汤圆": { "target": "tangyuan/glutinous rice balls", "type": "food" },
-        "粽子": { "target": "zongzi/rice dumpling", "type": "food" },
-        "腊肉": { "target": "cured/lap meat", "type": "food" },
-        "泡菜": { "target": "pickled vegetables", "type": "food" }
+        "米饭": {
+          "target": "rice",
+          "type": "food",
+          "context": "主食"
+        },
+        "白米饭": {
+          "target": "steamed rice",
+          "type": "food"
+        },
+        "面条": {
+          "target": "noodles/pasta",
+          "type": "food"
+        },
+        "粥": {
+          "target": "porridge",
+          "type": "food"
+        },
+        "包子": {
+          "target": "bun/dumpling",
+          "type": "food"
+        },
+        "饺子": {
+          "target": "dumplings",
+          "type": "food"
+        },
+        "馒头": {
+          "target": "steamed bun",
+          "type": "food"
+        },
+        "油条": {
+          "target": "fried dough stick",
+          "type": "food"
+        },
+        "豆浆": {
+          "target": "soy milk",
+          "type": "food"
+        },
+        "豆腐": {
+          "target": "tofu",
+          "type": "food"
+        },
+        "火锅": {
+          "target": "hot pot",
+          "type": "food"
+        },
+        "炒菜": {
+          "target": "stir-fried dishes",
+          "type": "food"
+        },
+        "红烧肉": {
+          "target": "braised pork",
+          "type": "food"
+        },
+        "糖醋排骨": {
+          "target": "sweet and sour ribs",
+          "type": "food"
+        },
+        "鱼香肉丝": {
+          "target": "shredded pork with garlic sauce",
+          "type": "food"
+        },
+        "宫保鸡丁": {
+          "target": "Kung Pao chicken",
+          "type": "food"
+        },
+        "麻婆豆腐": {
+          "target": "mapo tofu",
+          "type": "food"
+        },
+        "小笼包": {
+          "target": "soup dumpling",
+          "type": "food"
+        },
+        "烧麦": {
+          "target": "shaomai/steamed dumpling",
+          "type": "food"
+        },
+        "春卷": {
+          "target": "spring roll",
+          "type": "food"
+        },
+        "月饼": {
+          "target": "mooncake",
+          "type": "food"
+        },
+        "汤圆": {
+          "target": "tangyuan/glutinous rice balls",
+          "type": "food"
+        },
+        "粽子": {
+          "target": "zongzi/rice dumpling",
+          "type": "food"
+        },
+        "腊肉": {
+          "target": "cured/lap meat",
+          "type": "food"
+        },
+        "泡菜": {
+          "target": "pickled vegetables",
+          "type": "food"
+        }
       },
       "utensils": {
-        "筷子": { "target": "knife and fork", "type": "utensil", "strength": 50 },
-        "碗": { "target": "bowl/plate", "type": "utensil" },
-        "盘子": { "target": "plate", "type": "utensil" },
-        "茶杯": { "target": "teacup/mug", "type": "utensil" },
-        "蒸笼": { "target": "steaming basket", "type": "utensil" },
-        "砂锅": { "target": "clay pot", "type": "utensil" },
-        "炒锅": { "target": "wok/frying pan", "type": "utensil" },
-        "菜刀": { "target": "kitchen knife", "type": "utensil" }
+        "筷子": {
+          "target": "knife and fork",
+          "type": "utensil",
+          "strength": 50
+        },
+        "碗": {
+          "target": "bowl/plate",
+          "type": "utensil"
+        },
+        "盘子": {
+          "target": "plate",
+          "type": "utensil"
+        },
+        "茶杯": {
+          "target": "teacup/mug",
+          "type": "utensil"
+        },
+        "蒸笼": {
+          "target": "steaming basket",
+          "type": "utensil"
+        },
+        "砂锅": {
+          "target": "clay pot",
+          "type": "utensil"
+        },
+        "炒锅": {
+          "target": "wok/frying pan",
+          "type": "utensil"
+        },
+        "菜刀": {
+          "target": "kitchen knife",
+          "type": "utensil"
+        }
       },
       "customs": {
-        "拱手": { "target": "handshake", "type": "custom", "context": "问候礼" },
-        "鞠躬": { "target": "bow", "type": "custom", "context": "问候礼" },
-        "过年": { "target": "celebrate the New Year", "type": "custom", "context": "节日" },
-        "春节": { "target": "Chinese New Year/Spring Festival", "type": "custom", "context": "节日" },
-        "中秋": { "target": "Mid-Autumn Festival", "type": "custom", "context": "节日" },
-        "端午": { "target": "Dragon Boat Festival", "type": "custom", "context": "节日" },
-        "元宵节": { "target": "Lantern Festival", "type": "custom", "context": "节日" },
-        "清明": { "target": "Qingming/Tomb Sweeping Day", "type": "custom", "context": "节日" },
-        "红包": { "target": "red envelope/lucky money", "type": "custom" },
-        "拜年": { "target": "pay New Year visit/give New Year greetings", "type": "custom" },
-        "放鞭炮": { "target": "set off fireworks/firecrackers", "type": "custom" },
-        "舞龙": { "target": "dragon dance", "type": "custom" },
-        "舞狮": { "target": "lion dance", "type": "custom" },
-        "对联": { "target": "couplet/spring scroll", "type": "custom" },
-        "福字": { "target": "Fu character (blessing)", "type": "custom" },
-        "年画": { "target": "New Year picture", "type": "custom" },
-        "压岁钱": { "target": "lucky money", "type": "custom" },
-        "磕头": { "target": "kowtow/bow deeply", "type": "custom" },
-        "作揖": { "target": "make a formal bow with hands clasped", "type": "custom" }
+        "拱手": {
+          "target": "handshake",
+          "type": "custom",
+          "context": "问候礼"
+        },
+        "鞠躬": {
+          "target": "bow",
+          "type": "custom",
+          "context": "问候礼"
+        },
+        "过年": {
+          "target": "Christmas / New Year celebration",
+          "type": "custom",
+          "context": "家庭团聚、礼物交换、烟花",
+          "adaptation": "红包→Christmas gifts"
+        },
+        "春节": {
+          "target": "Chinese New Year/Spring Festival",
+          "type": "custom",
+          "context": "节日"
+        },
+        "中秋": {
+          "target": "Mid-Autumn Festival",
+          "type": "custom",
+          "context": "节日",
+          "adaptation": "月饼→pumpkin pie"
+        },
+        "端午": {
+          "target": "Dragon Boat Festival",
+          "type": "custom",
+          "context": "节日"
+        },
+        "元宵节": {
+          "target": "Lantern Festival",
+          "type": "custom",
+          "context": "节日"
+        },
+        "清明": {
+          "target": "Qingming/Tomb Sweeping Day",
+          "type": "custom",
+          "context": "节日"
+        },
+        "红包": {
+          "target": "red envelope / Christmas gift / gift of money",
+          "type": "custom",
+          "context": "金钱礼物"
+        },
+        "拜年": {
+          "target": "pay New Year visit/give New Year greetings",
+          "type": "custom",
+          "context": "走亲访友"
+        },
+        "放鞭炮": {
+          "target": "set off fireworks/firecrackers",
+          "type": "custom"
+        },
+        "舞龙": {
+          "target": "dragon dance",
+          "type": "custom"
+        },
+        "舞狮": {
+          "target": "lion dance",
+          "type": "custom"
+        },
+        "对联": {
+          "target": "couplet/spring scroll",
+          "type": "custom"
+        },
+        "福字": {
+          "target": "Fu character (blessing)",
+          "type": "custom"
+        },
+        "年画": {
+          "target": "New Year picture",
+          "type": "custom"
+        },
+        "压岁钱": {
+          "target": "lucky money",
+          "type": "custom",
+          "context": "长辈给孩子的钱"
+        },
+        "磕头": {
+          "target": "kowtow/bow deeply",
+          "type": "custom"
+        },
+        "作揖": {
+          "target": "make a formal bow with hands clasped",
+          "type": "custom"
+        }
       },
       "measures": {
-        "亩": { "target": "mu/acre", "type": "measure" },
-        "里": { "target": "li (Chinese mile)", "type": "measure" },
-        "尺": { "target": "chi/foot", "type": "measure" },
-        "斤": { "target": "jin (500g)", "type": "measure" },
-        "两": { "target": "liang (50g)", "type": "measure" },
-        "文": { "target": "wen (coin)", "type": "measure" },
-        "贯": { "target": "guan/string of coins", "type": "measure" }
+        "亩": {
+          "target": "mu/acre",
+          "type": "measure"
+        },
+        "里": {
+          "target": "li (Chinese mile)",
+          "type": "measure"
+        },
+        "尺": {
+          "target": "chi/foot",
+          "type": "measure"
+        },
+        "斤": {
+          "target": "jin (500g)",
+          "type": "measure"
+        },
+        "两": {
+          "target": "liang (50g)",
+          "type": "measure"
+        },
+        "文": {
+          "target": "wen (coin)",
+          "type": "measure"
+        },
+        "贯": {
+          "target": "guan/string of coins",
+          "type": "measure"
+        }
       },
       "transport": {
-        "马车": { "target": "carriage", "type": "transport" },
-        "轿子": { "target": "sedan chair/palanquin", "type": "transport" },
-        "帆船": { "target": "sailing boat", "type": "transport" },
-        "乌篷船": { "target": "skiff/boat", "type": "transport" },
-        "驿站": { "target": "post station/inn", "type": "place" },
-        "镖局": { "target": "escort agency", "type": "place" }
+        "马车": {
+          "target": "carriage",
+          "type": "transport"
+        },
+        "轿子": {
+          "target": "sedan chair/palanquin",
+          "type": "transport"
+        },
+        "帆船": {
+          "target": "sailing boat",
+          "type": "transport"
+        },
+        "乌篷船": {
+          "target": "skiff/boat",
+          "type": "transport"
+        },
+        "驿站": {
+          "target": "post station/inn",
+          "type": "place"
+        },
+        "镖局": {
+          "target": "escort agency",
+          "type": "place"
+        }
       },
       "clothing": {
-        "长衫": { "target": "robe/gown", "type": "clothing" },
-        "马褂": { "target": "mandarin jacket", "type": "clothing" },
-        "旗袍": { "target": "cheongsam/qipao", "type": "clothing" },
-        "肚兜": { "target": "chest cloth/undershirt", "type": "clothing" },
-        "裹脚": { "target": "foot binding", "type": "custom" },
-        "瓜皮帽": { "target": "skullcap", "type": "clothing" },
-        "辫子": { "target": "braid/queue", "type": "custom" }
+        "长衫": {
+          "target": "robe/gown",
+          "type": "clothing"
+        },
+        "马褂": {
+          "target": "mandarin jacket",
+          "type": "clothing"
+        },
+        "旗袍": {
+          "target": "cheongsam/qipao",
+          "type": "clothing"
+        },
+        "肚兜": {
+          "target": "chest cloth/undershirt",
+          "type": "clothing"
+        },
+        "裹脚": {
+          "target": "foot binding",
+          "type": "custom"
+        },
+        "瓜皮帽": {
+          "target": "skullcap",
+          "type": "clothing"
+        },
+        "辫子": {
+          "target": "braid/queue",
+          "type": "custom"
+        },
+        "汉服": {
+          "target": "traditional Chinese robe / flowing robes / hanfu",
+          "type": "clothing"
+        },
+        "官服": {
+          "target": "official robes / magistrate's garb / court dress",
+          "type": "clothing"
+        },
+        "龙袍": {
+          "target": "dragon robe / imperial robe / king's garb",
+          "type": "clothing"
+        },
+        "凤冠": {
+          "target": "phoenix crown / bridal headdress",
+          "type": "clothing"
+        }
       },
       "titles": {
-        "老爷": { "target": "Sir/Master", "type": "title" },
-        "大人": { "target": "Your Honor/Sir", "type": "title" },
-        "夫人": { "target": "Lady/Madam", "type": "title" },
-        "相公": { "target": "Husband/Sir", "type": "title" },
-        "娘子": { "target": "Wife/Lady", "type": "title" },
-        "官人": { "target": "Husband/Sir", "type": "title" },
-        "少爷": { "target": "Young Master", "type": "title" },
-        "小姐": { "target": "Miss/Lady", "type": "title" },
-        "姑娘": { "target": "Miss/Young lady", "type": "title" },
-        "郎中": { "target": "doctor/physician", "type": "title" },
-        "掌柜": { "target": "shopkeeper/manager", "type": "title" },
-        "小二": { "target": "waiter/server", "type": "title" },
-        "丫鬟": { "target": "maid/servant", "type": "title" },
-        "师爷": { "target": "幕僚/advisor", "type": "title" }
+        "老爷": {
+          "target": "Sir/Master",
+          "type": "title"
+        },
+        "大人": {
+          "target": "Your Honor/Sir",
+          "type": "title"
+        },
+        "夫人": {
+          "target": "Lady/Madam",
+          "type": "title"
+        },
+        "相公": {
+          "target": "Husband/Sir",
+          "type": "title"
+        },
+        "娘子": {
+          "target": "Wife/Lady",
+          "type": "title"
+        },
+        "官人": {
+          "target": "Husband/Sir",
+          "type": "title"
+        },
+        "少爷": {
+          "target": "Young Master",
+          "type": "title"
+        },
+        "小姐": {
+          "target": "Miss/Lady",
+          "type": "title"
+        },
+        "姑娘": {
+          "target": "Miss/Young lady",
+          "type": "title"
+        },
+        "郎中": {
+          "target": "doctor/physician",
+          "type": "title"
+        },
+        "掌柜": {
+          "target": "shopkeeper/manager",
+          "type": "title"
+        },
+        "小二": {
+          "target": "waiter/server",
+          "type": "title"
+        },
+        "丫鬟": {
+          "target": "maid/servant",
+          "type": "title"
+        },
+        "师爷": {
+          "target": "幕僚/advisor",
+          "type": "title"
+        }
+      },
+      "deity": {
+        "玉皇大帝": {
+          "target": "God / the Almighty / Providence",
+          "type": "deity",
+          "context": "基督教/犹太教上帝，或泛神论的最高神"
+        },
+        "如来佛祖": {
+          "target": "the Buddha / the Enlightened One",
+          "type": "deity"
+        },
+        "观世音菩萨": {
+          "target": "Guanyin / Avalokiteshvara / the Goddess of Mercy",
+          "type": "deity"
+        },
+        "阎王": {
+          "target": "the Grim Reaper / Lord of the Underworld",
+          "type": "deity"
+        },
+        "土地公": {
+          "target": "the Village God / local deity / guardian spirit",
+          "type": "deity"
+        }
+      },
+      "social_class": {
+        "皇帝": {
+          "target": "the King / the Emperor / His Majesty",
+          "type": "social_class"
+        },
+        "皇后": {
+          "target": "the Queen / Empress",
+          "type": "social_class"
+        },
+        "太监": {
+          "target": "court eunuch / palace servant",
+          "type": "social_class"
+        },
+        "宫女": {
+          "target": "palace maid / court lady-in-waiting",
+          "type": "social_class"
+        },
+        "丫鬟": {
+          "target": "maid / personal servant / handmaiden",
+          "type": "social_class"
+        },
+        "地主": {
+          "target": "landlord / plantation owner (Southern US) / lord (medieval Europe)",
+          "type": "social_class",
+          "context": "有地阶级，根据时代调整"
+        },
+        "佃农": {
+          "target": "tenant farmer / sharecropper (Southern US) / serf (medieval)",
+          "type": "social_class"
+        },
+        "书生": {
+          "target": "scholar / intellectual / young gentleman of letters",
+          "type": "social_class"
+        },
+        "商人": {
+          "target": "merchant / businessman / trader",
+          "type": "social_class"
+        },
+        "大夫": {
+          "target": "doctor / physician / healer",
+          "type": "social_class"
+        },
+        "县官": {
+          "target": "magistrate / county governor / local official",
+          "type": "social_class"
+        },
+        "侠客": {
+          "target": "wander martial artist / chivalrous hero / knight-errant",
+          "type": "social_class"
+        }
+      },
+      "architecture": {
+        "大观园": {
+          "target": "Grand Manor / Jia Family Estate / English country manor / Southern plantation mansion",
+          "type": "architecture",
+          "context": "贵族庭院，中式→英式/美式南方庄园"
+        },
+        "贾府": {
+          "target": "the Jia household / the family mansion / the Wayne family estate",
+          "type": "architecture"
+        },
+        "四合院": {
+          "target": "courtyard house / colonial mansion / English manor",
+          "type": "architecture"
+        },
+        "寺庙": {
+          "target": "temple / church / cathedral / monastery",
+          "type": "architecture"
+        },
+        "道观": {
+          "target": "Taoist temple / shrine",
+          "type": "architecture"
+        },
+        "城墙": {
+          "target": "city wall / castle walls / fortification",
+          "type": "architecture"
+        },
+        "城门": {
+          "target": "city gate / castle gate",
+          "type": "architecture"
+        },
+        "宫殿": {
+          "target": "palace / manor house / great hall",
+          "type": "architecture"
+        },
+        "书房": {
+          "target": "study / library / gentleman's study",
+          "type": "architecture"
+        }
+      },
+      "currency": {
+        "两银子": {
+          "target": "tael of silver / pieces of silver / silver coins",
+          "type": "currency"
+        },
+        "铜钱": {
+          "target": "copper coins / bronze cash",
+          "type": "currency"
+        },
+        "黄金": {
+          "target": "gold / gold coins / precious metal",
+          "type": "currency"
+        }
+      },
+      "era_setting": {
+        "唐代": {
+          "target": "Tang Dynasty / ancient times / medieval period",
+          "type": "era_setting"
+        },
+        "宋代": {
+          "target": "Song Dynasty / ancient period",
+          "type": "era_setting"
+        },
+        "明代": {
+          "target": "Ming Dynasty / late medieval period",
+          "type": "era_setting"
+        },
+        "清代": {
+          "target": "Qing Dynasty / early modern period",
+          "type": "era_setting"
+        },
+        "古代": {
+          "target": "ancient times / medieval period / old world era",
+          "type": "era_setting"
+        },
+        "现代": {
+          "target": "modern era / contemporary setting",
+          "type": "era_setting"
+        }
       }
     },
     "en→zh": {
       "food": {
-        "bread": { "target": "面包", "type": "food" },
-        "steak": { "target": "牛排", "type": "food" },
-        "pasta": { "target": "面条/意面", "type": "food" },
-        "potato": { "target": "土豆", "type": "food" },
-        "hamburger": { "target": "汉堡", "type": "food" },
-        "pizza": { "target": "披萨", "type": "food" },
-        "salad": { "target": "沙拉", "type": "food" },
-        "soup": { "target": "汤", "type": "food" }
+        "bread": {
+          "target": "面包",
+          "type": "food"
+        },
+        "steak": {
+          "target": "牛排",
+          "type": "food"
+        },
+        "pasta": {
+          "target": "面条/意面",
+          "type": "food"
+        },
+        "potato": {
+          "target": "土豆",
+          "type": "food"
+        },
+        "hamburger": {
+          "target": "汉堡",
+          "type": "food"
+        },
+        "pizza": {
+          "target": "披萨",
+          "type": "food"
+        },
+        "salad": {
+          "target": "沙拉",
+          "type": "food"
+        },
+        "soup": {
+          "target": "汤",
+          "type": "food"
+        }
       },
       "customs": {
-        "Christmas": { "target": "圣诞节", "type": "custom" },
-        "Thanksgiving": { "target": "感恩节", "type": "custom" },
-        "Easter": { "target": "复活节", "type": "custom" },
-        "Halloween": { "target": "万圣节", "type": "custom" },
-        "handshake": { "target": "握手", "type": "custom" },
-        "bow": { "target": "鞠躬", "type": "custom" }
+        "Christmas": {
+          "target": "圣诞节",
+          "type": "custom"
+        },
+        "Thanksgiving": {
+          "target": "感恩节",
+          "type": "custom"
+        },
+        "Easter": {
+          "target": "复活节",
+          "type": "custom"
+        },
+        "Halloween": {
+          "target": "万圣节",
+          "type": "custom"
+        },
+        "handshake": {
+          "target": "握手",
+          "type": "custom"
+        },
+        "bow": {
+          "target": "鞠躬",
+          "type": "custom"
+        }
       }
     }
   },
   "cultures": {
     "chinese": {
-      "greeting": ["你好", "您好", "请问", "劳驾", "打扰一下"],
-      "polite": ["请", "谢谢", "不好意思", "抱歉", "劳驾"],
-      "titles": ["先生", "女士", "小姐", "老师", "老板"],
-      "places": ["茶馆", "酒楼", "客栈", "书院", "寺庙", "集市", "衙门", "镖局", "当铺"]
+      "greeting": [
+        "你好",
+        "您好",
+        "请问",
+        "劳驾",
+        "打扰一下"
+      ],
+      "polite": [
+        "请",
+        "谢谢",
+        "不好意思",
+        "抱歉",
+        "劳驾"
+      ],
+      "titles": [
+        "先生",
+        "女士",
+        "小姐",
+        "老师",
+        "老板"
+      ],
+      "places": [
+        "茶馆",
+        "酒楼",
+        "客栈",
+        "书院",
+        "寺庙",
+        "集市",
+        "衙门",
+        "镖局",
+        "当铺"
+      ]
     },
     "western": {
-      "greeting": ["Hello", "Excuse me", "Pardon me", "How do you do"],
-      "polite": ["Please", "Thank you", "Sorry", "Excuse me"],
-      "titles": ["Mr.", "Mrs.", "Ms.", "Sir", "Lady"],
-      "places": ["inn", " tavern", "pub", "marketplace", "church", "tavern", "shop"]
+      "greeting": [
+        "Hello",
+        "Excuse me",
+        "Pardon me",
+        "How do you do"
+      ],
+      "polite": [
+        "Please",
+        "Thank you",
+        "Sorry",
+        "Excuse me"
+      ],
+      "titles": [
+        "Mr.",
+        "Mrs.",
+        "Ms.",
+        "Sir",
+        "Lady"
+      ],
+      "places": [
+        "inn",
+        " tavern",
+        "pub",
+        "marketplace",
+        "church",
+        "tavern",
+        "shop"
+      ]
     }
   }
 }

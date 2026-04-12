@@ -115,7 +115,22 @@
     "portuguese": "葡萄牙语",
     "italian": "意大利语",
     "russian": "俄语",
-    "arabic": "阿拉伯语"
+    "arabic": "阿拉伯语",
+    "acceptAll": "全部接受",
+    "preview": "预览结果",
+    "previewResult": "预览",
+    "accept": "接受",
+    "reject": "拒绝",
+    "transformed": "已转换",
+    "changeFestival": "节日",
+    "changeGreeting": "问候",
+    "changeDeity": "神祇",
+    "changeSocial": "社会阶层",
+    "changeArchitecture": "建筑",
+    "changeClothing": "服饰",
+    "changeCurrency": "货币",
+    "changeEra": "时代背景",
+    "changeOther": "其他"
   },
   "event": {
     "title": "事件线",

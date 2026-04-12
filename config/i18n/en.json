@@ -109,7 +109,22 @@
     "portuguese": "Portuguese",
     "italian": "Italian",
     "russian": "Russian",
-    "arabic": "Arabic"
+    "arabic": "Arabic",
+    "acceptAll": "Accept All",
+    "preview": "Preview",
+    "previewResult": "Preview Result",
+    "accept": "Accept",
+    "reject": "Reject",
+    "transformed": "Transformed",
+    "changeFestival": "Festival",
+    "changeGreeting": "Greeting",
+    "changeDeity": "Deity",
+    "changeSocial": "Social Class",
+    "changeArchitecture": "Architecture",
+    "changeClothing": "Clothing",
+    "changeCurrency": "Currency",
+    "changeEra": "Era Setting",
+    "changeOther": "Other"
   },
   "event": {
     "title": "Event Timeline",

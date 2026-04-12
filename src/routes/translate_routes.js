@@ -1,288 +1,211 @@
 /**
- * translate_routes.js - 语种翻译API
- * 核心功能：文化要素替换 + 改编强度控制
+ * translate_routes.js v4 - 兼容旧格式 + 深度文化映射
+ * 旧格式: mappings.zh→en.food["米饭"].target
+ * 新格式: zh→en.food["米饭"] = "rice"
  */
 const fs = require('fs');
 const path = require('path');
 
-const culturalMapPath = path.join(__dirname, '../../config/translation_cultural.json');
+const CULTURAL_FILE = path.join(__dirname, '../../config/translation_cultural.json');
 let culturalMap = {};
-try {
-  const raw = fs.readFileSync(culturalMapPath, 'utf-8');
-  culturalMap = JSON.parse(raw);
-} catch(e) {
-  console.error('[translate] Failed to load cultural map:', e.message);
-}
+let mapVersion = '1.0';
 
-function generateId() {
-  return 'tr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
-}
-
-/**
- * 根据改编强度执行翻译
- * @param {string} text - 原文
- * @param {string} sourceLang - 源语言
- * @param {string} targetLang - 目标语言
- * @param {number} strength - 改编强度 0-100
- * @returns {{text, changes[]}}
- */
-function translateWithStrength(text, sourceLang, targetLang, strength) {
-  const changes = [];
-  const mappingKey = sourceLang + '→' + targetLang;
-  const mapping = culturalMap.mappings && culturalMap.mappings[mappingKey];
-
-  if (!mapping || strength < 20) {
-    // 强度<20: 只做基础翻译，返回原文
-    return { text, changes: [] };
+function loadMap() {
+  try {
+    const raw = fs.readFileSync(CULTURAL_FILE, 'utf-8');
+    culturalMap = JSON.parse(raw);
+    mapVersion = culturalMap.version || '2.0';
+    console.log('[translate] Loaded cultural map v' + mapVersion);
+  } catch(e) {
+    console.error('[translate] Load error:', e.message);
   }
+}
+loadMap();
+
+// 兼容旧格式
+function getMappings() {
+  // 旧格式: { mappings: { "zh→en": { food: { "米饭": { target: "rice" }}}}}
+  // 新格式: { "zh→en": { food: { "米饭": "rice" }}}
+  if (culturalMap.mappings) return culturalMap.mappings;
+  return culturalMap;
+}
+
+function getLangDir(src, tgt) { return src + '→' + tgt; }
+function getMapping(src, tgt) { return getMappings()[getLangDir(src, tgt)] || null; }
+
+// 提取target值（兼容新旧格式）
+function getTarget(entry) {
+  if (!entry) return null;
+  if (typeof entry === 'string') return entry;
+  if (typeof entry === 'object') {
+    if (entry.target) return entry.target;
+    // 新格式直接是字符串
+    for (const v of Object.values(entry)) {
+      if (typeof v === 'string') return v;
+    }
+  }
+  return null;
+}
+
+// 获取某个分类的映射字典 {原文: 译文}
+function getCategoryDict(mapping, category) {
+  if (!mapping || !mapping[category]) return {};
+  const cat = mapping[category];
+  const result = {};
+  for (const [k, v] of Object.entries(cat)) {
+    const t = getTarget(v);
+    if (t) result[k] = t;
+  }
+  return result;
+}
+
+// 查找并替换文化要素
+function findCulturalChanges(text, mapping) {
+  const changes = [];
+  if (!mapping || !text) return { text, changes };
 
   let result = text;
-  const typesToApply = [];
+  const categories = ['food', 'utensils', 'customs', 'festival', 'greetings', 'deity', 'social_class', 'architecture', 'clothing', 'currency', 'era_setting'];
 
-  // 根据强度确定应用哪些类型的替换
-  if (strength >= 20) typesToApply.push('utensils');
-  if (strength >= 30) typesToApply.push('customs');
-  if (strength >= 40) typesToApply.push('food');
-  if (strength >= 50) typesToApply.push('titles');
-  if (strength >= 60) typesToApply.push('clothing');
-  if (strength >= 70) typesToApply.push('transport');
-  if (strength >= 80) typesToApply.push('measures');
+  for (const cat of categories) {
+    const catMap = getCategoryDict(mapping, cat);
+    if (!catMap || Object.keys(catMap).length === 0) continue;
 
-  if (!mapping) {
-    return { text: result, changes: [] };
-  }
-
-  // 应用各类别替换
-  for (const type of typesToApply) {
-    const typeMap = mapping[type];
-    if (!typeMap) continue;
-
-    for (const [original, info] of Object.entries(typeMap)) {
-      if (typeof info === 'string') {
-        // 简单字符串映射
-        if (result.includes(original)) {
-          const transformed = info;
-          result = result.split(original).join(transformed);
-          changes.push({
-            id: generateId(),
-            original,
-            transformed,
-            changeType: type,
-            context: info.context || '',
-            auto: 1,
-            confirmed: strength < 80 ? 1 : 0, // 高强度需要人工确认
-          });
-        }
-      } else if (info && info.target) {
-        // 对象映射 {target, type, context}
-        if (result.includes(original)) {
-          result = result.split(original).join(info.target);
-          changes.push({
-            id: generateId(),
-            original,
-            transformed: info.target,
-            changeType: info.type || type,
-            context: info.context || '',
-            auto: 1,
-            confirmed: strength < 80 ? 1 : 0,
-          });
-        }
+    for (const [original, replacement] of Object.entries(catMap)) {
+      if (!original || !replacement || original.length < 1) continue;
+      if (result.includes(original)) {
+        result = result.split(original).join('___' + changes.length + '___PLACEHOLDER___');
+        changes.push({
+          id: 'ch_' + changes.length,
+          original,
+          replacement,  // 单个推荐值
+          options: buildOptions(replacement),  // 可选值数组
+          changeType: cat,
+          context: '',
+          adaptation: '',
+          confirmed: false
+        });
       }
     }
   }
 
-  // 强度>=60: 也尝试替换文化场景描述
-  if (strength >= 60 && mapping.cultures && mapping.cultures[sourceLang]) {
-    const culture = mapping.cultures[sourceLang];
-    for (const phrase of (culture.greeting || [])) {
-      if (result.includes(phrase) && mapping.cultures[targetLang]) {
-        const greetings = mapping.cultures[targetLang].greeting || [];
-        if (greetings.length > 0) {
-          result = result.split(phrase).join(greetings[0]);
-          changes.push({
-            id: generateId(),
-            original: phrase,
-            transformed: greetings[0],
-            changeType: 'greeting',
-            auto: 1,
-            confirmed: strength >= 80 ? 0 : 1,
-          });
-        }
-      }
-    }
-  }
-
-  // 强度>=90: 完全重写模式
-  if (strength >= 90) {
-    // 标记为需人工审核
-    changes.forEach(c => c.confirmed = 0);
+  // 替换占位符
+  for (let i = 0; i < changes.length; i++) {
+    result = result.replace('___' + i + '___PLACEHOLDER___', '【' + i + '】');
   }
 
   return { text: result, changes };
 }
 
-/**
- * 构建Fastify翻译路由
- */
-function translateRoutes(fastify, options) {
+function buildOptions(replacement) {
+  if (!replacement) return [];
+  if (typeof replacement === 'string' && replacement.includes('/')) {
+    return replacement.split('/').map(s => s.trim()).filter(s => s);
+  }
+  return [replacement];
+}
 
-  // POST /api/translate - 执行翻译
+function getStrengthLabel(s) {
+  if (s < 20) return 'basic';
+  if (s < 40) return 'light';
+  if (s < 60) return 'smart';
+  if (s < 80) return 'deep';
+  return 'full';
+}
+
+function translate(text, srcLang, tgtLang, strength) {
+  const mapping = getMapping(srcLang, tgtLang);
+  const { text: resultText, changes } = findCulturalChanges(text, mapping);
+
+  let finalText = resultText;
+  if (strength >= 40 && srcLang === 'zh' && tgtLang === 'en') {
+    finalText = finalText
+      .replace(/，/g, ', ')
+      .replace(/。/g, '. ')
+      .replace(/"/g, '"').replace(/"/g, '"')
+      .replace(/'/g, "'");
+  }
+
+  const strengthLabel = getStrengthLabel(strength);
+
+  return {
+    translationId: 'tr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8),
+    sourceLang: srcLang,
+    targetLang: tgtLang,
+    strength,
+    strengthLabel,
+    text: finalText.trim(),
+    originalText: text,
+    changesCount: changes.length,
+    changes,
+    culturalVersion: mapVersion
+  };
+}
+
+// API路由
+module.exports = async function(fastify) {
+
   fastify.post('/api/translate', async (req, reply) => {
-    const { bookId, sourceLang, targetLang, strength, text, chapterId } = req.body || {};
+    const { text, sourceLang = 'zh', targetLang = 'en', strength = 50 } = req.body || {};
 
-    if (!text && !bookId) {
-      return reply.status(400).send({ success: false, error: 'text or bookId required' });
+    if (!text || !text.trim()) {
+      return reply.code(400).send({ success: false, error: 'text is required' });
+    }
+    if (strength < 0 || strength > 100) {
+      return reply.code(400).send({ success: false, error: 'strength must be 0-100' });
     }
 
-    const lang = sourceLang || 'zh';
-    const target = targetLang || 'en';
-    const s = Math.max(0, Math.min(100, parseInt(strength) || 50));
-
-    const translationId = generateId();
-    const changes = [];
-
-    let translatedText = text || '';
-
-    if (text) {
-      // 直接翻译文本
-      const result = translateWithStrength(text, lang, target, s);
-      translatedText = result.text;
-      changes.push(...result.changes);
-    } else if (bookId) {
-      // 从书本读取内容翻译
-      const chapters = [];
-      try {
-        const evRes = await fastify.inject({
-          method: 'GET',
-          url: `/api/events/timeline/${bookId}`
-        });
-        const evData = JSON.parse(evRes.body);
-        if (evData.success && evData.data && evData.data.events) {
-          for (const ev of evData.data.events) {
-            const r = translateWithStrength(ev.result || ev.title || '', lang, target, s);
-            if (r.changes.length > 0 || r.text !== (ev.result || ev.title)) {
-              changes.push(...r.changes);
-            }
-          }
-        }
-      } catch(e) {
-        console.error('[translate] Failed to load book events:', e);
-      }
+    try {
+      const result = translate(text, sourceLang, targetLang, strength);
+      return { success: true, data: result };
+    } catch(e) {
+      console.error('[translate] Error:', e);
+      return reply.code(500).send({ success: false, error: e.message });
     }
+  });
 
-    // 保存翻译记录
-    if (bookId) {
-      try {
-        const db = req.server.db || global.db;
-        if (db) {
-          db.prepare(`
-            INSERT INTO translations (id, book_id, source_lang, target_lang, strength, version)
-            VALUES (?, ?, ?, ?, ?, 1)
-          `).run(translationId, bookId, lang, target, s);
-
-          // 保存变更记录
-          const insertChange = db.prepare(`
-            INSERT INTO translation_changes (id, translation_id, original, transformed, change_type, context, auto, confirmed)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `);
-          for (const change of changes) {
-            insertChange.run(
-              change.id, translationId, change.original, change.transformed,
-              change.changeType, change.context || '', change.auto || 1, change.confirmed || 0
-            );
-          }
-        }
-      } catch(e) {
-        console.error('[translate] DB save error:', e);
-      }
-    }
-
+  fastify.get('/api/translate/categories', async (req, reply) => {
     return {
       success: true,
       data: {
-        translationId,
-        sourceLang: lang,
-        targetLang: target,
-        strength: s,
-        text: translatedText,
-        changesCount: changes.length,
-        changes: changes.slice(0, 50), // 最多返回50条
-        strengthLabel: s < 20 ? 'basic' : s < 40 ? 'light' : s < 60 ? 'smart' : s < 80 ? 'deep' : 'full'
+        version: mapVersion,
+        categories: ['food', 'utensils', 'customs', 'festival', 'greetings', 'deity', 'social_class', 'architecture', 'clothing', 'currency', 'era_setting'],
+        supportedPairs: Object.keys(getMappings()).filter(k => !k.startsWith('_'))
       }
     };
   });
 
-  // GET /api/translate/:id - 获取翻译结果
-  fastify.get('/api/translate/:id', async (req, reply) => {
-    const { id } = req.params;
-    const db = req.server.db || global.db;
-    if (!db) return reply.status(500).send({ success: false, error: 'DB not available' });
+  fastify.post('/api/translate/validate', async (req, reply) => {
+    const { text, expectedFormat = 'memory_entry' } = req.body || {};
+    if (!text) return reply.code(400).send({ success: false, error: 'text is required' });
 
-    const tr = db.prepare('SELECT * FROM translations WHERE id = ?').get(id);
-    if (!tr) return reply.status(404).send({ success: false, error: 'Translation not found' });
+    let valid = true;
+    let errors = [];
+    let parsed = null;
 
-    const changes = db.prepare('SELECT * FROM translation_changes WHERE translation_id = ? ORDER BY created_at DESC').all(id);
+    try {
+      parsed = JSON.parse(text);
+    } catch(e) {
+      valid = false;
+      errors.push('JSON parse failed: ' + e.message);
+    }
 
-    return { success: true, data: { ...tr, changes } };
+    if (valid && expectedFormat === 'memory_entry') {
+      const required = ['summary', 'emotions', 'importance', 'layer_assignment', 'related_characters'];
+      for (const field of required) {
+        if (!(field in parsed)) {
+          errors.push('Missing required field: ' + field);
+          valid = false;
+        }
+      }
+      if (parsed.layer_assignment && !['buffer', 'core', 'recall', 'archival'].includes(parsed.layer_assignment)) {
+        errors.push('Invalid layer_assignment: ' + parsed.layer_assignment);
+        valid = false;
+      }
+    }
+
+    return { success: true, data: { valid, errors, parsed: parsed || text } };
   });
 
-  // GET /api/translate/:id/changes - 获取变更记录
-  fastify.get('/api/translate/:id/changes', async (req, reply) => {
-    const { id } = req.params;
-    const db = req.server.db || global.db;
-    if (!db) return reply.status(500).send({ success: false, error: 'DB not available' });
-
-    const changes = db.prepare('SELECT * FROM translation_changes WHERE translation_id = ? ORDER BY created_at DESC').all(id);
-    return { success: true, data: changes };
-  });
-
-  // PUT /api/translate/:id/changes/:changeId - 确认/拒绝变更
-  fastify.put('/api/translate/:id/changes/:changeId', async (req, reply) => {
-    const { id, changeId } = req.params;
-    const { confirmed } = req.body || {};
-    const db = req.server.db || global.db;
-    if (!db) return reply.status(500).send({ success: false, error: 'DB not available' });
-
-    db.prepare('UPDATE translation_changes SET confirmed = ? WHERE id = ? AND translation_id = ?')
-      .run(confirmed ? 1 : 0, changeId, id);
-
-    return { success: true };
-  });
-
-  // GET /api/translate/book/:bookId/versions - 获取某书所有翻译版本
-  fastify.get('/api/translate/book/:bookId/versions', async (req, reply) => {
-    const { bookId } = req.params;
-    const db = req.server.db || global.db;
-    if (!db) return reply.status(500).send({ success: false, error: 'DB not available' });
-
-    const versions = db.prepare('SELECT * FROM translations WHERE book_id = ? ORDER BY created_at DESC').all(bookId);
-    return { success: true, data: versions };
-  });
-
-  // DELETE /api/translate/:id - 删除翻译版本
-  fastify.delete('/api/translate/:id', async (req, reply) => {
-    const { id } = req.params;
-    const db = req.server.db || global.db;
-    if (!db) return reply.status(500).send({ success: false, error: 'DB not available' });
-
-    db.prepare('DELETE FROM translation_changes WHERE translation_id = ?').run(id);
-    db.prepare('DELETE FROM translations WHERE id = ?').run(id);
-    return { success: true };
-  });
-
-  // GET /api/translate/strengths - 获取改编强度说明
-  fastify.get('/api/translate/strengths', async (req, reply) => {
-    return {
-      success: true,
-      data: [
-        { min: 0, max: 20, label: 'basic', name: '基础翻译', desc: '只翻译文字，不改变任何文化要素' },
-        { min: 20, max: 40, label: 'light', name: '受限改造', desc: '语义优化，保留文化背景' },
-        { min: 40, max: 60, label: 'smart', name: '智能适配', desc: '自动替换文化要素（筷子→刀叉）' },
-        { min: 60, max: 80, label: 'deep', name: '深度本土化', desc: '情节逻辑、人物习惯全面调整' },
-        { min: 80, max: 100, label: 'full', name: '完全重写', desc: 'AI基于原故事重新创作，需人工审核' },
-      ]
-    };
-  });
-}
-
-module.exports = translateRoutes;
+  console.log('[translate] v4 routes registered (map v' + mapVersion + ')');
+};

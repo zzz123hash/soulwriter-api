@@ -1337,3 +1337,131 @@ body {
     max-height: 150px;
   }
 }
+
+/* ============ 翻译增强：预览 + 接受/拒绝 ============ */
+.tl-changes-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.tl-preview-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 10px;
+  padding: 12px;
+}
+
+.tl-preview-label {
+  font-size: 11px;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.tl-preview-text {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.translate-change-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.translate-change-check {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-tl-apply-change, .btn-tl-reject-change {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+}
+
+.btn-tl-apply-change:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.btn-tl-reject-change:hover {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.translate-change-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.translate-change-body {
+  padding-left: 24px;
+}
+
+.translate-change-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.change-label {
+  color: var(--text2);
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+.original-text {
+  color: var(--text);
+}
+
+.tl-change-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  flex: 1;
+  max-width: 300px;
+}
+
+.translate-change-context {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: var(--bg2);
+  border-radius: 4px;
+}
+
+.translate-change-item.rejected {
+  opacity: 0.5;
+  background: var(--bg2);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.translate-change-item.rejected .original-text {
+  text-decoration: line-through;
+  color: var(--text2);
+}
+

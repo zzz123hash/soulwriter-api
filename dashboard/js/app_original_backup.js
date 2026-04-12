@@ -503,51 +503,8 @@ window.DrawerApp = {
   },
   
   showDetail: function(parentId, childId) {
-    // Close drawer panel
+    // Just close the drawer panel - detail content shown in side panel
     this.closePanel();
-
-    // Determine what to show based on childId
-    // For entity types (roles, items, locations), show them in the main content
-    var entityTypes = ['roles', 'items', 'locations', 'buildings', 'events', 'chapters'];
-    if (entityTypes.indexOf(childId) !== -1) {
-      // Switch to home tab and show entity list
-      state.currentTab = 'home';
-      state.currentEntity = childId;
-
-      // Update tab UI
-      document.querySelectorAll('.book-tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.tab === 'home');
-      });
-
-      // Update content
-      var tabCanvas = document.getElementById('tab-canvas');
-      if (tabCanvas) {
-        tabCanvas.innerHTML = renderTabContent();
-        bindTabContentEvents();
-      }
-
-      // Update entity type tabs
-      document.querySelectorAll('.entity-type-tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.type === childId);
-      });
-      return;
-    }
-
-    // For special tabs, switch to that tab
-    if (SPECIAL_TABS[childId]) {
-      state.currentTab = childId;
-      state.currentEntity = childId;
-
-      document.querySelectorAll('.book-tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.tab === childId);
-      });
-
-      var tabCanvas = document.getElementById('tab-canvas');
-      if (tabCanvas) {
-        tabCanvas.innerHTML = renderTabContent();
-        bindTabContentEvents();
-      }
-    }
   },
   
   closeDetail: function() {

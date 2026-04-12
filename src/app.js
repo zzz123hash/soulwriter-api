@@ -380,6 +380,31 @@ const _mimeTypes = {
   '.svg': 'image/svg+xml'
 };
 
+// config 目录静态文件（i18n语言包、快捷键配置等）
+fastify.get('/config/i18n/:lang.json', (req, reply) => {
+  const lang = req.params.lang;
+  const filePath = path.join(__dirname, '..', 'config', 'i18n', `${lang}.json`);
+  if (fs.existsSync(filePath)) {
+    reply.header('Content-Type', 'application/json');
+    reply.send(fs.createReadStream(filePath));
+  } else {
+    reply.code(404).send({ error: 'Locale not found' });
+  }
+});
+
+fastify.get('/config/:filename', (req, reply) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '..', 'config', filename);
+  if (fs.existsSync(filePath)) {
+    const ext = path.extname(filename);
+    const ct = ext === '.json' ? 'application/json' : 'text/plain';
+    reply.header('Content-Type', ct + '; charset=utf-8');
+    reply.send(fs.createReadStream(filePath));
+  } else {
+    reply.code(404).send({ error: 'Config not found' });
+  }
+});
+
 fastify.get('/dashboard/', (req, reply) => {
   reply.header('Content-Type', 'text/html; charset=utf-8');
   reply.send(fs.createReadStream(path.join(__dirname, '..', 'dashboard', 'index.html')));

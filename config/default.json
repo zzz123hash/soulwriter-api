@@ -1,0 +1,31 @@
+{
+  "server": {
+    "port": 3000,
+    "host": "0.0.0.0",
+    "prefix": "/api"
+  },
+  "database": {
+    "path": "./data.db"
+  },
+  "upload": {
+    "maxSize": "50mb",
+    "allowedTypes": [".txt", ".docx", ".epub", ".md"]
+  },
+  "ai": {
+    "defaultProvider": "moss",
+    "providers": {
+      "moss": {
+        "baseUrl": "http://localhost:13000",
+        "model": "MOSS-Core"
+      },
+      "openai": {
+        "baseUrl": "https://api.openai.com",
+        "model": "gpt-4",
+        "apiKey": ""
+      }
+    }
+  },
+  "translation": {
+    "culturalMapping": "./config/translation_cultural.json"
+  }
+}

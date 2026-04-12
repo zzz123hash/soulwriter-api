@@ -1,0 +1,29 @@
+{
+  "global": {
+    "Ctrl+S": "save",
+    "Ctrl+N": "newItem",
+    "Ctrl+F": "search",
+    "Ctrl+,": "openSettings",
+    "Ctrl+/": "showShortcuts"
+  },
+  "editor": {
+    "Ctrl+B": "bold",
+    "Ctrl+I": "italic",
+    "Ctrl+Z": "undo",
+    "Ctrl+Y": "redo",
+    "Escape": "closePanel"
+  },
+  "navigation": {
+    "1": "navHome",
+    "2": "navPlot",
+    "3": "navBackground",
+    "4": "navCreate",
+    "5": "navIdea",
+    "6": "navMap",
+    "7": "navAnalysis",
+    "8": "navSynthesis",
+    "9": "navTools",
+    "ArrowLeft": "prevChapter",
+    "ArrowRight": "nextChapter"
+  }
+}

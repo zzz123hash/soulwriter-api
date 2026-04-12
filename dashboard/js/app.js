@@ -1,3 +1,44 @@
+// ============ i18n 内联实现 ============
+;(function() {
+  window._i18n = {
+    currentLocale: 'zh',
+    data: {},
+    ready: false,
+    async loadLocale(locale) {
+      try {
+        var r = await fetch('/config/i18n/' + locale + '.json');
+        if (!r.ok) throw new Error(r.status);
+        this.data = await r.json();
+        this.currentLocale = locale;
+        localStorage.setItem('sw_locale', locale);
+        this.ready = true;
+        window.dispatchEvent(new CustomEvent('i18nReady', { detail: { locale } }));
+      } catch(e) {
+        console.error('[i18n] load error:', e);
+        if (locale !== 'en') this.loadLocale('en');
+      }
+    },
+    t(key, params) {
+      if (!this.ready) return key;
+      var keys = key.split('.'), val = this.data;
+      for (var i = 0; i < keys.length; i++) { val = val && val[keys[i]]; if (!val) return key; }
+      if (params && typeof val === 'string') {
+        return val.replace(/\{(\w+)\}/g, function(_, k) { return params[k] !== undefined ? params[k] : '{'+k+'}'; });
+      }
+      return val || key;
+    },
+    async setLocale(locale) { await this.loadLocale(locale); if (typeof renderApp === 'function') renderApp(); }
+  };
+  // 初始化
+  var saved = localStorage.getItem('sw_locale') || 'zh';
+  window._i18n.loadLocale(saved);
+})();
+
+const t = function(key, params) {
+  if (window._i18n && window._i18n.ready) return window._i18n.t(key, params);
+  return key;
+};
+
 /**
  * SoulWriter v2 - 分层导航 + 自定义布局
  * 2026-04-12
@@ -72,8 +113,30 @@ function renderApp() {
 }
 
 // ============ 欢迎页 ============
+// ============ 顶部工具栏 ============
+function renderToolbar() {
+  var locale = (window._i18n && window._i18n.currentLocale) || 'zh';
+  return '<div id="sw-toolbar">' +
+    '<div class="toolbar-left">' +
+      '<span class="toolbar-logo">' + t('app.name') + '</span>' +
+    '</div>' +
+    '<div class="toolbar-right">' +
+      '<select class="toolbar-select" id="btn-theme">' +
+        '<option value="dark">' + t('settings.themeDark') + '</option>' +
+        '<option value="soft">' + t('settings.themeSoft') + '</option>' +
+        '<option value="blue">' + t('settings.themeBlue') + '</option>' +
+        '<option value="green">' + t('settings.themeGreen') + '</option>' +
+      '</select>' +
+      '<select class="toolbar-select" id="btn-lang">' +
+        '<option value="zh-CN"' + (locale === 'zh' ? ' selected' : '') + '>🇨🇳 中文</option>' +
+        '<option value="en-US"' + (locale === 'en' ? ' selected' : '') + '>🇺🇸 English</option>' +
+      '</select>' +
+    '</div>' +
+  '</div>';
+}
+
 function renderWelcome() {
-  return '<div class="welcome-page">' +
+  return renderToolbar() + '<div class="welcome-page">'; +
     '<div class="welcome-logo"><h1 class="app-logo">SoulWriter</h1><p class="app-slogan">灵魂创作者</p></div>' +
     '<section class="bookshelf-section"><h2 class="section-title">书架</h2><div class="bookshelf" id="books-list"><div class="loading-text">加载中...</div></div></section>' +
     '<div class="create-book-area"><button class="btn-create-book" id="create-book-btn"><span class="btn-icon">+</span><span class="btn-text">创建新书</span></button></div>' +
@@ -82,7 +145,8 @@ function renderWelcome() {
 
 // ============ 书本视图 ============
 function renderBookView() {
-  return '<div class="book-layout">' +
+  return renderToolbar() +
+    '<div class="book-layout">' +
     '<header class="book-header">' +
       '<div class="book-tabs">' +
         '<button class="book-tab ' + (state.currentTab === 'home' ? 'active' : '') + '" data-tab="home">' + icon('home') + ' 导航页</button>' +
@@ -482,12 +546,13 @@ async function loadBookData() {
 
 // ============ 事件绑定 ============
 function bindWelcomeEvents() {
-  document.getElementById('create-book-btn').addEventListener('click', showCreateBookModal);
+  var btn = document.getElementById('create-book-btn');
+  if (btn) btn.addEventListener('click', showCreateBookModal);
   loadBooks();
 }
 
 function bindBookEvents() {
-  document.getElementById('back-to-books').addEventListener('click', function() {
+  var btnBack = document.getElementById('back-to-books'); if (btnBack) btnBack.addEventListener('click', function() {
     state.currentBook = null;
     state.currentView = 'welcome';
     state.events = [];
@@ -963,9 +1028,9 @@ function showNvwaAddModal() {
     '<div class="detail-field"><label>层级</label><select id="nvwa-new-status"><option value="buffer">缓冲区</option><option value="core">核心记忆</option><option value="recall">召回</option><option value="archival">归档</option></select></div></div>' +
     '</div><div class="modal-actions"><button class="btn btn-primary" id="nvwa-do-add">保存</button><button class="btn btn-secondary" id="nvwa-cancel-add">取消</button></div></div>';
   document.body.appendChild(modal);
-  document.getElementById('nvwa-new-imp').addEventListener('input', function() { document.getElementById('nvwa-imp-val').textContent = this.value; });
-  document.getElementById('nvwa-cancel-add').addEventListener('click', function() { modal.remove(); });
-  document.getElementById('nvwa-do-add').addEventListener('click', function() {
+  var el=document.getElementById('nvwa-new-imp');if(el)el.addEventListener('input', function() { document.getElementById('nvwa-imp-val').textContent = this.value; });
+  var el=document.getElementById('nvwa-cancel-add');if(el)el.addEventListener('click', function() { modal.remove(); });
+  var el=document.getElementById('nvwa-do-add');if(el)el.addEventListener('click', function() {
     var content = document.getElementById('nvwa-new-content').value.trim();
     if (!content) { alert('请输入内容'); return; }
     fetch('/api/memory/' + state.currentBook.id + '/' + charId, {
@@ -986,8 +1051,8 @@ function showLongTextAnalyzeModal() {
     '<div id="lt-result" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;max-height:300px;overflow-y:auto;font-size:13px;line-height:1.8;"></div>' +
     '</div><div class="modal-actions"><button class="btn btn-primary" id="lt-analyze-btn">分析</button><button class="btn btn-secondary" id="lt-close-btn">关闭</button></div></div>';
   document.body.appendChild(modal);
-  document.getElementById('lt-close-btn').addEventListener('click', function() { modal.remove(); });
-  document.getElementById('lt-analyze-btn').addEventListener('click', async function() {
+  var el=document.getElementById('lt-close-btn');if(el)el.addEventListener('click', function() { modal.remove(); });
+  var el=document.getElementById('lt-analyze-btn');if(el)el.addEventListener('click', async function() {
     var content = document.getElementById('lt-content').value.trim();
     var depth = document.getElementById('lt-depth').value;
     if (!content) { alert('请输入文本'); return; }
@@ -1015,5 +1080,17 @@ function showLongTextAnalyzeModal() {
 }
 
 // ============ 初始化 ============
-function init() { renderApp(); }
+function init() {
+  function doRender() { renderApp(); }
+  if (window._i18n && window._i18n.ready) {
+    doRender();
+  } else {
+    var _timer = setTimeout(doRender, 2000);
+    window.addEventListener('i18nReady', function _h() {
+      clearTimeout(_timer);
+      window.removeEventListener('i18nReady', _h);
+      doRender();
+    });
+  }
+}
 document.addEventListener('DOMContentLoaded', init);

@@ -317,6 +317,7 @@ function renderTabContent() {
     case 'home': return renderHomeTab();
 
     case 'genesis': return renderGenesisTab();
+    case 'analysis-settings': return renderSettingsTab();
 
     case 'event': return renderEventTab();
 
@@ -431,7 +432,7 @@ var NAV_TREE = [
 
 
 
-var SPECIAL_TABS = { genesis: true, event: true, nvwa: true, analysis: true, tension: true, map: true, chapters: true, world: true, worldview: true, novel: true };
+var SPECIAL_TABS = { genesis: true, event: true, nvwa: true, analysis: true, tension: true, map: true, chapters: true, world: true, worldview: true, novel: true, "analysis-settings": true, apiroutes: true, presets: true, writingstyle: true };
 
 
 
@@ -651,6 +652,26 @@ function saveGlobalSettings() {
   
   closeGlobalSettings();
   alert('设置已保存！');
+}
+
+
+
+// Save book settings
+function saveBookSettings() {
+  var apiProvider = document.getElementById('book-api-provider')?.value || 'MOSS';
+  var apiKey = document.getElementById('book-api-key')?.value || '';
+  var apiUrl = document.getElementById('book-api-url')?.value || '';
+  var writingStyle = document.getElementById('book-writing-style')?.value || 'classical';
+  var narrativePov = document.getElementById('book-narrative-pov')?.value || 'third';
+  
+  if (state.currentBook) {
+    state.currentBook.settings = {
+      apiProvider, apiKey, apiUrl, writingStyle, narrativePov
+    };
+    // Save to localStorage for now
+    localStorage.setItem('sw_book_settings_' + state.currentBook.id, JSON.stringify(state.currentBook.settings));
+    alert('小说设置已保存！');
+  }
 }
 
 

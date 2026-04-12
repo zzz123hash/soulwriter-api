@@ -15,6 +15,21 @@
   <link rel="stylesheet" href="/dashboard/css/ai_analysis.css">
 </head>
 <body>
+  <style>
+    /* Force hide old detail panel */
+    #detail-panel,
+    .right-drawer,
+    aside.right-drawer,
+    #detail-panel * {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+  </style>
+
   <div id="app"><div class="loading">Loading...</div></div>
   <script src="/dashboard/js/logger.js"></script>
   <script src="/dashboard/js/drawer_v2.js"></script>

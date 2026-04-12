@@ -3,7 +3,7 @@
  * 用于事件线的节点可视化
  */
 
-const VisualEditor = {
+window.VisualEditor = {
   nodeTypes: {
     character: { icon: '👤', label: '角色', color: '#6366f1' },
     item: { icon: '🎁', label: '物品', color: '#f59e0b' },

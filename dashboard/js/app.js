@@ -335,40 +335,49 @@ function renderTabContent() {
 
 
 function renderGenesisTab() {
-
-  var nodes = state.nodes || [];
-
-  if (!nodes.length) {
-
-    return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('genesis') + '</div><div style="margin-bottom:8px;">暂无节点</div><div style="font-size:12px;">从左侧添加角色或节点</div></div>';
-
+  // Use VisualEditor if available
+  if (typeof VisualEditor !== 'undefined') {
+    var hasNodes = VisualEditor.state && VisualEditor.state.nodes.length > 0;
+    return '<div id="genesis-editor" style="width:100%;height:calc(100vh - 200px);position:relative;">' +
+      '<div style="position:absolute;top:0;left:0;right:0;padding:12px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;gap:8px;z-index:10;flex-wrap:wrap;">' +
+        '<button class="btn-primary" onclick="GenesisApp.addNode(\'character\')">+ 角色</button>' +
+        '<button class="btn-primary" onclick="GenesisApp.addNode(\'item\')">+ 物品</button>' +
+        '<button class="btn-primary" onclick="GenesisApp.addNode(\'location\')">+ 地点</button>' +
+        '<button class="btn-primary" onclick="GenesisApp.addNode(\'plot\')">+ 情节</button>' +
+        '<button class="btn-primary" onclick="GenesisApp.addNode(\'event\')">+ 事件</button>' +
+      '</div>' +
+      '<div id="genesis-canvas" style="position:absolute;top:56px;left:0;right:0;bottom:0;overflow:auto;background:var(--bg);"></div>' +
+    '</div>';
   }
-
+  
+  var nodes = state.nodes || [];
+  if (!nodes.length) {
+    return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('genesis') + '</div><div style="margin-bottom:8px;">暂无节点</div><div style="font-size:12px;">从左侧添加角色或节点</div></div>';
+  }
+  
   var html = '<div style="padding:24px;max-width:800px;margin:0 auto;">' +
-
-    '<h2 style="font-size:1.4em;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">' + icon('genesis') + ' ' + t('genesis.title') + '</h2>';
-
+    '<h2 style="font-size:1.4em;font-weight:700;margin-bottom:20px;">' + icon('genesis') + ' ' + t('genesis.title') + '</h2>';
   nodes.forEach(function(n) {
-
-    var desc = (n.description || '').substring(0, 30);
-
-    html += '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;" data-id="' + n.id + '">' +
-
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;" data-id="' + n.id + '">' +
       '<span style="color:var(--accent);">' + icon('nodes') + '</span>' +
-
-      '<span style="flex:1;font-weight:500;">' + escapeHtml(n.title || n.name || '未命名') + '</span>' +
-
-      '<span style="font-size:11px;color:var(--text2);">' + escapeHtml(desc) + '</span></div>';
-
+      '<span style="flex:1;font-weight:500;">' + escapeHtml(n.title || n.name || '未命名') + '</span></div>';
   });
-
   html += '</div>';
-
   return html;
-
 }
 
-
+var GenesisApp = {
+  addNode: function(type) {
+    if (typeof VisualEditor !== 'undefined') {
+      var canvas = document.getElementById('genesis-canvas');
+      var rect = canvas ? canvas.getBoundingClientRect() : { width: 800, height: 600 };
+      var x = Math.random() * 400 + 50;
+      var y = Math.random() * 300 + 50;
+      VisualEditor.createNode(type, x, y, { title: VisualEditor.nodeTypes[type].label });
+      VisualEditor.render();
+    }
+  }
+};
 
 function renderNovelTab() {
 
@@ -1405,6 +1414,15 @@ function bindTabContentEvents() {
 
 
   var ltZone = document.getElementById('home-longtext-zone');
+
+  // Initialize VisualEditor for Genesis tab
+  if (typeof VisualEditor !== 'undefined') {
+    var canvas = document.getElementById('genesis-canvas');
+    if (canvas && !canvas.hasVisualEditor) {
+      canvas.hasVisualEditor = true;
+      VisualEditor.init('genesis-canvas');
+    }
+  }
 
   if (ltZone) ltZone.addEventListener('click', function() { showLongTextAnalyzeModal(); });
 

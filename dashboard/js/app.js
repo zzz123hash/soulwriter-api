@@ -100,7 +100,7 @@ function renderWelcome() {
 function renderBookView() {
   return `
     <div class="book-layout">
-      <!-- 顶部 Tab 栏 -->
+      
       <header class="book-header">
         <div class="book-tabs">
           <button class="book-tab ${state.currentTab === 'home' ? 'active' : ''}" data-tab="home">
@@ -125,9 +125,9 @@ function renderBookView() {
         </div>
       </header>
       
-      <!-- 主体区域 -->
+      
       <div class="book-body">
-        <!-- 左侧抽屉1：实体类型导航 -->
+        
         <aside class="left-drawer ${state.leftDrawerOpen ? 'open' : ''}" id="left-drawer">
           <div class="drawer-header">
             <span class="drawer-title">导航</span>
@@ -138,12 +138,12 @@ function renderBookView() {
           </nav>
         </aside>
         
-        <!-- 中间主内容区 -->
+        
         <main class="main-canvas" id="main-canvas">
           ${renderTabCanvas()}
         </main>
         
-        <!-- 右侧抽屉2：实体列表 -->
+        
         <aside class="right-drawer drawer-1 ${state.rightDrawer1Open ? 'open' : ''}" id="right-drawer-1">
           <div class="drawer-header">
             <span class="drawer-title">${t('nav.' + state.currentEntity)}</span>
@@ -154,7 +154,7 @@ function renderBookView() {
           </div>
         </aside>
         
-        <!-- 右侧抽屉3：实体详情 -->
+        
         <aside class="right-drawer drawer-2 ${state.rightDrawer2Open ? 'open' : ''}" id="right-drawer-2" style="width: ${state.rightDrawer2Width}px">
           <div class="drawer-header">
             <span class="drawer-title">详情</span>

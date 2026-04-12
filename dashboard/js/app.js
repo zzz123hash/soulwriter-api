@@ -149,11 +149,11 @@ function renderBookView() {
     '<div class="book-layout">' +
     '<header class="book-header">' +
       '<div class="book-tabs">' +
-        '<button class="book-tab ' + (state.currentTab === 'home' ? 'active' : '') + '" data-tab="home">' + icon('home') + ' 导航页</button>' +
-        '<button class="book-tab ' + (state.currentTab === 'genesis' ? 'active' : '') + '" data-tab="genesis">' + icon('genesis') + ' 创世树</button>' +
-        '<button class="book-tab ' + (state.currentTab === 'event' ? 'active' : '') + '" data-tab="event">' + icon('event') + ' 事件线</button>' +
-        '<button class="book-tab ' + (state.currentTab === 'nvwa' ? 'active' : '') + '" data-tab="nvwa">' + icon('nvwa') + ' 女娲</button>' +
-        '<button class="book-tab ' + (state.currentTab === 'novel' ? 'active' : '') + '" data-tab="novel">' + icon('novel') + ' 小说</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'home' ? 'active' : '') + '" data-tab="home">' + icon('home') + ' ' + t('nav.home') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'genesis' ? 'active' : '') + '" data-tab="genesis">' + icon('genesis') + ' ' + t('genesis.title') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'event' ? 'active' : '') + '" data-tab="event">' + icon('event') + ' ' + t('event.title') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'nvwa' ? 'active' : '') + '" data-tab="nvwa">' + icon('nvwa') + ' ' + t('nvwa.title') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'novel' ? 'active' : '') + '" data-tab="novel">' + icon('novel') + ' ' + t('entity.novels') + '</button>' +
       '</div>' +
       '<div class="book-info">' +
         '<span class="book-name">' + escapeHtml(state.currentBook && state.currentBook.title || '') + '</span>' +
@@ -200,7 +200,7 @@ function renderGenesisTab() {
     return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('genesis') + '</div><div style="margin-bottom:8px;">暂无节点</div><div style="font-size:12px;">从左侧添加角色或节点</div></div>';
   }
   var html = '<div style="padding:24px;max-width:800px;margin:0 auto;">' +
-    '<h2 style="font-size:1.4em;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">' + icon('genesis') + ' 创世树</h2>';
+    '<h2 style="font-size:1.4em;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">' + icon('genesis') + ' ' + t('genesis.title') + '</h2>';
   nodes.forEach(function(n) {
     var desc = (n.description || '').substring(0, 30);
     html += '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;" data-id="' + n.id + '">' +

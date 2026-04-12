@@ -51,7 +51,7 @@
     "translate": "翻译",
     "createBook": "创建新书",
     "openBook": "打开",
-    "backToBooks": "返回"
+    "backToBooks": "← 返回"
   },
   "home": {
     "stats": "内容概览",
@@ -62,7 +62,9 @@
     "uploadDesc": "上传文本/文档，AI自动提取角色、物品、地点",
     "longTextDesc": "粘贴大段文字，提取故事线、人物关系",
     "noItems": "暂无内容",
-    "createFirst": "创建第一个"
+    "createFirst": "创建第一个",
+    "aiTitle": "⚡ AI 助手",
+    "longTextPlaceholder": "粘贴要分析的文字..."
   },
   "translate": {
     "title": "语种翻译",
@@ -107,21 +109,23 @@
     "status": "状态",
     "statusOpen": "进行中",
     "statusClosed": "已解决",
-    "keyEvent": "关键事件",
+    "keyEvent": "关键",
     "characters": "涉及角色",
     "locations": "涉及地点",
     "items": "涉及物品",
     "charactersHint": "逗号分隔",
     "locationsHint": "逗号分隔",
     "noEvents": "暂无事件",
-    "noEventsHint": "点击右上角「新增事件」开始构建故事线"
+    "noEventsHint": "点击右上角「新增事件」开始构建故事线",
+    "order": "序号",
+    "chapterPlaceholder": "第X回"
   },
   "nvwa": {
     "title": "女娲推演",
     "selectChar": "选择角色",
-    "buffer": "缓冲区",
-    "core": "核心记忆",
-    "recall": "召回索引",
+    "buffer": "缓冲",
+    "core": "核心",
+    "recall": "召回",
     "archival": "归档",
     "summary": "角色摘要",
     "addMemory": "添加记忆",
@@ -159,27 +163,37 @@
     "themeGreen": "绿色",
     "selectChar": "选择角色",
     "charOverride": "覆盖全局配置",
-    "noChar": "无"
+    "noChar": "无",
+    "zhCN": "中文",
+    "enUS": "English"
   },
   "errors": {
     "loadFailed": "加载失败",
     "saveFailed": "保存失败",
     "deleteFailed": "删除失败",
     "networkError": "网络错误",
-    "notFound": "未找到",
+    "notFound": "未提取到信息",
     "required": "此项为必填",
-    "confirmDelete": "确定删除？此操作不可撤销"
+    "confirmDelete": "确定删除？此操作不可撤销",
+    "analyzing": "AI 分析中",
+    "developing": "功能开发中"
   },
   "welcome": {
-    "bookshelf": "书架",
-    "emptyShelf": "书架空空，点击下方创建新书",
+    "bookshelf": "书柜",
+    "emptyShelf": "书柜空空，点击下方创建新书",
     "bookTitle": "书名",
     "bookAuthor": "作者",
-    "wordCount": "字"
+    "wordCount": "字",
+    "wordCountUnit": "字"
   },
   "detail": {
     "name": "名称",
     "description": "描述",
-    "properties": "属性"
+    "properties": "属性",
+    "title": "详情",
+    "clickToView": "← 点击实体查看详情"
+  },
+  "novel": {
+    "wip": "小说视图"
   }
 }

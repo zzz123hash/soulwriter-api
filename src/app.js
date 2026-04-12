@@ -5,6 +5,8 @@ const fs = require('fs');
 const crypto = require('crypto');
 const booksRoutes = require('./books_routes');
 const nvwa = require('./nvwa_engine');
+const worksStorage = require('./services/works_storage');
+const worksRoutes = require('./routes/works_routes');
 
 const db = new Database(path.join(__dirname, '..', 'data.db'));
 
@@ -48,8 +50,14 @@ const aiConfigCount = db.prepare('SELECT COUNT(*) as c FROM ai_config').get();
 if (!aiConfigCount.c) {
   db.prepare('INSERT INTO ai_config (id, type, baseUrl, model, apiKey, localPort, localModel) VALUES (?, ?, ?, ?, ?, ?, ?)')
     .run(crypto.randomUUID(), 'cloud', 'https://api.openai.com/v1', 'gpt-4o', '', 42897, 'qwen-1.5b');
-nvwa.initNvwaDB(db);
 }
+nvwa.initNvwaDB(db);
+const NvwaEngine = require('./modules/nvwa/engine_v2');
+const nvwaEngine = new NvwaEngine({ db });
+
+// Plugin system
+const pluginManager = require('./services/plugin_manager');
+pluginManager.loadPlugins();
 
 // ============ AI Functions ============
 const DEFAULT_CLOUD_URL = 'https://api.openai.com/v1/chat/completions';
@@ -382,6 +390,7 @@ fastify.get('/dashboard/*', (req, reply) => {
 const start = async () => {
   try {
     fastify.register(booksRoutes);
+    fastify.register(worksRoutes);
 // ============ Nvwa Routes ============
 fastify.get('/api/v1/nvwa/status', () => {
   const souls = db.prepare("SELECT id, name, status, createdAt FROM nvwa_souls WHERE status = 'active'").all();
@@ -417,8 +426,7 @@ fastify.put('/api/v1/nvwa/souls/:id', (req) => {
 fastify.delete('/api/v1/nvwa/souls/:id', (req) => { db.prepare("DELETE FROM nvwa_souls WHERE id = ?").run(req.params.id); return { success: true }; });
 
 fastify.post('/api/v1/nvwa/tick', async (req) => {
-  const cfg = db.prepare("SELECT * FROM ai_config LIMIT 1").get();
-  const result = await nvwa.runNvwaTick(db, cfg, req.body || {});
+  const result = await nvwaEngine.runTick(req.body || {});
   return result;
 });
 

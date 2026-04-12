@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可视化编辑器 - SoulWriter</title>
+  <link rel="stylesheet" href="/dashboard/css/visual_editor.css">
+  <style>
+    body { margin: 0; background: #16213e; }
+  </style>
+</head>
+<body>
+  <div class="ve-container" id="ve-container">
+    <!-- 工具栏 -->
+    <div class="ve-toolbar">
+      <span class="ve-toolbar-title">🎭 创世编辑器</span>
+      <button class="ve-toolbar-btn" onclick="createVeNode('character')">👤 角色</button>
+      <button class="ve-toolbar-btn" onclick="createVeNode('item')">🎁 物品</button>
+      <button class="ve-toolbar-btn" onclick="createVeNode('location')">📍 地点</button>
+      <button class="ve-toolbar-btn" onclick="createVeNode('plot')">📖 情节</button>
+      <button class="ve-toolbar-btn" onclick="createVeNode('world')">🌍 世界观</button>
+      <button class="ve-toolbar-btn" onclick="createVeNode('chapter')">📚 章节</button>
+      <button class="ve-toolbar-btn" onclick="createVeNode('event')">⚡ 事件</button>
+      <div class="ve-toolbar-sep"></div>
+      <button class="ve-toolbar-btn" onclick="clearVeAll()">🗑️ 清空</button>
+    </div>
+    
+    <!-- 主体 -->
+    <div class="ve-main">
+      <!-- 画布 -->
+      <div class="ve-canvas-wrap">
+        <div id="ve-canvas"></div>
+      </div>
+      
+      <!-- 右侧详情面板 -->
+      <div class="ve-panel" id="ve-panel">
+        <div class="ve-panel-empty">👈 点击节点查看详情<br>或从工具栏创建新节点</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="ve-hint">💡 拖拽移动节点 | 点击选中查看详情</div>
+  
+  <script src="/dashboard/js/visual_editor.js"></script>
+  <script>
+    // Initialize
+    VisualEditor.init('ve-canvas');
+    
+    // Create sample data
+    const char1 = VisualEditor.createNode('character', 80, 100, { title: '主角', description: '穿越者', level: 5 });
+    const char2 = VisualEditor.createNode('character', 400, 80, { title: '反派', description: '大Boss', level: 10 });
+    const item1 = VisualEditor.createNode('item', 80, 280, { title: '神兵', description: '倚天剑', level: 8 });
+    const loc1 = VisualEditor.createNode('location', 400, 280, { title: '城镇', description: '新手村', level: 1 });
+    const event1 = VisualEditor.createNode('event', 240, 180, { title: '相遇', description: '主角与反派初次相遇' });
+    
+    VisualEditor.createConnection(char1.id, item1.id, '持有');
+    VisualEditor.createConnection(char1.id, loc1.id, '所在');
+    VisualEditor.createConnection(char2.id, loc1.id, '占领');
+    VisualEditor.createConnection(char1.id, event1.id, '触发');
+    
+    VisualEditor.render();
+  </script>
+</body>
+</html>

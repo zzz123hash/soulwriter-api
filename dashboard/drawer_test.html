@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抽屉系统测试</title>
+  <link rel="stylesheet" href="/dashboard/css/drawer_v2.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      --accent: #e94560;
+      --accent2: #ff6b6b;
+      --bg: #1a1a2e;
+      --bg2: #16213e;
+      --bg3: #0f3460;
+      --text: #eaeaea;
+      --text2: #a0a0a0;
+      --border: #2a2a4a;
+      --radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 抽屉容器 -->
+<div class="drawer-container">
+  <!-- 第一层抽屉 -->
+  <div class="drawer-level-1" id="drawer-level-1">
+    <div class="drawer-header">
+      <span class="drawer-header-title">📚 SoulWriter</span>
+    </div>
+    <div class="drawer-content" id="drawer-level-1-content">
+      <!-- JS渲染 -->
+    </div>
+  </div>
+  
+  <!-- 第二层抽屉 -->
+  <div class="drawer-level-2" id="drawer-level-2">
+    <!-- JS渲染 -->
+  </div>
+  
+  <!-- 遮罩 -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="detail-modal" id="detail-modal">
+  <div class="detail-modal__backdrop" onclick="DrawerSystem.closeModal()"></div>
+  <div class="detail-modal__container">
+    <div class="detail-modal__header">
+      <span class="detail-modal__title" id="detail-modal-title">详情</span>
+      <button class="detail-modal__close" onclick="DrawerSystem.closeModal()">✕</button>
+    </div>
+    <div class="detail-modal__body" id="detail-modal-body">
+      <!-- JS渲染 -->
+    </div>
+    <div class="detail-modal__footer">
+      <button class="btn-secondary" onclick="DrawerSystem.closeModal()">关闭</button>
+      <button class="btn-primary">保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="/dashboard/js/drawer_v2.js"></script>
+<script>
+  // 初始化
+  DrawerSystem.renderLevel1();
+  console.log('抽屉系统初始化完成');
+</script>
+
+</body>
+</html>

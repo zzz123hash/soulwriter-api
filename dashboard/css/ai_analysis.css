@@ -1,0 +1,440 @@
+/**
+ * SoulWriter - 节点AI分析系统
+ * 
+ * 包含：
+ * 1. 圆环打分组件 (SVG)
+ * 2. 节点AI分析卡片
+ * 3. 人物饱满度分析
+ */
+
+:root {
+  /* 圆环颜色 */
+  --score-excellent: #22c55e;  /* >=80 绿色 */
+  --score-good: #f59e0b;       /* 60-79 黄色 */
+  --score-poor: #ef4444;        /* <60 红色 */
+  --score-bg: var(--bg3);
+}
+
+/* ============================================
+   1. 圆环打分组件
+   ============================================ */
+
+.score-ring {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.score-ring:hover {
+  transform: scale(1.1);
+}
+
+.score-ring__chart {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+
+.score-ring__svg {
+  transform: rotate(-90deg);
+}
+
+.score-ring__bg {
+  fill: none;
+  stroke: var(--score-bg);
+  stroke-width: 4;
+}
+
+.score-ring__fill {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.score-ring__value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.score-ring__label {
+  font-size: 10px;
+  color: var(--text2);
+  text-transform: uppercase;
+}
+
+/* 分数颜色 */
+.score-ring--excellent .score-ring__fill { stroke: var(--score-excellent); }
+.score-ring--good .score-ring__fill { stroke: var(--score-good); }
+.score-ring--poor .score-ring__fill { stroke: var(--score-poor); }
+
+/* 优秀标记 */
+.score-ring__excellent-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 10px;
+}
+
+/* ============================================
+   2. 节点AI分析卡片
+   ============================================ */
+
+.ai-node-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.ai-node-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.ai-node-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ai-node-card__scores {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.ai-node-card__score-grid {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* AI分析按钮 */
+.ai-node-card__analyze-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.ai-node-card__analyze-btn:hover {
+  opacity: 0.9;
+}
+
+.ai-node-card__analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 建议提示 */
+.ai-node-card__advice {
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid var(--score-good);
+  margin: var(--space-sm);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.ai-node-card__advice-text {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.ai-node-card__advice-icon {
+  color: var(--score-good);
+  margin-right: var(--space-xs);
+}
+
+/* 展开详情 */
+.ai-node-card__detail {
+  display: none;
+  padding: var(--space-md);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.ai-node-card__detail--open {
+  display: block;
+}
+
+.ai-node-card__detail-section {
+  margin-bottom: var(--space-md);
+}
+
+.ai-node-card__detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.ai-node-card__detail-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: var(--space-xs);
+}
+
+.ai-node-card__detail-score {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: var(--space-xs);
+}
+
+.ai-node-card__detail-score--excellent {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--score-excellent);
+}
+
+.ai-node-card__detail-score--good {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--score-good);
+}
+
+.ai-node-card__detail-score--poor {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--score-poor);
+}
+
+.ai-node-card__detail-text {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+  padding-left: var(--space-md);
+}
+
+.ai-node-card__detail-advice {
+  font-size: 12px;
+  color: var(--accent);
+  padding-left: var(--space-md);
+  margin-top: var(--space-xs);
+}
+
+/* 综合评语 */
+.ai-node-card__summary {
+  padding: var(--space-md);
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-sm);
+}
+
+.ai-node-card__summary-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: var(--space-sm);
+}
+
+.ai-node-card__summary-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* 免责提示 */
+.ai-node-card__disclaimer {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 11px;
+  color: var(--text2);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+/* ============================================
+   3. 人物饱满度分析
+   ============================================ */
+
+.ai-character-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.ai-character-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.ai-character-card__name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.ai-character-card__scores {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.ai-character-card__dimensions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.ai-character-card__dimension {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.ai-character-card__dimension-label {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.ai-character-card__dimension-bar {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ai-character-card__dimension-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.ai-character-card__dimension-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 人物分析展开 */
+.ai-character-card__detail {
+  display: none;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+.ai-character-card__detail--open {
+  display: block;
+}
+
+.ai-character-card__analysis-item {
+  margin-bottom: var(--space-sm);
+}
+
+.ai-character-card__analysis-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: var(--space-xs);
+}
+
+.ai-character-card__analysis-text {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ============================================
+   4. 批量分析按钮
+   ============================================ */
+
+.batch-analyze-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-md);
+}
+
+.batch-analyze-bar__info {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.batch-analyze-bar__actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.batch-analyze-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.batch-analyze-btn:hover {
+  opacity: 0.9;
+}
+
+.batch-analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   5. 加载状态
+   ============================================ */
+
+.ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  color: var(--text2);
+  font-size: 12px;
+}
+
+.ai-loading__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,286 @@
+/**
+ * SoulWriter - 可视化编辑器 CSS
+ */
+
+.ve-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #16213e;
+}
+
+/* 工具栏 */
+.ve-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #1a1a2e;
+  border-bottom: 1px solid #2a2a4a;
+  flex-shrink: 0;
+}
+
+.ve-toolbar-title {
+  font-weight: 600;
+  margin-right: 16px;
+  color: #f5c518;
+  font-size: 14px;
+}
+
+.ve-toolbar-btn {
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.ve-toolbar-btn:hover {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: #6366f1;
+}
+
+.ve-toolbar-sep {
+  width: 1px;
+  background: #333;
+  height: 24px;
+  margin: 0 8px;
+}
+
+/* 主体区域 */
+.ve-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 画布 */
+.ve-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #16213e;
+}
+
+.ve-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* SVG连线层 */
+.ve-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* 节点 */
+.ve-node {
+  position: absolute;
+  background: #16213e;
+  border-radius: 12px;
+  border: 2px solid #6366f1;
+  cursor: move;
+  user-select: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  min-width: 140px;
+  transition: box-shadow 0.2s;
+}
+
+.ve-node:hover {
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.ve-node.selected {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+}
+
+.ve-node-header {
+  padding: 8px 12px;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.ve-node-icon {
+  font-size: 16px;
+}
+
+.ve-node-type {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.ve-node-delete {
+  margin-left: auto;
+  cursor: pointer;
+  opacity: 0.5;
+  font-size: 12px;
+  transition: opacity 0.2s;
+}
+
+.ve-node-delete:hover {
+  opacity: 1;
+}
+
+.ve-node-body {
+  padding: 12px;
+}
+
+.ve-node-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+.ve-node-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 右侧面板 */
+.ve-panel {
+  width: 300px;
+  background: #1a1a2e;
+  border-left: 1px solid #2a2a4a;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ve-panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #f5c518;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ve-panel-empty {
+  color: #666;
+  text-align: center;
+  padding: 40px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ve-form-group {
+  margin-bottom: 12px;
+}
+
+.ve-form-label {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ve-form-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #16213e;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.ve-form-input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+textarea.ve-form-input {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.ve-form-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: #16213e;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ve-btn-delete {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  margin-top: auto;
+}
+
+.ve-btn-delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 连接列表 */
+.ve-conn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ve-conn-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #16213e;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.ve-conn-item span:first-child {
+  font-size: 14px;
+}
+
+/* 提示 */
+.ve-hint {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #666;
+  font-size: 12px;
+  background: #16213e;
+  padding: 8px 16px;
+  border-radius: 8px;
+}

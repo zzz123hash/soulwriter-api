@@ -126,39 +126,67 @@ const state = {
 
 
 
+const Icons = {
+
+  roles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+
+  items: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
+
+  locations: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+
+  nodes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+
+  units: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+
+  world: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+
+  prompts: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+
+  map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+
+  genesis: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/></svg>',
+
+  event: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+
+  nvwa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 1 7 7"/><circle cx="12" cy="12" r="3"/></svg>',
+
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+
+  translate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M3 12h18"/><path d="M12 3v18"/><path d="M12 16l4-4-4-4-4 4z"/></svg>',
+
+  novel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+
+  chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+
+  chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+
+  chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+
+  save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>',
+
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+
+  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+
+  building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20"/><path d="M9 22V18h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/></svg>',
+
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+
+  tension: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+
+};
 
 
 
 function icon(name) { return Icons[name] || ''; }
-
-var Icons = {
-  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
-  event: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-  world: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
-  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-  map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
-  create: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>',
-  lightbulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>',
-  tools: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
-  roles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-  items: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
-  locations: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
-  units: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
-  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
-  api: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>',
-  parse: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
-  style: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>',
-  thoughts: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-  inspiration: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-  notes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
-  relationships: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-  summary: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>',
-  presets: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>',
-  novel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
-  chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>',
-  chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'
-};
 
 
 
@@ -381,43 +409,57 @@ function renderNovelTab() {
 // ============ 分层导航树 ============
 
 var NAV_TREE = [
-  { label: '导航', id: 'nav', icon: 'compass', children: [
+
+  { label: '导航', id: 'nav-root', icon: 'compass', children: [
+
     { label: '角色', id: 'roles', icon: 'roles' },
+
     { label: '物品', id: 'items', icon: 'items' },
+
     { label: '地点', id: 'locations', icon: 'locations' },
-    { label: '自定义', id: 'custom', icon: 'star' },
+
+    { label: '建筑', id: 'buildings', icon: 'building' },
+
   ]},
-  { label: '剧情', id: 'plot', icon: 'event', children: [
-    { label: '事件', id: 'events', icon: 'event' },
-    { label: '章节', id: 'chapters', icon: 'units' },
-  ]},
-  { label: '背景', id: 'background', icon: 'world', children: [
-    { label: '设定', id: 'settings', icon: 'settings' },
+
+  { label: '背景', id: 'background-root', icon: 'world', children: [
+
+    { label: '设定', id: 'world', icon: 'world' },
+
     { label: '世界观', id: 'worldview', icon: 'world' },
+
   ]},
-  { label: '创作', id: 'creation', icon: 'create', children: [
-    { label: '剧本', id: 'script', icon: 'script' },
-    { label: '小说', id: 'novel', icon: 'novel' },
+
+  { label: '剧情', id: 'plot-root', icon: 'event', children: [
+
+    { label: '事件线', id: 'event', icon: 'event' },
+
+    { label: '章节目录', id: 'chapters', icon: 'units' },
+
   ]},
-  { label: '创意', id: 'idea', icon: 'lightbulb', children: [
-    { label: '想法', id: 'thoughts', icon: 'thoughts' },
-    { label: '灵感', id: 'inspiration', icon: 'inspiration' },
-    { label: '记录', id: 'notes', icon: 'notes' },
+
+  { label: '推演', id: 'genesis-root', icon: 'genesis', children: [
+
+    { label: '创世树', id: 'genesis', icon: 'genesis' },
+
+    { label: '女娲推演', id: 'nvwa', icon: 'nvwa' },
+
   ]},
-  { label: '地图', id: 'map', icon: 'map', children: [
-    { label: '列表', id: 'maplist', icon: 'map' },
+
+  { label: '分析', id: 'analysis-root', icon: 'chart', children: [
+
+    { label: '合册分析', id: 'analysis', icon: 'chart' },
+
+    { label: '张力曲线', id: 'tension', icon: 'tension' },
+
   ]},
-  { label: '分析', id: 'analysis', icon: 'chart', children: [
-    { label: '人物关系', id: 'relationships', icon: 'relationships' },
-    { label: '综合', id: 'summary', icon: 'summary' },
-    { label: '设置', id: 'analysis-settings', icon: 'settings' },
-    { label: 'API路由', id: 'apiroutes', icon: 'api' },
-    { label: '预设', id: 'presets', icon: 'presets' },
-    { label: '写作风格', id: 'writingstyle', icon: 'style' },
+
+  { label: '地图', id: 'map-root', icon: 'map', children: [
+
+    { label: '地图视图', id: 'map', icon: 'map' },
+
   ]},
-  { label: '工具', id: 'tools', icon: 'tools', children: [
-    { label: '小说解析', id: 'novelparse', icon: 'parse' },
-  ]},
+
 ];
 
 
@@ -427,148 +469,54 @@ var SPECIAL_TABS = { genesis: true, event: true, nvwa: true, analysis: true, ten
 
 
 function renderLeftDrawerNav() {
+
+  var cfg = state.drawerConfig = loadDrawerConfig();
+
   var html = '';
 
   NAV_TREE.forEach(function(group) {
-    var hasChildren = group.children && group.children.length > 0;
 
-    html += '<div class="drawer-group" data-group="' + group.id + '">';
+    var isOpen = cfg.collapsed[group.id] !== true;
 
-    html += '<div class="drawer-level1-item' + (hasChildren ? ' has-children' : '') + '" data-group="' + group.id + '" onclick="DrawerApp.openPanel(\'' + group.id + '\')">' +
-      '<span class="drawer-l1-prefix">' + (hasChildren ? '+' : '') + '</span>' +
-      '<span class="drawer-l1-icon">' + (group.icon ? icon(group.icon) : '') + '</span>' +
-      '<span class="drawer-l1-label">' + escapeHtml(group.label) + '</span>' +
-      (hasChildren ? '<span class="drawer-l1-arrow">></span>' : '') + '</div>';
+    html += '<div class="drawer-group' + (isOpen ? ' open' : '') + '" data-group="' + group.id + '">';
+
+    html += '<div class="drawer-group-header" data-group="' + group.id + '">' +
+
+      '<span class="drawer-chevron">' + (isOpen ? icon('chevronDown') : icon('chevronRight')) + '</span>' +
+
+      '<span class="drawer-icon">' + icon(group.icon) + '</span>' +
+
+      '<span class="drawer-group-label">' + escapeHtml(group.label) + '</span></div>';
+
+    if (isOpen) {
+
+      html += '<div class="drawer-group-children">';
+
+      group.children.forEach(function(child) {
+
+        var isActive = state.currentEntity === child.id;
+
+        html += '<div class="drawer-item' + (isActive ? ' active' : '') + '" data-id="' + child.id + '" data-group="' + group.id + '">' +
+
+          '<span class="drawer-chevron small"></span>' +
+
+          '<span class="drawer-icon small">' + icon(child.icon) + '</span>' +
+
+          '<span class="drawer-item-label">' + escapeHtml(child.label) + '</span></div>';
+
+      });
+
+      html += '</div>';
+
+    }
 
     html += '</div>';
+
   });
 
   return html;
-}
 
-// DrawerApp namespace
-window.DrawerApp = {
-  currentPanel: null,
-  
-  openPanel: function(groupId) {
-    var group = NAV_TREE.find(function(g) { return g.id === groupId; });
-    if (!group) return;
-    
-    this.currentPanel = groupId;
-    
-    // Create or show side panel
-    var container = document.getElementById('drawer-panel-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'drawer-panel-container';
-      container.className = 'drawer-panel-container';
-      document.querySelector('.book-body').appendChild(container);
-    }
-    
-    var html = '<div class="drawer-panel">' +
-      '<div class="drawer-panel-header">' +
-      '<span class="drawer-panel-back" onclick="DrawerApp.closePanel()">←</span>' +
-      '<span class="drawer-panel-title">+ ' + escapeHtml(group.label) + '</span>' +
-      '</div>' +
-      '<div class="drawer-panel-content">';
-    
-    if (group.children) {
-      group.children.forEach(function(child) {
-        html += '<div class="drawer-panel-item" onclick="DrawerApp.showDetail(\'' + groupId + '\', \'' + child.id + '\')">' +
-          '<span class="drawer-panel-item-prefix">++</span>' +
-          '<span class="drawer-panel-item-label">' + escapeHtml(child.label) + '</span>' +
-          '<span class="drawer-panel-item-arrow">></span></div>';
-      });
-    }
-    
-    html += '</div></div>';
-    container.innerHTML = html;
-    container.classList.add('open');
-  },
-  
-  closePanel: function() {
-    var container = document.getElementById('drawer-panel-container');
-    if (container) container.classList.remove('open');
-    this.currentPanel = null;
-  },
-  
-  showDetail: function(parentId, childId) {
-    var group = NAV_TREE.find(function(g) { return g.id === parentId; });
-    var child = group && group.children && group.children.find(function(c) { return c.id === childId; });
-    if (!child) return;
-    
-    // Create or show modal
-    var modal = document.getElementById('detail-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'detail-modal';
-      modal.className = 'detail-modal';
-      modal.innerHTML = '<div class="detail-modal-backdrop" onclick="DrawerApp.closeDetail()"></div>' +
-        '<div class="detail-modal-box">' +
-        '<div class="detail-modal-header">' +
-        '<span class="detail-modal-title"></span>' +
-        '<button class="detail-modal-close" onclick="DrawerApp.closeDetail()">×</button>' +
-        '</div>' +
-        '<div class="detail-modal-body"></div>' +
-        '</div>';
-      document.body.appendChild(modal);
-    }
-    
-    var modalTitle = modal.querySelector('.detail-modal-title');
-    var modalBody = modal.querySelector('.detail-modal-body');
-    
-    if (modalTitle) modalTitle.textContent = '+ ' + (group ? group.label : '') + ' / ++ ' + child.label;
-    if (modalBody) modalBody.innerHTML = this.renderDetailContent(childId);
-    
-    modal.classList.add('open');
-    this.closePanel();
-  },
-  
-  closeDetail: function() {
-    var modal = document.getElementById('detail-modal');
-    if (modal) modal.classList.remove('open');
-  },
-  
-  renderDetailContent: function(itemId) {
-    var html = '';
-    switch(itemId) {
-      case 'roles':
-        var roles = window.state && window.state.currentBook && window.state.currentBook.roles || [];
-        if (roles.length === 0) {
-          html += '<div class="detail-empty"><div class="detail-empty-icon">👤</div><div>暂无角色</div></div>';
-        } else {
-          roles.forEach(function(r) {
-            html += '<div class="detail-list-item"><div class="detail-list-item-icon">👤</div>' +
-              '<div class="detail-list-item-content"><div class="detail-list-item-title">' + (r.name || '未命名') + '</div>' +
-              '<div class="detail-list-item-desc">' + (r.description || '暂无描述') + '</div></div>' +
-              '<div class="detail-list-item-arrow">></div></div>';
-          });
-        }
-        html += '<button class="btn-primary-full" onclick="DrawerApp.createRole()">+ 新建角色</button>';
-        break;
-      case 'novelparse':
-        html += '<div class="form-group"><label>粘贴小说文本</label>' +
-          '<textarea id="novel-parse-text" class="form-textarea" placeholder="粘贴要解析的小说内容..."></textarea></div>' +
-          '<button class="btn-primary-full" onclick="DrawerApp.parseNovel()">🔍 开始解析</button>';
-        break;
-      default:
-        html += '<div class="detail-empty"><div class="detail-empty-icon">📄</div><div>内容开发中</div></div>';
-    }
-    return html;
-  },
-  
-  createRole: function() {
-    var name = prompt("角色名称：");
-    if (!name) return;
-    alert("创建角色: " + name + " (功能开发中)");
-  },
-  
-  parseNovel: function() {
-    var text = document.getElementById("novel-parse-text") && document.getElementById("novel-parse-text").value;
-    if (!text) { alert("请输入小说内容"); return; }
-    alert("小说解析功能开发中");
-  }
-};
+}
 
 
 

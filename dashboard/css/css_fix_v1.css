@@ -1,0 +1,681 @@
+/**
+ * SoulWriter CSS Fix v1 - 核心问题修复
+ * 
+ * 修复：
+ * 1. 统计栏太素
+ * 2. 空状态没设计
+ * 3. 按钮太丑
+ * 4. 间距不统一
+ * 5. 颜色不协调
+ */
+
+/* ============================================
+   1. 间距系统（必须先定义）
+   ============================================ */
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --radius: 8px;
+  --radius-sm: 4px;
+  --radius-lg: 12px;
+}
+
+/* ============================================
+   2. 统计栏改造（Home Tab）
+   ============================================ */
+.home-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stat-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.15);
+}
+
+.stat-item.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: var(--accent);
+  color: white;
+}
+
+.stat-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.stat-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 24px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.stat-item.active .stat-num,
+.stat-item.active .stat-label {
+  color: white;
+}
+
+/* ============================================
+   3. 空状态设计
+   ============================================ */
+.entity-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  background: var(--bg2);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  margin: var(--space-md);
+}
+
+.entity-list-empty svg {
+  width: 48px;
+  height: 48px;
+  color: var(--text2);
+  opacity: 0.5;
+  margin-bottom: var(--space-md);
+}
+
+.entity-list-empty > div:nth-child(2) {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: var(--space-md);
+}
+
+/* ============================================
+   4. 统一按钮系统
+   ============================================ */
+.btn-create-entity,
+.btn-primary,
+.btn--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+}
+
+.btn-create-entity:hover,
+.btn-primary:hover,
+.btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(233, 69, 96, 0.4);
+}
+
+.btn-create-entity svg,
+.btn-primary svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 次要按钮 */
+.btn-secondary,
+.btn--secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover,
+.btn--secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* 小按钮 */
+.btn-sm,
+.btn--sm {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 12px;
+}
+
+/* 危险按钮（红色）*/
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   5. Tab标签页样式
+   ============================================ */
+.book-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.book-tab svg {
+  width: 16px;
+  height: 16px;
+}
+
+.book-tab:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.book-tab.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+}
+
+/* ============================================
+   6. 左侧抽屉优化
+   ============================================ */
+.drawer-group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: var(--radius-sm);
+}
+
+.drawer-group-header:hover {
+  background: var(--bg3);
+}
+
+.drawer-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.drawer-chevron {
+  transition: transform 0.2s;
+}
+
+.drawer-group.open .drawer-chevron {
+  transform: rotate(180deg);
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.drawer-item:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.drawer-item.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
+}
+
+.drawer-item-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   7. 右侧详情面板
+   ============================================ */
+.detail-panel {
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.detail-body {
+  padding: var(--space-md);
+}
+
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.detail-label {
+  font-size: 12px;
+  color: var(--text2);
+  min-width: 70px;
+}
+
+.detail-value {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.detail-input,
+.detail-textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.detail-input:focus,
+.detail-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.detail-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+.detail-actions {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-top: 1px solid var(--border);
+  background: var(--bg3);
+}
+
+/* ============================================
+   8. 事件线Tab - 章节标签
+   ============================================ */
+.event-chapter {
+  margin-bottom: var(--space-lg);
+}
+
+.event-chapter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.event-chapter-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--accent);
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.event-node-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.event-node-card:hover {
+  border-color: var(--accent);
+  border-left-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateX(4px);
+}
+
+.event-node-card.active {
+  border-color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--bg3);
+}
+
+.event-node-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: var(--space-xs);
+}
+
+.event-node-summary {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================
+   9. 翻译Tab
+   ============================================ */
+.translate-header {
+  padding: var(--space-md);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+
+.translate-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-md);
+}
+
+.translate-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.translate-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.translate-control label {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.translate-select {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.translate-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  height: calc(100vh - 200px);
+  overflow: hidden;
+}
+
+.translate-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.translate-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.translate-pane-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+.translate-textarea {
+  width: 100%;
+  height: 100%;
+  padding: var(--space-md);
+  background: var(--bg);
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  resize: none;
+  line-height: 1.8;
+}
+
+.translate-textarea:focus {
+  outline: none;
+}
+
+.translate-result {
+  padding: var(--space-md);
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+/* 翻译按钮 */
+.btn-translate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-xl);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(233, 69, 96, 0.3);
+}
+
+.btn-translate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+}
+
+/* ============================================
+   10. 滚动条美化
+   ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border);
+}
+
+/* ============================================
+   11. 工具栏
+   ============================================ */
+#sw-toolbar {
+  background: var(--bg2) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.toolbar-logo {
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.toolbar-btn {
+  padding: var(--space-xs) var(--space-md) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 12px !important;
+}
+
+.toolbar-btn:hover {
+  background: var(--accent) !important;
+  color: white !important;
+}
+
+.toolbar-select {
+  padding: var(--space-xs) var(--space-sm) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 12px !important;
+}
+
+/* ============================================
+   12. 女娲Tab
+   ============================================ */
+.nvwa-container {
+  padding: var(--space-md);
+}
+
+.nvwa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.nvwa-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ============================================
+   13. 杂项修复
+   ============================================ */
+
+/* 修复空白提示 */
+.empty-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  color: var(--text2);
+  font-size: 13px;
+}
+
+/* 修复加载动画 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  color: var(--text2);
+}
+
+/* 修复分隔线 */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-md) 0;
+}
+
+/* 统一hover效果 */
+.book-tab,
+.drawer-item,
+.stat-item,
+.event-node-card {
+  transition: all 0.2s ease;
+}

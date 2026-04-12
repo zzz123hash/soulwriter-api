@@ -817,10 +817,10 @@ function renderEventTab() {
 // ============ 女娲 Tab ============
 
 function renderNvwaTab() {
-
-  return '<div class="nvwa-tab-root" id="nvwa-tab-root"><div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">'+t('errors.loading')+'</div></div>';
-
+  window.state = state;
+  return NvwaUI.init();
 }
+
 
 
 

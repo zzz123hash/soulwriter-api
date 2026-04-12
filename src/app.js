@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const booksRoutes = require('./books_routes');
+const nvwa = require('./nvwa_engine');
 
 const db = new Database(path.join(__dirname, '..', 'data.db'));
 
@@ -47,6 +48,7 @@ const aiConfigCount = db.prepare('SELECT COUNT(*) as c FROM ai_config').get();
 if (!aiConfigCount.c) {
   db.prepare('INSERT INTO ai_config (id, type, baseUrl, model, apiKey, localPort, localModel) VALUES (?, ?, ?, ?, ?, ?, ?)')
     .run(crypto.randomUUID(), 'cloud', 'https://api.openai.com/v1', 'gpt-4o', '', 42897, 'qwen-1.5b');
+nvwa.initNvwaDB(db);
 }
 
 // ============ AI Functions ============
@@ -380,6 +382,62 @@ fastify.get('/dashboard/*', (req, reply) => {
 const start = async () => {
   try {
     fastify.register(booksRoutes);
+// ============ Nvwa Routes ============
+fastify.get('/api/v1/nvwa/status', () => {
+  const souls = db.prepare("SELECT id, name, status, createdAt FROM nvwa_souls WHERE status = 'active'").all();
+  const worldVars = db.prepare("SELECT key, value, reason FROM nvwa_world_vars").all().reduce((acc, v) => { acc[v.key] = v.value; return acc; }, {});
+  return { activeCharacters: souls.length, characters: souls, worldVars };
+});
+
+fastify.get('/api/v1/nvwa/souls', () => db.prepare("SELECT * FROM nvwa_souls ORDER BY createdAt DESC").all());
+
+fastify.post('/api/v1/nvwa/souls', async (req) => {
+  const { name, gender, personality, background, goals, fears, strengths, weaknesses, soul } = req.body;
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  db.prepare(`INSERT INTO nvwa_souls (id, name, attributes, klines, relationships, metadata, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(id, name, JSON.stringify({}), JSON.stringify([]), JSON.stringify([]), JSON.stringify({ gender, personality, background, goals, fears, strengths, weaknesses, soul }), 'active', now, now);
+  return { success: true, id, soul: db.prepare("SELECT * FROM nvwa_souls WHERE id = ?").get(id) };
+});
+
+fastify.get('/api/v1/nvwa/souls/:id', (req) => db.prepare("SELECT * FROM nvwa_souls WHERE id = ?").get(req.params.id));
+
+fastify.put('/api/v1/nvwa/souls/:id', (req) => {
+  const { attributes, relationships, status } = req.body;
+  const updates = []; const vals = [];
+  if (attributes !== undefined) { updates.push('attributes = ?'); vals.push(JSON.stringify(attributes)); }
+  if (relationships !== undefined) { updates.push('relationships = ?'); vals.push(JSON.stringify(relationships)); }
+  if (status !== undefined) { updates.push('status = ?'); vals.push(status); }
+  updates.push('updatedAt = ?'); vals.push(new Date().toISOString());
+  vals.push(req.params.id);
+  db.prepare(`UPDATE nvwa_souls SET ${updates.join(',')} WHERE id = ?`).run(...vals);
+  return { success: true, soul: db.prepare("SELECT * FROM nvwa_souls WHERE id = ?").get(req.params.id) };
+});
+
+fastify.delete('/api/v1/nvwa/souls/:id', (req) => { db.prepare("DELETE FROM nvwa_souls WHERE id = ?").run(req.params.id); return { success: true }; });
+
+fastify.post('/api/v1/nvwa/tick', async (req) => {
+  const cfg = db.prepare("SELECT * FROM ai_config LIMIT 1").get();
+  const result = await nvwa.runNvwaTick(db, cfg, req.body || {});
+  return result;
+});
+
+fastify.get('/api/v1/nvwa/world-vars', () => db.prepare("SELECT * FROM nvwa_world_vars").all());
+fastify.put('/api/v1/nvwa/world-vars/:key', (req) => {
+  const { value, reason } = req.body;
+  db.prepare("UPDATE nvwa_world_vars SET value = ?, reason = ?, updatedAt = CURRENT_TIMESTAMP WHERE `key` = ?").run(value, reason || '', req.params.key);
+  return { success: true };
+});
+fastify.get('/api/v1/nvwa/events', (req) => {
+  const limit = parseInt(req.query.limit) || 50;
+  return db.prepare("SELECT * FROM nvwa_events ORDER BY createdAt DESC LIMIT ?").all(limit);
+});
+fastify.get('/api/v1/nvwa/logs', (req) => {
+  const limit = parseInt(req.query.limit) || 50;
+  return db.prepare("SELECT * FROM nvwa_logs ORDER BY createdAt DESC LIMIT ?").all(limit);
+});
+fastify.get('/api/v1/nvwa/klines/:soulId', (req) => db.prepare("SELECT * FROM nvwa_souls_klines WHERE soulId = ? ORDER BY createdAt DESC LIMIT 100").all(req.params.soulId));
+
 
 await fastify.listen({ port: 3000, host: '0.0.0.0' });
     console.log('Server running at http://localhost:3000');

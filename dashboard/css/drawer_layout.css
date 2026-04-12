@@ -1,0 +1,249 @@
+/* ============ 基础 ============ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #1a1a2e;
+  --bg2: #16213e;
+  --bg3: #0f3460;
+  --text: #e8e8e8;
+  --text2: #a0a0a0;
+  --accent: #e94560;
+  --accent2: #533483;
+  --border: #2a2a4a;
+}
+body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+
+/* ============ 书本布局 ============ */
+.book-layout { display: flex; flex-direction: column; height: 100vh; }
+
+/* ============ 顶部 Tab ============ */
+.book-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  height: 48px;
+  flex-shrink: 0;
+  margin-top: 48px;
+}
+
+.book-tabs { display: flex; gap: 4px; }
+.book-tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text2);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.book-tab:hover { background: var(--bg3); color: var(--text); }
+.book-tab.active { background: var(--accent); color: white; }
+
+.book-info { display: flex; align-items: center; gap: 12px; }
+.book-name { font-size: 14px; color: var(--text2); }
+.btn-back {
+  padding: 6px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+}
+.btn-back:hover { border-color: var(--accent); }
+
+/* ============ 主体区域 ============ */
+.book-body { display: flex; flex: 1; overflow: hidden; }
+
+/* ============ 左侧抽屉（导航） ============ */
+.left-drawer {
+  width: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  transition: width 0.3s ease;
+  flex-shrink: 0;
+}
+.left-drawer.open { width: 200px; }
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.drawer-title { font-size: 14px; font-weight: 600; }
+.drawer-toggle {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+.drawer-toggle:hover { color: var(--accent); }
+.drawer-actions { display: flex; gap: 4px; }
+.drawer-expand { background: none; border: none; color: var(--text2); cursor: pointer; font-size: 16px; }
+
+/* ============ 实体导航 ============ */
+.entity-nav { padding: 8px 0; }
+.entity-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 14px;
+}
+.entity-nav-item:hover { background: var(--bg3); color: var(--text); }
+.entity-nav-item.active { background: var(--accent); color: white; }
+.nav-icon { font-size: 18px; }
+.nav-label {}
+
+/* ============ 主画布 ============ */
+.main-canvas { flex: 1; overflow: hidden; position: relative; }
+.tab-canvas { width: 100%; height: 100%; background: var(--bg); overflow: auto; }
+.canvas-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text2);
+  font-size: 18px;
+}
+
+/* ============ 右侧抽屉 ============ */
+.right-drawer {
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  width: 0;
+  flex-shrink: 0;
+}
+.right-drawer.open { width: 320px; }
+.drawer-2 { position: absolute; right: 0; top: 0; bottom: 0; z-index: 10; box-shadow: -4px 0 20px rgba(0,0,0,0.3); }
+
+.right-drawer .drawer-content { flex: 1; overflow-y: auto; padding: 16px; }
+
+/* ============ 实体列表 ============ */
+.entity-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.entity-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.entity-list-item:hover { border-color: var(--accent); transform: translateX(4px); }
+.item-icon { font-size: 24px; }
+.item-info { flex: 1; min-width: 0; }
+.item-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-desc { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.empty-hint { text-align: center; color: var(--text2); padding: 40px 20px; font-size: 14px; }
+
+.btn-add-entity {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-add-entity:hover { background: var(--accent2); }
+
+/* ============ 实体详情 ============ */
+.entity-detail {}
+.detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.detail-icon { font-size: 32px; }
+.detail-title { font-size: 18px; font-weight: 600; }
+
+.detail-body {}
+.detail-field { margin-bottom: 16px; }
+.detail-field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; }
+.detail-input, .detail-textarea, .detail-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+}
+.detail-input:focus, .detail-textarea:focus, .detail-select:focus { outline: none; border-color: var(--accent); }
+.detail-textarea { min-height: 100px; resize: vertical; }
+
+.detail-actions { display: flex; gap: 8px; margin-top: 20px; }
+.btn-save-detail { flex: 1; padding: 12px; background: var(--accent); border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px; }
+.btn-delete-detail { padding: 12px; background: transparent; border: 1px solid #ef4444; border-radius: 8px; color: #ef4444; cursor: pointer; font-size: 14px; }
+
+/* ============ 欢迎页 ============ */
+.welcome-page { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 40px; }
+.welcome-logo { text-align: center; margin-bottom: 60px; }
+.app-logo { font-size: 4em; font-weight: 800; background: linear-gradient(135deg, #f5c518, #e94560); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.app-slogan { font-size: 1.4em; color: var(--text2); margin-top: 8px; letter-spacing: 4px; }
+
+.section-title { font-size: 1.8em; font-weight: 600; margin-bottom: 30px; padding-left: 20px; border-left: 4px solid var(--accent); }
+
+.bookshelf-section { width: 100%; max-width: 1000px; }
+.bookshelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+
+.book-item { display: flex; gap: 20px; padding: 20px; background: var(--bg2); border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: all 0.3s; }
+.book-item:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 8px 30px rgba(233, 69, 96, 0.2); }
+.book-cover { position: relative; width: 60px; height: 90px; flex-shrink: 0; }
+.book-spine { position: absolute; left: 0; width: 12px; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px 0 0 3px; }
+.book-front { position: absolute; left: 12px; right: 0; top: 0; bottom: 0; background: var(--bg3); border-radius: 0 4px 4px 0; display: flex; align-items: center; justify-content: center; }
+.book-name { font-size: 1.4em; font-weight: 700; color: #f5c518; }
+.book-info { flex: 1; }
+.book-title { font-size: 1.2em; font-weight: 600; margin-bottom: 6px; }
+.book-desc { font-size: 0.9em; color: var(--text2); margin-bottom: 12px; }
+.book-actions { display: flex; gap: 8px; }
+
+.create-book-area { margin-top: 40px; }
+.btn-create-book { display: flex; align-items: center; gap: 12px; padding: 16px 40px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 12px; color: white; font-size: 1.2em; cursor: pointer; transition: all 0.3s; }
+.btn-create-book:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(233, 69, 96, 0.3); }
+.btn-icon { font-size: 1.4em; }
+
+.empty-bookshelf { text-align: center; padding: 60px; background: var(--bg2); border-radius: 16px; border: 2px dashed var(--border); color: var(--text2); }
+
+/* ============ 按钮 ============ */
+.btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+.btn-primary { background: var(--accent); border: none; color: white; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
+.btn-sm { padding: 6px 10px; font-size: 12px; }
+.btn-danger { background: #dc2626; border: none; color: white; }
+.btn-open { background: var(--accent); border: none; color: white; }
+
+/* ============ 模态框 ============ */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+.modal { background: var(--bg2); border-radius: 16px; padding: 24px; min-width: 400px; max-width: 90vw; border: 1px solid var(--border); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header h3 { font-size: 1.2em; font-weight: 600; }
+.modal-close { background: none; border: none; color: var(--text2); font-size: 1.5em; cursor: pointer; }
+.modal-close:hover { color: var(--accent); }
+.modal-body .form-group { margin-bottom: 16px; }
+.modal-body label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.modal-body .input { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; }
+.modal-body .input:focus { outline: none; border-color: var(--accent); }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+
+/* ============ 加载 ============ */
+.loading-text { text-align: center; padding: 40px; color: var(--text2); }

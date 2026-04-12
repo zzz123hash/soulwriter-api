@@ -1,6 +1,5 @@
 /**
- * SoulWriter - 完整内页框架 v2
- * 顶部Tab + 左侧导航 + 右侧内容区
+ * SoulWriter - 抽屉式内页架构
  */
 
 const API_BASE = '/api/v1';
@@ -8,35 +7,39 @@ const API_BASE = '/api/v1';
 // 状态
 const state = {
   currentView: 'welcome',      // welcome | book
-  currentTab: 'genesis',       // genesis | event | nvwa | novel
-  currentEntity: 'roles',      // roles | items | locations | nodes | units | world | settings | prompts | map
+  currentTab: 'genesis',         // home | genesis | event | nvwa | novel
+  currentEntity: 'roles',       // roles | items | locations | nodes | units | world | settings | prompts | map
   currentBook: null,
   books: [],
+  // 抽屉状态
+  leftDrawerOpen: true,
+  rightDrawer1Open: false,      // 实体列表
+  rightDrawer2Open: false,      // 实体详情
+  rightDrawer2Width: 400,
+  selectedEntity: null,
+  // 数据
   roles: [],
   items: [],
   locations: [],
   nodes: [],
-  units: [],
-  world: '',
-  settings: '',
-  prompts: ''
+  units: []
 };
 
 // i18n
 const i18n = {
   'zh-CN': {
     app: { name: 'SoulWriter', subtitle: '灵魂创作者' },
-    tabs: { home: '首页', genesis: '创世树', event: '事件线', nvwa: '女娲推演', novel: '小说详写' },
-    nav: { roles: '角色', items: '物品', locations: '地点', nodes: '节点', units: '单元', world: '世界观', settings: '背景设定', prompts: '提示词', map: '地图' },
-    book: { create: '创建新书', noBooks: '书架空空如也' },
-    common: { back: '返回', loading: '加载中...' }
+    tabs: { home: '首页', genesis: '创世树', event: '事件线', nvwa: '女娲', novel: '小说' },
+    nav: { roles: '角色', items: '物品', locations: '地点', nodes: '节点', units: '单元', world: '世界观', settings: '设定', prompts: '提示词', map: '地图' },
+    book: { create: '创建新书', noBooks: '书架空空' },
+    common: { back: '返回', loading: '加载中...', save: '保存', cancel: '取消', delete: '删除', edit: '编辑' }
   },
   'en-US': {
     app: { name: 'SoulWriter', subtitle: 'Soul Creator' },
-    tabs: { home: 'Home', genesis: 'Genesis', event: 'Event Line', nvwa: 'Nvwa', novel: 'Novel' },
+    tabs: { home: 'Home', genesis: 'Genesis', event: 'Event', nvwa: 'Nvwa', novel: 'Novel' },
     nav: { roles: 'Roles', items: 'Items', locations: 'Locations', nodes: 'Nodes', units: 'Units', world: 'World', settings: 'Settings', prompts: 'Prompts', map: 'Map' },
-    book: { create: 'Create Book', noBooks: 'Your bookshelf is empty' },
-    common: { back: 'Back', loading: 'Loading...' }
+    book: { create: 'Create Book', noBooks: 'Empty shelf' },
+    common: { back: 'Back', loading: 'Loading...', save: 'Save', cancel: 'Cancel', delete: 'Delete', edit: 'Edit' }
   }
 };
 
@@ -49,45 +52,15 @@ function t(key) {
   return v;
 }
 
-// 主题
-function getTheme() { return localStorage.getItem('soulwriter-theme') || 'dark'; }
-function setTheme(theme) {
-  localStorage.setItem('soulwriter-theme', theme);
-  applyTheme(theme);
-}
-function applyTheme(theme) {
-  const root = document.documentElement;
-  if (theme === 'soft') {
-    root.style.setProperty('--bg', '#f0f0f5');
-    root.style.setProperty('--bg2', '#ffffff');
-    root.style.setProperty('--bg3', '#e8e8f0');
-    root.style.setProperty('--text', '#2a2a3a');
-    root.style.setProperty('--text2', '#6b6b80');
-    root.style.setProperty('--accent', '#8b5cf6');
-    root.style.setProperty('--accent2', '#a78bfa');
-    root.style.setProperty('--border', '#d0d0e0');
-  } else {
-    root.style.setProperty('--bg', '#1a1a2e');
-    root.style.setProperty('--bg2', '#16213e');
-    root.style.setProperty('--bg3', '#0f3460');
-    root.style.setProperty('--text', '#e8e8e8');
-    root.style.setProperty('--text2', '#a0a0a0');
-    root.style.setProperty('--accent', '#e94560');
-    root.style.setProperty('--accent2', '#533483');
-    root.style.setProperty('--border', '#2a2a4a');
-  }
-}
-
 function escapeHtml(str) {
   if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // ============ 主渲染 ============
 function renderApp() {
   const app = document.getElementById('app');
   if (!app) return;
-  applyTheme(getTheme());
   
   if (!state.currentBook) {
     app.innerHTML = renderWelcome();
@@ -103,14 +76,12 @@ function renderApp() {
 function renderWelcome() {
   return `
     <div class="welcome-page">
-      <header class="welcome-header">
-        <div class="logo-area">
-          <h1 class="app-logo">SoulWriter</h1>
-          <p class="app-slogan">${t('app.subtitle')}</p>
-        </div>
-      </header>
+      <div class="welcome-logo">
+        <h1 class="app-logo">SoulWriter</h1>
+        <p class="app-slogan">${t('app.subtitle')}</p>
+      </div>
       <section class="bookshelf-section">
-        <h2 class="section-title">&#x1F4DA; ${t('common.bookshelf')}</h2>
+        <h2 class="section-title">${t('common.bookshelf')}</h2>
         <div class="bookshelf" id="books-list">
           <div class="loading-text">${t('common.loading')}</div>
         </div>
@@ -119,10 +90,6 @@ function renderWelcome() {
         <button class="btn-create-book" id="create-book-btn">
           <span class="btn-icon">+</span>
           <span class="btn-text">${t('book.create')}</span>
-        </button>
-        <button class="btn-create-book" id="import-book-btn">
-          <span class="btn-icon">&#x1F4E5;</span>
-          <span class="btn-text">&#x5BFC;&#x5165;</span>
         </button>
       </div>
     </div>
@@ -137,64 +104,176 @@ function renderBookView() {
       <header class="book-header">
         <div class="book-tabs">
           <button class="book-tab ${state.currentTab === 'home' ? 'active' : ''}" data-tab="home">
-            &#x1F3E0; ${t('tabs.home')}
+            🏠 ${t('tabs.home')}
           </button>
           <button class="book-tab ${state.currentTab === 'genesis' ? 'active' : ''}" data-tab="genesis">
-            &#x1F333; ${t('tabs.genesis')}
+            🌳 ${t('tabs.genesis')}
           </button>
           <button class="book-tab ${state.currentTab === 'event' ? 'active' : ''}" data-tab="event">
-            &#x1F4C5; ${t('tabs.event')}
+            📋 ${t('tabs.event')}
           </button>
           <button class="book-tab ${state.currentTab === 'nvwa' ? 'active' : ''}" data-tab="nvwa">
-            &#x1F9EC; ${t('tabs.nvwa')}
+            🧬 ${t('tabs.nvwa')}
           </button>
           <button class="book-tab ${state.currentTab === 'novel' ? 'active' : ''}" data-tab="novel">
-            &#x1F4D6; ${t('tabs.novel')}
+            📖 ${t('tabs.novel')}
           </button>
         </div>
-        <div class="book-header-actions">
-          <span class="book-title-small">${escapeHtml(state.currentBook?.title || '')}</span>
-          <button class="btn btn-sm" id="back-to-books">&#x2190; ${t('common.back')}</button>
+        <div class="book-info">
+          <span class="book-name">${escapeHtml(state.currentBook?.title || '')}</span>
+          <button class="btn-back" id="back-to-books">← ${t('common.back')}</button>
         </div>
       </header>
       
       <!-- 主体区域 -->
       <div class="book-body">
-        <!-- 左侧导航 -->
-        <aside class="entity-nav">
-          <div class="entity-nav-item ${state.currentEntity === 'roles' ? 'active' : ''}" data-entity="roles">
-            &#x1F9D4; ${t('nav.roles')}
+        <!-- 左侧抽屉1：实体类型导航 -->
+        <aside class="left-drawer ${state.leftDrawerOpen ? 'open' : ''}" id="left-drawer">
+          <div class="drawer-header">
+            <span class="drawer-title">导航</span>
+            <button class="drawer-toggle" id="toggle-left">◀</button>
           </div>
-          <div class="entity-nav-item ${state.currentEntity === 'items' ? 'active' : ''}" data-entity="items">
-            &#x1F381; ${t('nav.items')}
+          <nav class="entity-nav">
+            ${renderEntityNavItems()}
+          </nav>
+        </aside>
+        
+        <!-- 中间主内容区 -->
+        <main class="main-canvas" id="main-canvas">
+          ${renderTabCanvas()}
+        </main>
+        
+        <!-- 右侧抽屉2：实体列表 -->
+        <aside class="right-drawer drawer-1 ${state.rightDrawer1Open ? 'open' : ''}" id="right-drawer-1">
+          <div class="drawer-header">
+            <span class="drawer-title">${t('nav.' + state.currentEntity)}</span>
+            <button class="drawer-toggle" id="toggle-right-1">▶</button>
           </div>
-          <div class="entity-nav-item ${state.currentEntity === 'locations' ? 'active' : ''}" data-entity="locations">
-            &#x1F4CD; ${t('nav.locations')}
-          </div>
-          <div class="entity-nav-item ${state.currentEntity === 'nodes' ? 'active' : ''}" data-entity="nodes">
-            &#x1F4CC; ${t('nav.nodes')}
-          </div>
-          <div class="entity-nav-item ${state.currentEntity === 'units' ? 'active' : ''}" data-entity="units">
-            &#x1F4DA; ${t('nav.units')}
-          </div>
-          <div class="entity-nav-item ${state.currentEntity === 'world' ? 'active' : ''}" data-entity="world">
-            &#x1F30D; ${t('nav.world')}
-          </div>
-          <div class="entity-nav-item ${state.currentEntity === 'settings' ? 'active' : ''}" data-entity="settings">
-            &#x2699; ${t('nav.settings')}
-          </div>
-          <div class="entity-nav-item ${state.currentEntity === 'prompts' ? 'active' : ''}" data-entity="prompts">
-            &#x1F4DD; ${t('nav.prompts')}
-          </div>
-          <div class="entity-nav-item ${state.currentEntity === 'map' ? 'active' : ''}" data-entity="map">
-            &#x1F5FA; ${t('nav.map')}
+          <div class="drawer-content" id="entity-list-drawer">
+            ${renderEntityList()}
           </div>
         </aside>
         
-        <!-- 主内容区 -->
-        <main class="entity-content" id="entity-content">
-          <!-- 动态内容 -->
-        </main>
+        <!-- 右侧抽屉3：实体详情 -->
+        <aside class="right-drawer drawer-2 ${state.rightDrawer2Open ? 'open' : ''}" id="right-drawer-2" style="width: ${state.rightDrawer2Width}px">
+          <div class="drawer-header">
+            <span class="drawer-title">详情</span>
+            <div class="drawer-actions">
+              <button class="drawer-expand" id="expand-detail">⛶</button>
+              <button class="drawer-toggle" id="toggle-right-2">▶</button>
+            </div>
+          </div>
+          <div class="drawer-content" id="entity-detail-drawer">
+            ${state.selectedEntity ? renderEntityDetail() : '<div class="empty-hint">← 点击实体查看详情</div>'}
+          </div>
+        </aside>
+      </div>
+    </div>
+  `;
+}
+
+function renderEntityNavItems() {
+  const items = [
+    { key: 'roles', icon: '👤' },
+    { key: 'items', icon: '🎁' },
+    { key: 'locations', icon: '📍' },
+    { key: 'nodes', icon: '📌' },
+    { key: 'units', icon: '📑' },
+    { key: 'world', icon: '🌍' },
+    { key: 'settings', icon: '⚙️' },
+    { key: 'prompts', icon: '💬' },
+    { key: 'map', icon: '🗺️' }
+  ];
+  
+  return items.map(item => `
+    <div class="entity-nav-item ${state.currentEntity === item.key ? 'active' : ''}" data-entity="${item.key}">
+      <span class="nav-icon">${item.icon}</span>
+      <span class="nav-label">${t('nav.' + item.key)}</span>
+    </div>
+  `).join('');
+}
+
+function renderTabCanvas() {
+  // 根据 Tab 渲染不同的画布内容
+  switch (state.currentTab) {
+    case 'home':
+      return '<div class="tab-canvas"><div class="canvas-placeholder">🏠 首页 - 书本概览</div></div>';
+    case 'genesis':
+      return '<div class="tab-canvas"><div class="canvas-placeholder" id="genesis-canvas">🌳 创世树 - 拖拽创建节点和关系</div></div>';
+    case 'event':
+      return '<div class="tab-canvas"><div class="canvas-placeholder">📋 事件线 - 时间轴视图</div></div>';
+    case 'nvwa':
+      return '<div class="tab-canvas"><div class="canvas-placeholder">🧬 女娲推演 - AI 角色推演引擎</div></div>';
+    case 'novel':
+      return '<div class="tab-canvas"><div class="canvas-placeholder">📖 小说详写 - 章节编辑器</div></div>';
+    default:
+      return '<div class="tab-canvas"></div>';
+  }
+}
+
+function renderEntityList() {
+  const data = state[state.currentEntity] || [];
+  
+  if (data.length === 0) {
+    return `<div class="empty-hint">暂无${t('nav.' + state.currentEntity)}，点击下方按钮创建</div>
+      <button class="btn-add-entity" id="add-entity-btn">+ 添加${t('nav.' + state.currentEntity)}</button>`;
+  }
+  
+  return `
+    <div class="entity-list">
+      ${data.map(item => `
+        <div class="entity-list-item" data-id="${item.id}">
+          <div class="item-icon">${getEntityIcon(state.currentEntity)}</div>
+          <div class="item-info">
+            <div class="item-title">${escapeHtml(item.title || item.name || '未命名')}</div>
+            <div class="item-desc">${escapeHtml((item.description || '').substring(0, 30))}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn-add-entity" id="add-entity-btn">+ 添加${t('nav.' + state.currentEntity)}</button>
+  `;
+}
+
+function getEntityIcon(entityType) {
+  const icons = {
+    roles: '👤', items: '🎁', locations: '📍', nodes: '📌', units: '📑',
+    world: '🌍', settings: '⚙️', prompts: '💬', map: '🗺️'
+  };
+  return icons[entityType] || '📄';
+}
+
+function renderEntityDetail() {
+  if (!state.selectedEntity) return '<div class="empty-hint">← 点击实体查看详情</div>';
+  
+  const entity = state.selectedEntity;
+  return `
+    <div class="entity-detail">
+      <div class="detail-header">
+        <div class="detail-icon">${getEntityIcon(state.currentEntity)}</div>
+        <div class="detail-title">${escapeHtml(entity.title || entity.name || '未命名')}</div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-field">
+          <label>名称</label>
+          <input type="text" class="detail-input" id="detail-title" value="${escapeHtml(entity.title || entity.name || '')}">
+        </div>
+        <div class="detail-field">
+          <label>描述</label>
+          <textarea class="detail-textarea" id="detail-desc" rows="5">${escapeHtml(entity.description || '')}</textarea>
+        </div>
+        <div class="detail-field">
+          <label>类型</label>
+          <select class="detail-select" id="detail-type">
+            <option value="main" ${entity.type === 'main' ? 'selected' : ''}>主角</option>
+            <option value="supporting" ${entity.type === 'supporting' ? 'selected' : ''}>配角</option>
+            <option value="minor" ${entity.type === 'minor' ? 'selected' : ''}>龙套</option>
+          </select>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-save-detail" id="save-entity-btn">💾 ${t('common.save')}</button>
+        <button class="btn-delete-detail" id="delete-entity-btn">🗑️ ${t('common.delete')}</button>
       </div>
     </div>
   `;
@@ -211,138 +290,22 @@ async function loadBookData() {
     state.locations = result.data.locations || [];
     state.nodes = result.data.nodes || [];
     state.units = result.data.units || [];
-    state.world = result.data.world || '';
-    state.settings = result.data.settings || '';
-    state.prompts = result.data.prompts || '';
   }
   
-  renderEntityContent();
+  updateEntityDrawer();
 }
 
-// ============ 渲染实体内容 ============
-function renderEntityContent() {
-  const content = document.getElementById('entity-content');
-  if (!content) return;
-  
-  const entityTitles = {
-    roles: { icon: '&#x1F9D4;', title: t('nav.roles') },
-    items: { icon: '&#x1F381;', title: t('nav.items') },
-    locations: { icon: '&#x1F4CD;', title: t('nav.locations') },
-    nodes: { icon: '&#x1F4CC;', title: t('nav.nodes') },
-    units: { icon: '&#x1F4DA;', title: t('nav.units') },
-    world: { icon: '&#x1F30D;', title: t('nav.world') },
-    settings: { icon: '&#x2699;', title: t('nav.settings') },
-    prompts: { icon: '&#x1F4DD;', title: t('nav.prompts') },
-    map: { icon: '&#x1F5FA;', title: t('nav.map') }
-  };
-  
-  const config = entityTitles[state.currentEntity] || entityTitles.roles;
-  
-  let html = `
-    <div class="entity-page">
-      <div class="entity-page-header">
-        <h2 class="entity-page-title">
-          <span class="entity-icon">${config.icon}</span>
-          ${config.title}
-        </h2>
-        <div class="entity-page-actions">
-          <button class="btn btn-primary" id="add-entity-btn">+ ${t('common.create') || '创建'}</button>
-        </div>
-      </div>
-      <div class="entity-list" id="entity-list">
-  `;
-  
-  // 根据实体类型渲染不同内容
-  if (state.currentEntity === 'roles' || state.currentEntity === 'items' || state.currentEntity === 'locations') {
-    const data = state[state.currentEntity] || [];
-    if (data.length === 0) {
-      html += `<div class="entity-empty">暂无数据</div>`;
-    } else {
-      html += `<div class="entity-grid">`;
-      for (const item of data) {
-        html += renderEntityCard(state.currentEntity, item);
-      }
-      html += `</div>`;
-    }
-  } else if (state.currentEntity === 'world') {
-    html += `
-      <div class="entity-textarea-wrap">
-        <textarea class="entity-textarea" id="world-textarea" placeholder="描述你的世界观...">${escapeHtml(state.world)}</textarea>
-        <button class="btn btn-primary" id="save-world-btn">&#x1F4BE; 保存</button>
-      </div>
-    `;
-  } else if (state.currentEntity === 'settings') {
-    html += `
-      <div class="entity-textarea-wrap">
-        <textarea class="entity-textarea" id="settings-textarea" placeholder="背景设定...">${escapeHtml(state.settings)}</textarea>
-        <button class="btn btn-primary" id="save-settings-btn">&#x1F4BE; 保存</button>
-      </div>
-    `;
-  } else if (state.currentEntity === 'prompts') {
-    html += `
-      <div class="entity-textarea-wrap">
-        <textarea class="entity-textarea" id="prompts-textarea" placeholder="提示词模板...">${escapeHtml(state.prompts)}</textarea>
-        <button class="btn btn-primary" id="save-prompts-btn">&#x1F4BE; 保存</button>
-      </div>
-    `;
-  } else if (state.currentEntity === 'map') {
-    html += `
-      <div class="entity-placeholder">
-        <div class="placeholder-icon">&#x1F5FA;</div>
-        <p>地图功能开发中...</p>
-      </div>
-    `;
-  } else {
-    html += `
-      <div class="entity-placeholder">
-        <div class="placeholder-icon">${config.icon}</div>
-        <p>${config.title} 功能开发中...</p>
-      </div>
-    `;
+function updateEntityDrawer() {
+  const listEl = document.getElementById('entity-list-drawer');
+  if (listEl) {
+    listEl.innerHTML = renderEntityList();
+    bindEntityListEvents();
   }
-  
-  html += `</div></div>`;
-  content.innerHTML = html;
-  
-  // 绑定事件
-  bindEntityEvents();
-}
-
-function renderEntityCard(type, item) {
-  const icons = { roles: '&#x1F9D4;', items: '&#x1F381;', locations: '&#x1F4CD;' };
-  const icon = icons[type] || '&#x2753;';
-  const title = escapeHtml(item.title || item.name || '未命名');
-  const desc = escapeHtml((item.description || item.desc || item.bio || '').substring(0, 100));
-  
-  return `
-    <div class="entity-card" data-id="${item.id}">
-      <div class="entity-card-icon">${icon}</div>
-      <div class="entity-card-body">
-        <h3 class="entity-card-title">${title}</h3>
-        <p class="entity-card-desc">${desc}</p>
-      </div>
-      <div class="entity-card-actions">
-        <button class="btn btn-sm btn-edit" data-id="${item.id}">&#x270F;</button>
-        <button class="btn btn-sm btn-danger" data-id="${item.id}">&#x1F5D1;</button>
-      </div>
-    </div>
-  `;
 }
 
 // ============ 事件绑定 ============
 function bindWelcomeEvents() {
   document.getElementById('create-book-btn')?.addEventListener('click', showCreateBookModal);
-  document.getElementById('import-book-btn')?.addEventListener('click', importBook);
-  
-  // 监听工具栏的主题/语言切换事件
-  window.addEventListener('theme-change', (e) => {
-    setTheme(e.detail.theme);
-    renderApp();
-  });
-  window.addEventListener('lang-change', (e) => {
-    renderApp();
-  });
-  
   loadBooks();
 }
 
@@ -360,85 +323,183 @@ function bindBookEvents() {
       document.querySelectorAll('.book-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       state.currentTab = tab.dataset.tab;
-      // 每个 tab 可以有独立的内容渲染逻辑
-      renderTabContent();
+      renderApp();
     });
   });
   
-  // 实体类型切换
+  // 左侧抽屉切换
+  document.getElementById('toggle-left')?.addEventListener('click', () => {
+    state.leftDrawerOpen = !state.leftDrawerOpen;
+    document.getElementById('left-drawer')?.classList.toggle('open', state.leftDrawerOpen);
+  });
+  
+  // 右侧抽屉1切换
+  document.getElementById('toggle-right-1')?.addEventListener('click', () => {
+    state.rightDrawer1Open = !state.rightDrawer1Open;
+    document.getElementById('right-drawer-1')?.classList.toggle('open', state.rightDrawer1Open);
+  });
+  
+  // 右侧抽屉2切换
+  document.getElementById('toggle-right-2')?.addEventListener('click', () => {
+    state.rightDrawer2Open = false;
+    document.getElementById('right-drawer-2')?.classList.remove('open');
+  });
+  
+  // 详情展开
+  document.getElementById('expand-detail')?.addEventListener('click', () => {
+    state.rightDrawer2Width = state.rightDrawer2Width === 400 ? 600 : 400;
+    document.getElementById('right-drawer-2').style.width = state.rightDrawer2Width + 'px';
+  });
+  
+  // 实体类型导航
   document.querySelectorAll('.entity-nav-item').forEach(item => {
     item.addEventListener('click', () => {
       document.querySelectorAll('.entity-nav-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
       state.currentEntity = item.dataset.entity;
-      renderEntityContent();
+      state.rightDrawer1Open = true;
+      state.rightDrawer2Open = false;
+      state.selectedEntity = null;
+      renderApp();
     });
+  });
+  
+  bindEntityListEvents();
+}
+
+function bindEntityListEvents() {
+  // 点击实体项
+  document.querySelectorAll('.entity-list-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const id = item.dataset.id;
+      const data = state[state.currentEntity] || [];
+      state.selectedEntity = data.find(e => e.id === id);
+      state.rightDrawer2Open = true;
+      renderApp();
+    });
+  });
+  
+  // 添加实体
+  document.getElementById('add-entity-btn')?.addEventListener('click', () => {
+    showCreateEntityModal(state.currentEntity);
+  });
+  
+  // 保存实体
+  document.getElementById('save-entity-btn')?.addEventListener('click', () => {
+    saveEntityDetail();
+  });
+  
+  // 删除实体
+  document.getElementById('delete-entity-btn')?.addEventListener('click', () => {
+    if (confirm('确定删除？')) {
+      deleteCurrentEntity();
+    }
   });
 }
 
-function bindEntityEvents() {
-  // 创建按钮
-  document.getElementById('add-entity-btn')?.addEventListener('click', () => showCreateEntityModal(state.currentEntity));
+function showCreateEntityModal(type) {
+  const titles = { roles: '创建角色', items: '创建物品', locations: '创建地点', nodes: '创建节点', units: '创建单元' };
   
-  // 保存世界观
-  document.getElementById('save-world-btn')?.addEventListener('click', async () => {
-    const text = document.getElementById('world-textarea')?.value || '';
-    await saveEntity('world', { content: text });
-  });
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h3>${titles[type] || '创建'}</h3>
+        <button class="modal-close" id="modal-close">×</button>
+      </div>
+      <form class="modal-body" id="entity-form">
+        <div class="form-group">
+          <label>名称</label>
+          <input type="text" name="title" class="input" required placeholder="输入名称">
+        </div>
+        <div class="form-group">
+          <label>描述</label>
+          <textarea name="description" class="input" rows="3" placeholder="描述..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="modal-cancel">${t('common.cancel')}</button>
+          <button type="submit" class="btn btn-primary">${t('common.save')}</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
   
-  // 保存背景设定
-  document.getElementById('save-settings-btn')?.addEventListener('click', async () => {
-    const text = document.getElementById('settings-textarea')?.value || '';
-    await saveEntity('settings', { content: text });
-  });
-  
-  // 保存提示词
-  document.getElementById('save-prompts-btn')?.addEventListener('click', async () => {
-    const text = document.getElementById('prompts-textarea')?.value || '';
-    await saveEntity('prompts', { content: text });
-  });
-  
-  // 编辑/删除按钮
-  document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.dataset.id;
-      editEntity(state.currentEntity, id);
+  document.getElementById('modal-close').addEventListener('click', () => modal.remove());
+  document.getElementById('modal-cancel').addEventListener('click', () => modal.remove());
+  document.getElementById('entity-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = e.target.title.value.trim();
+    const description = e.target.description.value.trim();
+    if (!title) { alert('请输入名称'); return; }
+    
+    const result = await booksApi('save_' + type.replace(/s$/, ''), {
+      bookId: state.currentBook.id,
+      title,
+      description
     });
-  });
-  
-  document.querySelectorAll('.btn-danger').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.dataset.id;
-      deleteEntity(state.currentEntity, id);
-    });
+    
+    modal.remove();
+    if (result.success) {
+      loadBookData();
+    } else {
+      alert('创建失败');
+    }
   });
 }
 
-function renderTabContent() {
-  // 根据当前 Tab 渲染不同内容
-  // 目前先用 entity-content 渲染实体列表
-  renderEntityContent();
+async function saveEntityDetail() {
+  if (!state.selectedEntity) return;
+  
+  const title = document.getElementById('detail-title')?.value || '';
+  const description = document.getElementById('detail-desc')?.value || '';
+  
+  const result = await booksApi('update_' + state.currentEntity.replace(/s$/, ''), {
+    bookId: state.currentBook.id,
+    id: state.selectedEntity.id,
+    title,
+    description
+  });
+  
+  if (result.success) {
+    state.selectedEntity.title = title;
+    state.selectedEntity.description = description;
+    renderApp();
+  } else {
+    alert('保存失败');
+  }
+}
+
+async function deleteCurrentEntity() {
+  if (!state.selectedEntity) return;
+  
+  const result = await booksApi('delete_' + state.currentEntity.replace(/s$/, ''), {
+    bookId: state.currentBook.id,
+    id: state.selectedEntity.id
+  });
+  
+  if (result.success) {
+    state.selectedEntity = null;
+    state.rightDrawer2Open = false;
+    loadBookData();
+  } else {
+    alert('删除失败');
+  }
 }
 
 // ============ Books API ============
-// 根据 action 调用不同 API
 async function booksApi(action, data = {}) {
   try {
     let endpoint = '/api/books';
     let body = { action, ...data };
     
-    // 根据 action 确定 endpoint
-    if (action.startsWith('save_role')) {
+    if (action.startsWith('save_role') || action.startsWith('update_role') || action.startsWith('delete_role')) {
       endpoint = '/api/roles';
-      body = { action: 'create', bookId: data.bookId, title: data.title, description: data.description };
-    } else if (action.startsWith('save_item')) {
+    } else if (action.startsWith('save_item') || action.startsWith('update_item') || action.startsWith('delete_item')) {
       endpoint = '/api/items';
-      body = { action: 'create', bookId: data.bookId, title: data.title, description: data.description };
-    } else if (action.startsWith('save_location')) {
+    } else if (action.startsWith('save_location') || action.startsWith('update_location') || action.startsWith('delete_location')) {
       endpoint = '/api/locations';
-      body = { action: 'create', bookId: data.bookId, title: data.title, description: data.description };
     }
     
     const res = await fetch(endpoint, {
@@ -450,19 +511,6 @@ async function booksApi(action, data = {}) {
   } catch (e) {
     console.error('API error:', e);
     return { error: e.message };
-  }
-}
-
-async function saveEntity(type, data) {
-  const result = await booksApi('save_' + type, {
-    bookId: state.currentBook.id,
-    ...data
-  });
-  if (result.success) {
-    state[type] = data.content;
-    alert('保存成功');
-  } else {
-    alert('保存失败');
   }
 }
 
@@ -507,6 +555,11 @@ async function openBook(id) {
   if (result.success && result.data) {
     state.currentBook = result.data;
     state.currentView = 'book';
+    state.currentTab = 'home';
+    state.leftDrawerOpen = true;
+    state.rightDrawer1Open = false;
+    state.rightDrawer2Open = false;
+    state.selectedEntity = null;
     renderApp();
   }
 }
@@ -517,24 +570,6 @@ async function deleteBook(id) {
   if (result.success) loadBooks();
 }
 
-function importBook() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.soul,.json';
-  input.onchange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const book = JSON.parse(text);
-      if (!book.title) { alert('文件格式错误'); return; }
-      const result = await booksApi('create', { title: book.title, author: book.author || '', description: book.description || '' });
-      if (result.success) { alert('导入成功'); loadBooks(); }
-    } catch (err) { alert('读取失败: ' + err.message); }
-  };
-  input.click();
-}
-
 function showCreateBookModal() {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
@@ -542,7 +577,7 @@ function showCreateBookModal() {
     <div class="modal">
       <div class="modal-header">
         <h3>${t('book.create')}</h3>
-        <button class="modal-close">&#xD7;</button>
+        <button class="modal-close">×</button>
       </div>
       <form class="modal-body" id="book-form">
         <div class="form-group">
@@ -553,13 +588,9 @@ function showCreateBookModal() {
           <label>作者</label>
           <input type="text" name="author" class="input" placeholder="作者名称">
         </div>
-        <div class="form-group">
-          <label>简介</label>
-          <textarea name="description" class="input" rows="3" placeholder="简要描述..."></textarea>
-        </div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" id="modal-cancel">取消</button>
-          <button type="submit" class="btn btn-primary">创建</button>
+          <button type="button" class="btn btn-secondary" id="modal-cancel">${t('common.cancel')}</button>
+          <button type="submit" class="btn btn-primary">${t('common.save')}</button>
         </div>
       </form>
     </div>
@@ -571,89 +602,17 @@ function showCreateBookModal() {
     e.preventDefault();
     const title = e.target.title.value.trim();
     const author = e.target.author.value.trim();
-    const description = e.target.description.value.trim();
     if (!title) { alert('请输入书名'); return; }
-    const result = await booksApi('create', { title, author, description });
+    const result = await booksApi('create', { title, author });
     modal.remove();
     if (result.success && result.data) {
-      state.currentBook = result.data;
-      state.currentView = 'book';
-      renderApp();
+      openBook(result.data.id);
     }
   });
-  setTimeout(() => modal.querySelector('input[name="title"]')?.focus(), 100);
-}
-
-function showCreateEntityModal(type) {
-  const titles = { roles: '创建角色', items: '创建物品', locations: '创建地点', nodes: '创建节点', units: '创建单元' };
-  const placeholders = {
-    roles: { name: '角色名称', desc: '描述角色...' },
-    items: { name: '物品名称', desc: '描述物品...' },
-    locations: { name: '地点名称', desc: '描述地点...' },
-    nodes: { name: '节点标题', desc: '节点内容...' },
-    units: { name: '单元标题', desc: '单元内容...' }
-  };
-  
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal">
-      <div class="modal-header">
-        <h3>${titles[type] || '创建'}</h3>
-        <button class="modal-close">&#xD7;</button>
-      </div>
-      <form class="modal-body" id="entity-form">
-        <div class="form-group">
-          <label>名称</label>
-          <input type="text" name="title" class="input" required placeholder="${placeholders[type]?.name || '名称'}">
-        </div>
-        <div class="form-group">
-          <label>描述</label>
-          <textarea name="description" class="input" rows="3" placeholder="${placeholders[type]?.desc || '描述...'}"></textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" id="modal-cancel">取消</button>
-          <button type="submit" class="btn btn-primary">创建</button>
-        </div>
-      </form>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.querySelector('#modal-cancel').addEventListener('click', () => modal.remove());
-  modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
-  modal.querySelector('#entity-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = e.target.title.value.trim();
-    const description = e.target.description.value.trim();
-    if (!title) { alert('请输入名称'); return; }
-    
-    const result = await booksApi('save_' + type.replace(/s$/, ''), {
-      bookId: state.currentBook.id,
-      title,
-      description
-    });
-    
-    modal.remove();
-    if (result.success) {
-      loadBookData();
-    } else {
-      alert('创建失败');
-    }
-  });
-}
-
-function editEntity(type, id) {
-  alert('编辑功能开发中...');
-}
-
-function deleteEntity(type, id) {
-  if (!confirm('确定删除？')) return;
-  alert('删除功能开发中...');
 }
 
 // ============ 初始化 ============
 function init() {
-  logger?.info('APP_INIT', 'SoulWriter ready');
   renderApp();
 }
 

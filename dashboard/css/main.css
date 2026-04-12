@@ -1138,3 +1138,34 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
   justify-content: flex-end;
   margin-top: 20px;
 }
+body { padding-top: 48px; }
+
+.header-actions {
+  position: fixed;
+  top: 56px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 999;
+}
+
+.theme-toggle {
+  padding: 8px 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.lang-select {
+  padding: 8px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}

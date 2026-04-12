@@ -139,6 +139,7 @@ function renderMainLayout() {
         <button class="nav-item ${state.currentView === 'locations' ? 'active' : ''}" data-view="locations">🗺️ 地点</button>
         <button class="nav-item ${state.currentView === 'relationships' ? 'active' : ''}" data-view="relationships">🔗 关系</button>
         <button class="nav-item ${state.currentView === 'genesis' ? 'active' : ''}" data-view="genesis">🌱 创世</button>
+        <button class="nav-item ${state.currentView === 'settings' ? 'active' : ''}" data-view="settings">⚙️ 设置</button>
       </nav>
       <main class="main-content" id="main-content">
         ${renderContent()}
@@ -153,6 +154,113 @@ function renderMainLayout() {
   `;
 }
 
+function renderSettingsView() {
+  const themes = {
+    soft: { name: '柔和 🌸', preview: '#F8F8FA' },
+    dark: { name: '暗色 🌙', preview: '#1D1D1F' },
+    system: { name: '随系统 ⚙️', preview: 'linear-gradient(135deg, #F8F8FA 50%, #1D1D1F 50%)' }
+  };
+  const current = localStorage.getItem('soulwriter-theme') || 'soft';
+  
+  return `
+    <div class="settings-view">
+      <h2>⚙️ 设置</h2>
+      
+      <div class="settings-section">
+        <h3>🎨 主题</h3>
+        <div class="theme-grid">
+          ${Object.entries(themes).map(([key, t]) => `
+            <button class="theme-card ${current === key ? 'active' : ''}" data-theme="${key}">
+              <span class="theme-preview" style="background: ${t.preview}"></span>
+              <span class="theme-name">${t.name}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h3>🤖 AI 配置</h3>
+        <div class="ai-config-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>类型</label>
+              <select class="input" id="ai-type">
+                <option value="cloud">云端 API</option>
+                <option value="local">本地模型</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>模型</label>
+              <input type="text" class="input" id="ai-model" placeholder="gpt-4o">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>API 地址</label>
+            <input type="text" class="input" id="ai-url" placeholder="https://api.openai.com/v1">
+          </div>
+          <div class="form-group">
+            <label>API Key</label>
+            <input type="password" class="input" id="ai-key" placeholder="sk-...">
+          </div>
+          <button class="btn btn-primary" id="save-ai-config">保存配置</button>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h3>ℹ️ 关于</h3>
+        <p style="color: var(--color-text-secondary); font-size: 14px;">
+          SoulWriter v1.2<br>
+          创世 × 女娲 AI 创作引擎
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+function renderSettingsView() {
+  const themes = {
+    soft: { name: '柔和 🌸', preview: '#F8F8FA' },
+    dark: { name: '暗色 🌙', preview: '#1D1D1F' },
+    system: { name: '随系统 ⚙️', preview: 'linear-gradient(135deg, #F8F8FA 50%, #1D1D1F 50%)' }
+  };
+  const current = localStorage.getItem('soulwriter-theme') || 'soft';
+  return `<div class="settings-view">
+    <div class="settings-section">
+      <h3>🎨 主题</h3>
+      <div class="theme-grid">
+        ${Object.entries(themes).map(([k, t]) => `<button class="theme-card ${current === k ? 'active' : ''}" data-theme="${k}"><span class="theme-preview" style="background:${t.preview}"></span><span>${t.name}</span></button>`).join('')}
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>🤖 AI 配置</h3>
+      <div class="ai-form">
+        <div class="form-row">
+          <div class="form-group"><label>类型</label><select class="input" id="ai-type"><option value="cloud">云端</option><option value="local">本地</option></select></div>
+          <div class="form-group"><label>模型</label><input class="input" id="ai-model" placeholder="gpt-4o"></div>
+        </div>
+        <div class="form-group"><label>API 地址</label><input class="input" id="ai-url" placeholder="https://api.openai.com/v1"></div>
+        <div class="form-group"><label>API Key</label><input type="password" class="input" id="ai-key" placeholder="sk-..."></div>
+        <button class="btn btn-primary" id="save-ai">保存</button>
+      </div>
+    </div>
+    <div class="settings-section"><p style="color:var(--color-text-secondary);font-size:13px">SoulWriter v1.2 - 创世 × 女娲</p></div>
+  </div>`;
+}
+
+function bindSettingsEvents() {
+  document.querySelectorAll('.theme-card').forEach(c => c.addEventListener('click', () => {
+    const t = c.dataset.theme;
+    localStorage.setItem('soulwriter-theme', t);
+    document.documentElement.removeAttribute('data-theme');
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else if (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark');
+    document.querySelectorAll('.theme-card').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+  }));
+  api('/ai/config').then(d => { if (d.config) { document.getElementById('ai-type').value=d.config.type||'cloud'; document.getElementById('ai-model').value=d.config.model||''; document.getElementById('ai-url').value=d.config.baseUrl||''; document.getElementById('ai-key').value=d.config.apiKey||''; }});
+  document.getElementById('save-ai')?.addEventListener('click', async () => { await api('/ai/config', {method:'POST',body:JSON.stringify({type:document.getElementById('ai-type').value,model:document.getElementById('ai-model').value,baseUrl:document.getElementById('ai-url').value,apiKey:document.getElementById('ai-key').value})}); alert('已保存'); });
+}
+
 function renderContent() {
   switch (state.currentView) {
     case 'roles': return '<h2>📁 '+t('nav.roles')+'</h2><p>暂无角色</p><button class="btn btn-primary" id="add-role-btn">+ 创建角色</button>';
@@ -161,6 +269,7 @@ function renderContent() {
     case 'chapters': return '<h2>📖 '+t('nav.chapters')+'</h2><p>暂无章节</p><button class="btn btn-primary" id="add-chapter-btn">+ 创建章节</button>';
     case 'writing': return '<h2>✍️ '+t('nav.writing')+'</h2><p>写作界面开发中...</p>';
     case 'genesis': return '<h2>🌳 '+t('nav.genesis')+'</h2><p>创世树开发中...</p>';
+    case 'settings': return renderSettingsView();
     default: return '<h2>📁 '+t('nav.roles')+'</h2>';
   }
 }
@@ -180,7 +289,7 @@ function bindMainEvents() {
   });
   document.querySelectorAll('.nav-item').forEach(el => {
     el.addEventListener('click', () => {
-      state.currentView = el.dataset.view;
+      if (el.dataset.view === 'settings') { state.currentView = el.dataset.view; document.getElementById('main-content').innerHTML = renderContent(); bindSettingsEvents(); } else { state.currentView = el.dataset.view; document.getElementById('main-content').innerHTML = renderContent(); }
       document.getElementById('main-content').innerHTML = renderContent();
     });
   });
@@ -339,3 +448,20 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+/* Settings */
+.settings-view { max-width: 600px; margin: 0 auto; }
+.settings-section { background: var(--color-card); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+.settings-section h3 { font-size: 15px; margin-bottom: 14px; }
+.theme-grid { display: flex; gap: 10px; }
+.theme-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 18px; background: var(--color-bg); border: 2px solid transparent; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+.theme-card:hover { box-shadow: var(--shadow-md); }
+.theme-card.active { border-color: var(--color-primary); background: rgba(124,140,248,0.1); }
+.theme-preview { width: 44px; height: 28px; border-radius: 6px; }
+.ai-form { display: flex; flex-direction: column; gap: 10px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 12px; color: var(--color-text-secondary); }
+.input { width: 100%; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: var(--color-bg); color: var(--color-text); }
+.input:focus { outline: none; border-color: var(--color-primary); }
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; border: none; }
+.btn-primary { background: var(--color-primary); color: white; }

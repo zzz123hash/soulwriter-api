@@ -502,40 +502,18 @@ window.DrawerApp = {
   },
   
   showDetail: function(parentId, childId) {
-    var group = NAV_TREE.find(function(g) { return g.id === parentId; });
-    var child = group && group.children && group.children.find(function(c) { return c.id === childId; });
-    if (!child) return;
-    
-    // Create or show modal
-    var modal = document.getElementById('detail-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'detail-modal';
-      modal.className = 'detail-modal';
-      modal.innerHTML = '<div class="detail-modal-backdrop" onclick="DrawerApp.closeDetail()"></div>' +
-        '<div class="detail-modal-box">' +
-        '<div class="detail-modal-header">' +
-        '<span class="detail-modal-title"></span>' +
-        '<button class="detail-modal-close" onclick="DrawerApp.closeDetail()">×</button>' +
-        '</div>' +
-        '<div class="detail-modal-body"></div>' +
-        '</div>';
-      document.body.appendChild(modal);
-    }
-    
-    var modalTitle = modal.querySelector('.detail-modal-title');
-    var modalBody = modal.querySelector('.detail-modal-body');
-    
-    if (modalTitle) modalTitle.textContent = '+ ' + (group ? group.label : '') + ' / ++ ' + child.label;
-    if (modalBody) modalBody.innerHTML = this.renderDetailContent(childId);
-    
-    modal.classList.add('open');
+    // Just close the drawer panel - detail content shown in side panel
     this.closePanel();
   },
   
   closeDetail: function() {
     var modal = document.getElementById('detail-modal');
-    if (modal) modal.classList.remove('open');
+    if (modal) {
+      modal.classList.remove('open');
+      // Also remove open class from drawer-panel-container if present
+      var panel = document.getElementById('drawer-panel-container');
+      if (panel) panel.classList.remove('open');
+    }
   },
   
   renderDetailContent: function(itemId) {

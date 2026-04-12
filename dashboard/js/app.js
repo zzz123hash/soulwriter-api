@@ -108,13 +108,6 @@ function renderWelcome() {
           <h1 class="app-logo">SoulWriter</h1>
           <p class="app-slogan">${t('app.subtitle')}</p>
         </div>
-        <div class="header-actions">
-          <button class="theme-toggle" id="theme-btn" title="切换主题">&#x1F319;</button>
-          <select class="lang-select" id="lang-select">
-            <option value="zh-CN">中文</option>
-            <option value="en-US">English</option>
-          </select>
-        </div>
       </header>
       <section class="bookshelf-section">
         <h2 class="section-title">&#x1F4DA; ${t('common.bookshelf')}</h2>
@@ -340,14 +333,16 @@ function renderEntityCard(type, item) {
 function bindWelcomeEvents() {
   document.getElementById('create-book-btn')?.addEventListener('click', showCreateBookModal);
   document.getElementById('import-book-btn')?.addEventListener('click', importBook);
-  document.getElementById('lang-select')?.addEventListener('change', (e) => {
-    localStorage.setItem('soulwriter-lang', e.target.value);
+  
+  // 监听工具栏的主题/语言切换事件
+  window.addEventListener('theme-change', (e) => {
+    setTheme(e.detail.theme);
     renderApp();
   });
-  document.getElementById('lang-select').value = getLang();
-  document.getElementById('theme-btn')?.addEventListener('click', () => {
-    setTheme(getTheme() === 'dark' ? 'soft' : 'dark');
+  window.addEventListener('lang-change', (e) => {
+    renderApp();
   });
+  
   loadBooks();
 }
 

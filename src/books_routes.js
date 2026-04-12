@@ -117,6 +117,106 @@ async function booksRoutes(fastify) {
     const { bookId, ...data } = req.body;
     return { success: true, data: BooksService.createPalaceNode(bookId, data) };
   });
+
+  // ============ 状态 API - 万物皆可 API ============
+  
+  // 主题列表
+  fastify.get('/api/state/themes', async (req, reply) => {
+    return { 
+      success: true, 
+      data: {
+        themes: [
+          { id: 'dark', name: '暗色', icon: '🌙' },
+          { id: 'soft', name: '柔和', icon: '🌤️' },
+          { id: 'blue', name: '蓝色', icon: '💙' },
+          { id: 'green', name: '绿色', icon: '🌿' }
+        ]
+      }
+    };
+  });
+
+  // 语言列表
+  fastify.get('/api/state/langs', async (req, reply) => {
+    return { 
+      success: true, 
+      data: {
+        langs: [
+          { id: 'zh-CN', name: '中文', flag: '🇨🇳' },
+          { id: 'en-US', name: 'English', flag: '🇺🇸' }
+        ]
+      }
+    };
+  });
+
+  // Tab 列表
+  fastify.get('/api/state/tabs', async (req, reply) => {
+    return { 
+      success: true, 
+      data: {
+        tabs: ['home', 'genesis', 'event', 'nvwa', 'novel'],
+        labels: {
+          'home': '首页',
+          'genesis': '创世树',
+          'event': '事件线',
+          'nvwa': '女娲推演',
+          'novel': '小说详写'
+        }
+      }
+    };
+  });
+
+  // 实体类型列表
+  fastify.get('/api/state/entities', async (req, reply) => {
+    return { 
+      success: true, 
+      data: {
+        entities: ['roles', 'items', 'locations', 'nodes', 'units', 'world', 'settings', 'prompts', 'map'],
+        labels: {
+          'roles': '角色',
+          'items': '物品',
+          'locations': '地点',
+          'nodes': '节点',
+          'units': '单元',
+          'world': '世界观',
+          'settings': '设定',
+          'prompts': '提示词',
+          'map': '地图'
+        },
+        icons: {
+          'roles': '👤',
+          'items': '🎁',
+          'locations': '📍',
+          'nodes': '📌',
+          'units': '📑',
+          'world': '🌍',
+          'settings': '⚙️',
+          'prompts': '💬',
+          'map': '🗺️'
+        }
+      }
+    };
+  });
+
+  // 系统信息
+  fastify.get('/api/state/info', async (req, reply) => {
+    return {
+      success: true,
+      data: {
+        name: 'SoulWriter',
+        version: '1.0.0',
+        description: '灵魂创作者 - AI 驱动的小说创作平台',
+        endpoints: {
+          books: '/api/books',
+          roles: '/api/roles',
+          items: '/api/items',
+          locations: '/api/locations',
+          chapters: '/api/chapters',
+          palace: '/api/palace',
+          state: '/api/state/*'
+        }
+      }
+    };
+  });
 }
 
 module.exports = booksRoutes;

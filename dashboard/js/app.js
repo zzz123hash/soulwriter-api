@@ -1,6 +1,6 @@
 /**
  * SoulWriter - 灵魂创作者
- * Updated: 使用新的Books API
+ * Fixed: 修复所有语法错误
  */
 
 const API_BASE = '/api/v1';
@@ -18,7 +18,7 @@ const state = {
   scenes: []
 };
 
-// API - 同时支持旧API和新Books API
+// API
 async function api(endpoint, options = {}) {
   try {
     const url = API_BASE + endpoint;
@@ -40,7 +40,7 @@ async function api(endpoint, options = {}) {
   }
 }
 
-// Books API (新版)
+// Books API
 async function booksApi(action, data = {}) {
   try {
     logger?.info('BOOKS_API', action, data);
@@ -102,44 +102,23 @@ function renderApp() {
 
 // ============ 欢迎页 ============
 function renderWelcome() {
-  return `<div class="welcome-page">
-    <header class="welcome-header">
-      <h1 class="app-logo">SoulWriter</h1>
-      <p class="app-slogan">${t('app.subtitle')}</p>
-    </header>
-    <section class="bookshelf-section">
-      <h2 class="section-title">&#x1F4DA; ${t('common.bookshelf')}</h2>
-      <div class="bookshelf" id="books-list">
-        <div class="loading-text">${t('common.loading')}</div>
-      </div>
-    </section>
-    <div class="create-book-area">
-      <button class="btn-create-book" id="create-book-btn" onclick="showCreateBook()">
-        <span class="btn-icon">+</span>
-        <span class="btn-text">${t('book.create')}</span>
-      </button>
-      <button class="btn-create-book" id="import-book-btn" onclick="importBook()">
-        <span class="btn-icon">&#x1F4E5;</span>
-        <span class="btn-text">&#x5BFC;&#x5165;</span>
-      </button>
-    </div>
-  </div>`;
+  return '<div class="welcome-page"><header class="welcome-header"><h1 class="app-logo">SoulWriter</h1><p class="app-slogan">' + t('app.subtitle') + '</p></header><section class="bookshelf-section"><h2 class="section-title">&#x1F4DA; ' + t('common.bookshelf') + '</h2><div class="bookshelf" id="books-list"><div class="loading-text">' + t('common.loading') + '</div></div></section><div class="create-book-area"><button class="btn-create-book" id="create-book-btn"><span class="btn-icon">+</span><span class="btn-text">' + t('book.create') + '</span></button><button class="btn-create-book" id="import-book-btn"><span class="btn-icon">&#x1F4E5;</span><span class="btn-text">&#x5BFC;&#x5165;</span></button></div></div>';
 }
 
 // ============ 主布局 ============
 function renderMainLayout() {
-  return '<div class="main-layout"><aside class="sidebar"><div class="sidebar-header"><h2 class="book-title">'+(state.currentBook?.title || '')+'</h2><button class="btn btn-sm" id="back-to-books">← '+t('common.back')+'</button></div><nav class="sidebar-nav"><div class="nav-item" data-view="roles">📁 '+t('nav.roles')+'</div><div class="nav-item" data-view="items">🎁 '+t('nav.items')+'</div><div class="nav-item" data-view="locations">📍 '+t('nav.locations')+'</div><div class="nav-item" data-view="chapters">📖 '+t('nav.chapters')+'</div><div class="nav-item" data-view="writing">✍️ '+t('nav.writing')+'</div><div class="nav-item" data-view="genesis">🌳 '+t('nav.genesis')+'</div></nav></aside><main class="main-content" id="main-content">'+renderContent()+'</main></div>';
+  return '<div class="main-layout"><aside class="sidebar"><div class="sidebar-header"><h2 class="book-title">' + (state.currentBook?.title || '') + '</h2><button class="btn btn-sm" id="back-to-books">&#x2190; ' + t('common.back') + '</button></div><nav class="sidebar-nav"><div class="nav-item" data-view="roles">&#x1F46D; ' + t('nav.roles') + '</div><div class="nav-item" data-view="items">&#x1F381; ' + t('nav.items') + '</div><div class="nav-item" data-view="locations">&#x1F4CD; ' + t('nav.locations') + '</div><div class="nav-item" data-view="chapters">&#x1F4D6; ' + t('nav.chapters') + '</div><div class="nav-item" data-view="writing">&#x270F; ' + t('nav.writing') + '</div><div class="nav-item" data-view="genesis">&#x1F333; ' + t('nav.genesis') + '</div></nav></aside><main class="main-content" id="main-content">' + renderContent() + '</main></div>';
 }
 
 function renderContent() {
   switch (state.currentView) {
-    case 'roles': return '<h2>📁 '+t('nav.roles')+'</h2><p>暂无角色</p><button class="btn btn-primary" id="add-role-btn">+ 创建角色</button>';
-    case 'items': return '<h2>🎁 '+t('nav.items')+'</h2><p>暂无物品</p><button class="btn btn-primary" id="add-item-btn">+ 创建物品</button>';
-    case 'locations': return '<h2>📍 '+t('nav.locations')+'</h2><p>暂无地点</p><button class="btn btn-primary" id="add-location-btn">+ 创建地点</button>';
-    case 'chapters': return '<h2>📖 '+t('nav.chapters')+'</h2><p>暂无章节</p><button class="btn btn-primary" id="add-chapter-btn">+ 创建章节</button>';
-    case 'writing': return '<h2>✍️ '+t('nav.writing')+'</h2><p>写作界面开发中...</p>';
-    case 'genesis': return '<h2>🌳 '+t('nav.genesis')+'</h2><p>创世树开发中...</p>';
-    default: return '<h2>📁 '+t('nav.roles')+'</h2>';
+    case 'roles': return '<h2>&#x1F46D; ' + t('nav.roles') + '</h2><p>暂无角色</p><button class="btn btn-primary" id="add-role-btn">+ 创建角色</button>';
+    case 'items': return '<h2>&#x1F381; ' + t('nav.items') + '</h2><p>暂无物品</p><button class="btn btn-primary" id="add-item-btn">+ 创建物品</button>';
+    case 'locations': return '<h2>&#x1F4CD; ' + t('nav.locations') + '</h2><p>暂无地点</p><button class="btn btn-primary" id="add-location-btn">+ 创建地点</button>';
+    case 'chapters': return '<h2>&#x1F4D6; ' + t('nav.chapters') + '</h2><p>暂无章节</p><button class="btn btn-primary" id="add-chapter-btn">+ 创建章节</button>';
+    case 'writing': return '<h2>&#x270F; ' + t('nav.writing') + '</h2><p>写作界面开发中...</p>';
+    case 'genesis': return '<h2>&#x1F333; ' + t('nav.genesis') + '</h2><p>创世树开发中...</p>';
+    default: return '<h2>&#x1F46D; ' + t('nav.roles') + '</h2>';
   }
 }
 
@@ -162,14 +141,13 @@ function bindMainEvents() {
       document.getElementById('main-content').innerHTML = renderContent();
     });
   });
-  // 绑定新增按钮
   document.getElementById('add-role-btn')?.addEventListener('click', () => alert('创建角色功能开发中...'));
   document.getElementById('add-item-btn')?.addEventListener('click', () => alert('创建物品功能开发中...'));
   document.getElementById('add-location-btn')?.addEventListener('click', () => alert('创建地点功能开发中...'));
   document.getElementById('add-chapter-btn')?.addEventListener('click', () => showCreateChapterModal());
 }
 
-// ============ Books数据 (使用新API) ============
+// ============ Books数据 ============
 async function loadBooks() {
   logger?.info('BOOKS_LOAD', 'Loading books...');
   const result = await booksApi('list');
@@ -182,11 +160,10 @@ function renderBooksList() {
   const c = document.getElementById('books-list');
   if (!c) return;
   if (state.books.length === 0) {
-    c.innerHTML = '<div class="empty-bookshelf">'+t('book.noBooks')+'</div>';
+    c.innerHTML = '<div class="empty-bookshelf">' + t('book.noBooks') + '</div>';
     return;
   }
-  c.innerHTML = state.books.map(book => '<div class="book-item" data-id="'+book.id+'"><div class="book-cover"><div class="book-spine"></div><div class="book-front"><span class="book-name">'+(book.title?.charAt(0) || '?')+'</span></div></div><div class="book-info"><h3 class="book-title">'+book.title+'</h3><p class="book-desc">'+(book.author || '未知作者')+' · '+(book.wordCount || 0)+'字</p><div class="book-actions"><button class="btn btn-sm btn-open" data-id="'+book.id+'">打开</button><button class="btn btn-sm btn-danger" data-id="'+book.id+'">删除</button></div></div></div>').join('');
-  // 绑定按钮事件
+  c.innerHTML = state.books.map(book => '<div class="book-item" data-id="' + book.id + '"><div class="book-cover"><div class="book-spine"></div><div class="book-front"><span class="book-name">' + (book.title?.charAt(0) || '?') + '</span></div></div><div class="book-info"><h3 class="book-title">' + book.title + '</h3><p class="book-desc">' + (book.author || '未知作者') + ' · ' + (book.wordCount || 0) + '字</p><div class="book-actions"><button class="btn btn-sm btn-open" data-id="' + book.id + '">打开</button><button class="btn btn-sm btn-danger" data-id="' + book.id + '">删除</button></div></div></div>').join('');
   c.querySelectorAll('.btn-open').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); openBook(btn.dataset.id); }));
   c.querySelectorAll('.btn-danger').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); deleteBook(btn.dataset.id); }));
 }
@@ -212,8 +189,7 @@ async function deleteBook(id) {
   }
 }
 
-
-// ============ 导入书本 ============
+// ============ 导入 ============
 function importBook() {
   const input = document.createElement('input');
   input.type = 'file';
@@ -257,7 +233,7 @@ function showCreateBookModal() {
   logger?.info('MODAL_OPEN', 'CreateBook');
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
-  modal.innerHTML = '<div class="modal"><div class="modal-header"><h3>'+t('book.create')+'</h3><button class="modal-close">×</button></div><form class="modal-body" id="book-form"><div class="form-group"><label>书名</label><input type="text" name="title" class="input" required placeholder="输入书名"></div><div class="form-group"><label>作者</label><input type="text" name="author" class="input" placeholder="作者名称"></div><div class="form-group"><label>简介</label><textarea name="description" class="input" rows="3" placeholder="简要描述..."></textarea></div><div class="form-actions"><button type="button" class="btn" id="modal-cancel">取消</button><button type="submit" class="btn btn-primary">创建</button></div></form></div>';
+  modal.innerHTML = '<div class="modal"><div class="modal-header"><h3>' + t('book.create') + '</h3><button class="modal-close">&#xD7;</button></div><form class="modal-body" id="book-form"><div class="form-group"><label>书名</label><input type="text" name="title" class="input" required placeholder="输入书名"></div><div class="form-group"><label>作者</label><input type="text" name="author" class="input" placeholder="作者名称"></div><div class="form-group"><label>简介</label><textarea name="description" class="input" rows="3" placeholder="简要描述..."></textarea></div><div class="form-actions"><button type="button" class="btn" id="modal-cancel">取消</button><button type="submit" class="btn btn-primary">创建</button></div></form></div>';
   document.body.appendChild(modal);
   modal.querySelector('#modal-cancel').addEventListener('click', () => { logger?.info('MODAL_CLOSE', 'CreateBook'); modal.remove(); });
   modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
@@ -287,7 +263,7 @@ function showCreateChapterModal() {
   if (!state.currentBook) return;
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
-  modal.innerHTML = '<div class="modal"><div class="modal-header"><h3>创建章节</h3><button class="modal-close">×</button></div><form class="modal-body" id="chapter-form"><div class="form-group"><label>章节标题</label><input type="text" name="title" class="input" required placeholder="输入章节标题"></div><div class="form-actions"><button type="button" class="btn" id="modal-cancel">取消</button><button type="submit" class="btn btn-primary">创建</button></div></form></div>';
+  modal.innerHTML = '<div class="modal"><div class="modal-header"><h3>创建章节</h3><button class="modal-close">&#xD7;</button></div><form class="modal-body" id="chapter-form"><div class="form-group"><label>章节标题</label><input type="text" name="title" class="input" required placeholder="输入章节标题"></div><div class="form-actions"><button type="button" class="btn" id="modal-cancel">取消</button><button type="submit" class="btn btn-primary">创建</button></div></form></div>';
   document.body.appendChild(modal);
   modal.querySelector('#modal-cancel').addEventListener('click', () => modal.remove());
   modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());

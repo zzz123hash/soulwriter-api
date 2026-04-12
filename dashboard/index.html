@@ -4,11 +4,308 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SoulWriter - 灵魂创作者</title>
-  <link rel="stylesheet" href="/dashboard/css/main.css">
+  
+  <link rel="stylesheet" href="/dashboard/css/theme.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    .dashboard {
+      min-height: 100vh;
+      background: var(--color-bg);
+    }
+    
+    .dashboard-header {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    
+    .header-nav {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .nav-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .nav-btn:hover {
+      background: var(--color-bg);
+      color: var(--color-text);
+    }
+    
+    .nav-btn.active {
+      background: rgba(124, 140, 248, 0.12);
+      color: var(--color-primary);
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--color-card);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+    
+    .icon-btn:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    
+    .dashboard-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    
+    .card {
+      background: var(--color-card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-border);
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: all var(--transition-fast);
+    }
+    
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 16px;
+    }
+    
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(92, 184, 133, 0.12);
+      color: var(--color-secondary);
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--color-secondary);
+      border-radius: 50%;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--color-text-secondary);
+    }
+    
+    .empty-state h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: var(--color-text);
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition-fast);
+    }
+    
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      box-shadow: var(--shadow-soft);
+    }
+    
+    .btn-primary:hover {
+      background: var(--color-primary-hover);
+      transform: translateY(-1px);
+    }
+    
+    #app-view {
+      display: none;
+    }
+    
+    #app-view.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-  <div id="app"><div class="loading">Loading...</div></div>
+  <div class="dashboard">
+    <header class="dashboard-header">
+      <div class="header-left">
+        <span class="logo">✨ SoulWriter</span>
+        <nav class="header-nav">
+          <button class="nav-btn active" data-view="home">首页</button>
+          <button class="nav-btn" data-view="nvwa">女娲引擎</button>
+          <button class="nav-btn" data-view="genesis">创世树</button>
+          <button class="nav-btn" data-view="books">书本</button>
+        </nav>
+      </div>
+      <div class="header-right">
+        <button class="icon-btn" onclick="location.href='/dashboard/settings.html'" title="设置">⚙️</button>
+      </div>
+    </header>
+    
+    <main class="dashboard-content">
+      <!-- Home View -->
+      <div id="view-home" class="app-view active">
+        <div class="card">
+          <h2 class="card-title">🎯 快速开始</h2>
+          <p style="color: var(--color-text-secondary); margin-bottom: 16px;">
+            选择一个功能模块开始创作
+          </p>
+          <div class="card-grid">
+            <div class="card" style="cursor: pointer;" onclick="switchView('genesis')">
+              <h3 style="font-size: 16px; margin-bottom: 8px;">🌳 创世树</h3>
+              <p style="color: var(--color-text-secondary); font-size: 14px;">构建世界观、角色和故事背景</p>
+            </div>
+            <div class="card" style="cursor: pointer;" onclick="switchView('nvwa')">
+              <h3 style="font-size: 16px; margin-bottom: 8px;">🧬 女娲引擎</h3>
+              <p style="color: var(--color-text-secondary); font-size: 14px;">AI 驱动的角色推演引擎</p>
+            </div>
+            <div class="card" style="cursor: pointer;" onclick="switchView('books')">
+              <h3 style="font-size: 16px; margin-bottom: 8px;">📚 书本管理</h3>
+              <p style="color: var(--color-text-secondary); font-size: 14px;">管理和编辑你的创作</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-title">📊 系统状态</h2>
+          <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+            <div>
+              <div class="status-badge">
+                <span class="status-dot"></span>
+                服务正常
+              </div>
+            </div>
+            <div style="color: var(--color-text-secondary);">
+              活跃角色: <span id="active-chars">-</span>
+            </div>
+            <div style="color: var(--color-text-secondary);">
+              张力值: <span id="tension-val">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- NVWA View -->
+      <div id="view-nvwa" class="app-view">
+        <div class="card">
+          <h2 class="card-title">🧬 女娲引擎</h2>
+          <div id="nvwa-status">加载中...</div>
+        </div>
+      </div>
+      
+      <!-- Genesis View -->
+      <div id="view-genesis" class="app-view">
+        <div class="card">
+          <h2 class="card-title">🌳 创世树</h2>
+          <div id="genesis-status">加载中...</div>
+        </div>
+      </div>
+      
+      <!-- Books View -->
+      <div id="view-books" class="app-view">
+        <div class="card">
+          <h2 class="card-title">📚 书本管理</h2>
+          <div id="books-status">加载中...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
   <script src="/dashboard/js/logger.js"></script>
+  <script src="/dashboard/js/theme.js"></script>
   <script src="/dashboard/js/app.js"></script>
+  <script>
+    ThemeManager.init();
+    
+    function switchView(view) {
+      document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('view-' + view)?.classList.add('active');
+      document.querySelector(`[data-view="${view}"]`)?.classList.add('active');
+    }
+    
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchView(btn.dataset.view));
+    });
+    
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/v1/nvwa/status');
+        const data = await res.json();
+        document.getElementById('active-chars').textContent = data.activeCharacters || 0;
+        document.getElementById('tension-val').textContent = data.worldVars?.tension || '-';
+      } catch (e) {
+        console.log('Status load failed');
+      }
+    }
+    
+    loadStatus();
+  </script>
 </body>
 </html>

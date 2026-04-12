@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>女娲推演 - SoulWriter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #0f0f23; color: #e2e8f0; }
+    
+    .container { display: flex; flex-direction: column; height: 100vh; }
+    
+    /* 顶部工具栏 */
+    .toolbar {
+      display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+      background: #16213e; border-bottom: 1px solid #2a2a4a;
+    }
+    .toolbar-title { font-size: 18px; font-weight: 600; color: #f5c518; }
+    .toolbar-hint { color: #666; font-size: 13px; }
+    
+    .toolbar-main { display: flex; gap: 8px; margin-left: auto; }
+    .btn {
+      padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid #333;
+      border-radius: 8px; color: #e2e8f0; cursor: pointer; font-size: 14px; transition: all 0.2s;
+    }
+    .btn:hover { background: rgba(99, 102, 241, 0.3); border-color: #6366f1; }
+    .btn-primary { background: #6366f1; border-color: #6366f1; }
+    .btn-primary:hover { background: #818cf8; }
+    .btn-danger { border-color: #ef4444; color: #ef4444; }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+    
+    /* 主体 */
+    .main { display: flex; flex: 1; overflow: hidden; }
+    
+    /* 左侧面板 - 角色列表 */
+    .panel-left {
+      width: 280px; background: #1a1a2e; border-right: 1px solid #2a2a4a;
+      display: flex; flex-direction: column;
+    }
+    .panel-header {
+      padding: 12px 16px; font-weight: 600; color: #f5c518;
+      border-bottom: 1px solid #2a2a4a; display: flex; align-items: center; gap: 8px;
+    }
+    .panel-body { flex: 1; overflow-y: auto; padding: 12px; }
+    
+    .char-item {
+      padding: 12px; background: #16213e; border-radius: 10px; margin-bottom: 10px;
+      border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
+    }
+    .char-item:hover { border-color: #6366f1; }
+    .char-item.selected { border-color: #f5c518; background: rgba(245, 197, 24, 0.1); }
+    .char-item-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .char-avatar { font-size: 24px; }
+    .char-name { font-weight: 600; }
+    .char-role { font-size: 12px; color: #94a3b8; }
+    .char-attrs { display: flex; flex-wrap: wrap; gap: 6px; }
+    .attr-badge {
+      padding: 2px 8px; background: rgba(99, 102, 241, 0.2); border-radius: 4px;
+      font-size: 11px; color: #a5b4fc;
+    }
+    
+    /* 中间 - K线图 */
+    .panel-center { flex: 1; display: flex; flex-direction: column; background: #16213e; }
+    .kline-container { flex: 1; padding: 20px; position: relative; }
+    .kline-canvas { width: 100%; height: 100%; }
+    .kline-placeholder {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      color: #666; text-align: center;
+    }
+    
+    /* 右侧面板 - 详情/编辑 */
+    .panel-right {
+      width: 320px; background: #1a1a2e; border-left: 1px solid #2a2a4a;
+      padding: 20px; overflow-y: auto;
+    }
+    .detail-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #f5c518; }
+    .detail-empty { color: #666; text-align: center; padding: 40px 0; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
+    .form-input {
+      width: 100%; padding: 10px 12px; background: #16213e; border: 1px solid #2a2a4a;
+      border-radius: 8px; color: #e2e8f0; font-size: 14px;
+    }
+    .form-input:focus { outline: none; border-color: #6366f1; }
+    textarea.form-input { min-height: 80px; resize: vertical; }
+    
+    /* 世界变量 */
+    .world-vars { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+    .var-item { background: #16213e; padding: 12px; border-radius: 8px; }
+    .var-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .var-name { font-weight: 600; }
+    .var-value { color: #f5c518; }
+    .var-bar { height: 6px; background: #2a2a4a; border-radius: 3px; overflow: hidden; }
+    .var-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+    .var-tension .var-fill { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); }
+    .var-chaos .var-fill { background: #8b5cf6; }
+    .var-progress .var-fill { background: #3b82f6; }
+    
+    /* 事件流 */
+    .events-panel {
+      border-top: 1px solid #2a2a4a; max-height: 200px; overflow-y: auto;
+    }
+    .event-item {
+      padding: 10px 16px; border-bottom: 1px solid #2a2a4a;
+    }
+    .event-content { margin-bottom: 6px; line-height: 1.5; }
+    .event-meta { font-size: 12px; color: #666; }
+    
+    /* 底部状态栏 */
+    .status-bar {
+      display: flex; align-items: center; gap: 20px; padding: 8px 20px;
+      background: #16213e; border-top: 1px solid #2a2a4a; font-size: 12px; color: #666;
+    }
+    .status-item { display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .status-dot.green { background: #10b981; }
+    .status-dot.yellow { background: #f59e0b; }
+    .status-dot.red { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部工具栏 -->
+    <div class="toolbar">
+      <span class="toolbar-title">🔥 女娲推演</span>
+      <span class="toolbar-hint">AI模拟角色互动，自动推进剧情</span>
+      
+      <div class="toolbar-main">
+        <button class="btn" onclick="showAddChar()">➕ 添加角色</button>
+        <button class="btn btn-primary" onclick="runSimulation()">⚡ 运行推演</button>
+        <button class="btn" onclick="resetWorld()">🔄 重置世界</button>
+      </div>
+    </div>
+    
+    <!-- 主体 -->
+    <div class="main">
+      <!-- 左侧 - 角色列表 -->
+      <div class="panel-left">
+        <div class="panel-header">
+          <span>👥</span>
+          <span>角色列表</span>
+          <span style="margin-left: auto; color: #666; font-size: 12px;" id="charCount">0</span>
+        </div>
+        <div class="panel-body" id="charList">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+      
+      <!-- 中间 - K线图 -->
+      <div class="panel-center">
+        <div class="panel-header">
+          <span>📈</span>
+          <span>属性K线</span>
+        </div>
+        <div class="kline-container">
+          <canvas id="klineCanvas" class="kline-canvas"></canvas>
+          <div class="kline-placeholder" id="klinePlaceholder">
+            👈 选择角色查看K线<br>
+            <span style="font-size: 12px;">或点击"运行推演"生成事件</span>
+          </div>
+        </div>
+        
+        <!-- 事件流 -->
+        <div class="events-panel">
+          <div class="panel-header" style="border-top: 1px solid #2a2a4a;">
+            <span>📜</span>
+            <span>事件流</span>
+          </div>
+          <div id="eventsList">
+            <div class="event-item">
+              <div class="event-content">等待推演...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 右侧 - 详情面板 -->
+      <div class="panel-right">
+        <div id="detailPanel">
+          <div class="detail-empty">
+            👈 选择角色查看详情<br><br>
+            点击角色查看/编辑属性
+          </div>
+        </div>
+        
+        <!-- 世界变量 -->
+        <div class="world-vars">
+          <div class="detail-title">🌍 世界状态</div>
+          
+          <div class="var-item var-tension">
+            <div class="var-header">
+              <span class="var-name">紧张度</span>
+              <span class="var-value" id="tensionValue">50</span>
+            </div>
+            <div class="var-bar"><div class="var-fill" id="tensionBar" style="width: 50%"></div></div>
+          </div>
+          
+          <div class="var-item var-chaos">
+            <div class="var-header">
+              <span class="var-name">混乱度</span>
+              <span class="var-value" id="chaosValue">50</span>
+            </div>
+            <div class="var-bar"><div class="var-fill" id="chaosBar" style="width: 50%"></div></div>
+          </div>
+          
+          <div class="var-item var-progress">
+            <div class="var-header">
+              <span class="var-name">进度</span>
+              <span class="var-value" id="progressValue">50</span>
+            </div>
+            <div class="var-bar"><div class="var-fill" id="progressBar" style="width: 50%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-dot green"></span>
+        <span>引擎就绪</span>
+      </div>
+      <div class="status-item" id="lastSimTime">
+        <span>上次推演: --</span>
+      </div>
+      <div class="status-item" style="margin-left: auto;">
+        <span>SoulWriter v2.0</span>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ==================== 旧代码精髓 ====================
+// 
+// 1. 【量子纠缠系统】
+//    角色间的关系是动态的，通过relationships字段存储
+//    AI会选择关系最密切或属性最极端的角色对进行推演
+//
+// 2. 【属性K线追踪】
+//    每次推演后记录角色属性状态，存储到nvwa_souls_klines表
+//    用于绘制角色成长曲线
+//
+// 3. 【世界变量】
+//    tension(紧张度)、chaos(混乱度)、progress(进度)
+//    影响AI推演的风格和节奏
+//
+// 4. 【AI推演Prompt构建】
+//    - buildNvwaSimPrompt: 角色互动推演
+//    - buildStagePrompt: 剧情推进
+//    - 根据tension自动调整叙事节奏（低张→长句，高张→短句）
+//
+// 5. 【节点温度】
+//    genesis_nodes.temperature 字段
+//    用于事件分析（热节点=高冲突）
+//
+// ==================== 数据模型 ====================
+
+const API_BASE = '/api';
+
+// 角色默认属性（来自DEFAULT_ATTRS）
+const DEFAULT_ATTRS = {
+  health: 100,
+  sanity: 100,
+  wealth: 50,
+  combat: 50,
+  luck: 50,
+  fortune: 50,
+  charm: 50,
+  intelligence: 50,
+  vitality: 100
+};
+
+// 状态
+let state = {
+  characters: [],
+  selectedCharId: null,
+  worldVars: { tension: 50, chaos: 50, progress: 50 },
+  events: [],
+  klineData: {}
+};
+
+// ==================== API调用 ====================
+
+async function api(endpoint, data = {}) {
+  const res = await fetch(API_BASE + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+// ==================== 角色管理 ====================
+
+async function loadCharacters() {
+  const res = await api('/nvwa/list');
+  state.characters = res.data || [];
+  renderCharList();
+  updateCharCount();
+}
+
+async function showAddChar() {
+  const name = prompt('角色名称:');
+  if (!name) return;
+  
+  const role = prompt('角色职业/身份:', '主角');
+  const gender = prompt('性别:', 'unknown');
+  
+  await api('/nvwa/create', {
+    name,
+    role,
+    gender,
+    attributes: JSON.stringify(DEFAULT_ATTRS)
+  });
+  
+  loadCharacters();
+}
+
+function renderCharList() {
+  const container = document.getElementById('charList');
+  container.innerHTML = state.characters.map(c => {
+    const attrs = typeof c.attributes === 'string' ? JSON.parse(c.attributes) : c.attributes;
+    const isSelected = c.id === state.selectedCharId;
+    
+    return `
+      <div class="char-item ${isSelected ? 'selected' : ''}" onclick="selectChar('${c.id}')">
+        <div class="char-item-header">
+          <span class="char-avatar">${getCharAvatar(c.gender)}</span>
+          <div>
+            <div class="char-name">${c.name}</div>
+            <div class="char-role">${c.role || '未知'}</div>
+          </div>
+        </div>
+        <div class="char-attrs">
+          ${Object.entries(attrs || {}).slice(0, 4).map(([k, v]) => 
+            '<span class="attr-badge">' + k + ': ' + v + '</span>'
+          ).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  if (state.characters.length === 0) {
+    container.innerHTML = '<div style="color:#666;text-align:center;padding:40px 0;">暂无角色<br><br><button class="btn" onclick="showAddChar()">➕ 添加角色</button></div>';
+  }
+}
+
+function getCharAvatar(gender) {
+  if (gender === 'male') return '👨';
+  if (gender === 'female') return '👩';
+  return '🧑';
+}
+
+function updateCharCount() {
+  document.getElementById('charCount').textContent = state.characters.length;
+}
+
+// ==================== 角色详情 ====================
+
+async function selectChar(charId) {
+  state.selectedCharId = charId;
+  renderCharList();
+  renderDetail();
+  loadKline(charId);
+}
+
+function renderDetail() {
+  const panel = document.getElementById('detailPanel');
+  const char = state.characters.find(c => c.id === state.selectedCharId);
+  
+  if (!char) {
+    panel.innerHTML = '<div class="detail-empty">👈 选择角色查看详情</div>';
+    return;
+  }
+  
+  const attrs = typeof char.attributes === 'string' ? JSON.parse(char.attributes) : (char.attributes || {});
+  const relationships = typeof char.relationships === 'string' ? JSON.parse(char.relationships) : (char.relationships || []);
+  
+  panel.innerHTML = `
+    <div class="detail-title">${getCharAvatar(char.gender)} ${char.name}</div>
+    
+    <div class="form-group">
+      <label class="form-label">名称</label>
+      <input class="form-input" value="${char.name}" onchange="updateChar('${char.id}', {name: this.value})">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">职业</label>
+      <input class="form-input" value="${char.role || ''}" onchange="updateChar('${char.id}', {role: this.value})">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">描述</label>
+      <textarea class="form-input" onchange="updateChar('${char.id}', {description: this.value})">${char.description || ''}</textarea>
+    </div>
+    
+    <div class="detail-title" style="margin-top:20px;">📊 属性</div>
+    
+    ${Object.entries(attrs).map(([k, v]) => `
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+        <label class="form-label" style="margin:0;min-width:80px;">${k}</label>
+        <input type="range" min="0" max="100" value="${v}" 
+          style="flex:1" onchange="updateAttr('${char.id}', '${k}', this.value)">
+        <span style="width:30px;text-align:right;color:#f5c518;">${v}</span>
+      </div>
+    `).join('')}
+    
+    ${relationships.length > 0 ? `
+      <div class="detail-title" style="margin-top:20px;">💫 关系</div>
+      ${relationships.map(r => `
+        <div style="padding:8px;background:#16213e;border-radius:6px;margin-bottom:8px;">
+          <span style="color:#a5b4fc">${r.targetName || r.targetId}</span>
+          <span style="color:#666"> → </span>
+          <span>${r.type || '关系'}</span>
+          <span style="color:${r.value > 0 ? '#10b981' : '#ef4444'};margin-left:8px;">${r.value > 0 ? '+' : ''}${r.value}</span>
+        </div>
+      `).join('')}
+    ` : ''}
+    
+    <button class="btn btn-danger" style="width:100%;margin-top:20px;" onclick="deleteChar('${char.id}')">🗑️ 删除角色</button>
+  `;
+}
+
+async function updateChar(charId, data) {
+  await api('/nvwa/update', { id: charId, ...data });
+  loadCharacters();
+}
+
+async function updateAttr(charId, attr, value) {
+  const char = state.characters.find(c => c.id === charId);
+  if (!char) return;
+  
+  const attrs = typeof char.attributes === 'string' ? JSON.parse(char.attributes) : char.attributes;
+  attrs[attr] = parseInt(value);
+  
+  await updateChar(charId, { attributes: JSON.stringify(attrs) });
+}
+
+async function deleteChar(charId) {
+  if (!confirm('确定删除这个角色？')) return;
+  await api('/nvwa/delete', { id: charId });
+  if (state.selectedCharId === charId) state.selectedCharId = null;
+  loadCharacters();
+  renderDetail();
+}
+
+// ==================== K线图 ====================
+
+function loadKline(charId) {
+  // 模拟K线数据（实际应从API获取）
+  const canvas = document.getElementById('klineCanvas');
+  const placeholder = document.getElementById('klinePlaceholder');
+  
+  placeholder.style.display = 'none';
+  canvas.style.display = 'block';
+  
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height - 20;
+  
+  // 绘制简单的K线
+  const char = state.characters.find(c => c.id === charId);
+  if (!char) return;
+  
+  const attrs = typeof char.attributes === 'string' ? JSON.parse(char.attributes) : (char.attributes || {});
+  const keys = Object.keys(attrs);
+  
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // 绘制网格
+  ctx.strokeStyle = '#2a2a4a';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = (canvas.height / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+  
+  // 绘制每个属性的线
+  const colors = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#3b82f6', '#ec4899', '#14b8a6'];
+  const step = canvas.width / Math.max(keys.length - 1, 1);
+  
+  keys.forEach((key, i) => {
+    const value = attrs[key] / 100;
+    const x = i * step;
+    const y = canvas.height - (value * canvas.height);
+    
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '11px system-ui';
+    ctx.fillText(key + ': ' + attrs[key], x - 20, y - 10);
+  });
+}
+
+// ==================== 世界变量 ====================
+
+function updateWorldVars(vars) {
+  state.worldVars = { ...state.worldVars, ...vars };
+  
+  ['tension', 'chaos', 'progress'].forEach(key => {
+    const val = state.worldVars[key];
+    document.getElementById(key + 'Value').textContent = val;
+    document.getElementById(key + 'Bar').style.width = val + '%';
+  });
+}
+
+// ==================== 推演 ====================
+
+async function runSimulation() {
+  if (state.characters.length < 2) {
+    alert('需要至少2个角色才能推演！');
+    return;
+  }
+  
+  const res = await api('/nvwa/tick');
+  
+  if (res.success) {
+    // 更新世界变量
+    if (res.worldVars) {
+      updateWorldVars(res.worldVars);
+    }
+    
+    // 添加事件
+    if (res.event) {
+      state.events.unshift(res.event);
+      if (state.events.length > 50) state.events.pop();
+      renderEvents();
+    }
+    
+    // 刷新角色数据
+    loadCharacters();
+    
+    // 更新状态
+    document.getElementById('lastSimTime').textContent = '上次推演: ' + new Date().toLocaleTimeString();
+  } else {
+    alert('推演失败: ' + (res.error || '未知错误'));
+  }
+}
+
+function renderEvents() {
+  const container = document.getElementById('eventsList');
+  container.innerHTML = state.events.map(e => `
+    <div class="event-item">
+      <div class="event-content">${e.content || e}</div>
+      <div class="event-meta">
+        <span>${e.speaker || '旁白'}</span>
+        ${e.changes ? ' | ' + e.changes + ' 个属性变更' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function resetWorld() {
+  if (!confirm('确定重置世界？所有推演记录将清空。')) return;
+  await api('/nvwa/reset');
+  state.events = [];
+  updateWorldVars({ tension: 50, chaos: 50, progress: 50 });
+  renderEvents();
+  loadCharacters();
+}
+
+// ==================== 初始化 ====================
+
+async function init() {
+  await loadCharacters();
+  updateWorldVars({ tension: 50, chaos: 50, progress: 50 });
+  
+  // 窗口调整时重绘K线
+  window.addEventListener('resize', () => {
+    if (state.selectedCharId) loadKline(state.selectedCharId);
+  });
+}
+
+init();
+  </script>
+</body>
+</html>

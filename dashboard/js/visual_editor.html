@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可视化编辑器 - SoulWriter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #e2e8f0; overflow: hidden; }
+    
+    .editor-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+    
+    /* 顶部工具栏 */
+    .editor-toolbar {
+      display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+      background: #16213e; border-bottom: 1px solid #2a2a4a; flex-shrink: 0;
+    }
+    
+    .toolbar-btn {
+      padding: 8px 16px; background: rgba(255,255,255,0.05);
+      border: 1px solid #333; border-radius: 8px; color: #e2e8f0;
+      cursor: pointer; font-size: 14px; transition: all 0.2s;
+    }
+    .toolbar-btn:hover { background: rgba(99, 102, 241, 0.3); border-color: #6366f1; }
+    .toolbar-btn.active { background: #6366f1; border-color: #6366f1; }
+    
+    .toolbar-sep { width: 1px; background: #333; height: 24px; margin: 0 8px; }
+    
+    .toolbar-title { font-weight: 600; margin-right: 16px; color: #f5c518; }
+    
+    /* 主体区域 */
+    .editor-main { display: flex; flex: 1; overflow: hidden; }
+    
+    /* 画布 */
+    .editor-canvas-wrap { flex: 1; position: relative; background: #16213e; overflow: hidden; }
+    .editor-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    
+    /* SVG连线层 */
+    .editor-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+    
+    /* 节点 */
+    .editor-node {
+      position: absolute; background: #16213e; border-radius: 12px;
+      border: 2px solid #6366f1; cursor: move; user-select: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); min-width: 140px;
+      transition: box-shadow 0.2s;
+    }
+    .editor-node:hover { box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3); }
+    .editor-node.selected { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); }
+    
+    .node-header {
+      padding: 8px 12px; border-radius: 10px 10px 0 0;
+      display: flex; align-items: center; gap: 8px; color: white;
+    }
+    .node-icon { font-size: 16px; }
+    .node-type { font-size: 12px; opacity: 0.9; }
+    .node-delete { margin-left: auto; cursor: pointer; opacity: 0.5; font-size: 12px; }
+    .node-delete:hover { opacity: 1; }
+    
+    .node-body { padding: 12px; }
+    .node-title { font-weight: 600; margin-bottom: 4px; color: #e2e8f0; }
+    .node-desc { font-size: 12px; color: #94a3b8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    
+    /* 右侧面板 */
+    .editor-panel {
+      width: 320px; background: #1a1a2e; border-left: 1px solid #2a2a4a;
+      padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+    }
+    
+    .panel-title { font-size: 16px; font-weight: 600; color: #f5c518; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .panel-title span { font-size: 20px; }
+    
+    .panel-empty { color: #666; text-align: center; padding: 40px 0; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
+    .form-input {
+      width: 100%; padding: 10px 12px; background: #16213e; border: 1px solid #2a2a4a;
+      border-radius: 8px; color: #e2e8f0; font-size: 14px;
+    }
+    .form-input:focus { outline: none; border-color: #6366f1; }
+    textarea.form-input { min-height: 80px; resize: vertical; }
+    
+    .form-select {
+      width: 100%; padding: 10px 12px; background: #16213e; border: 1px solid #2a2a4a;
+      border-radius: 8px; color: #e2e8f0; font-size: 14px;
+    }
+    
+    .btn-save { width: 100%; padding: 12px; background: #6366f1; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .btn-save:hover { background: #818cf8; }
+    .btn-delete { width: 100%; padding: 10px; background: transparent; border: 1px solid #ef4444; border-radius: 8px; color: #ef4444; cursor: pointer; font-size: 14px; margin-top: 8px; }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.1); }
+    
+    /* 连接列表 */
+    .conn-list { display: flex; flex-direction: column; gap: 8px; }
+    .conn-item {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: #16213e; border-radius: 8px; font-size: 13px;
+    }
+    .conn-item span { color: #94a3b8; }
+    .conn-item .conn-icon { font-size: 16px; }
+    
+    /* 提示 */
+    .hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: #666; font-size: 12px; background: #16213e; padding: 8px 16px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="editor-container">
+    <!-- 工具栏 -->
+    <div class="editor-toolbar">
+      <span class="toolbar-title">🎭 创世编辑器</span>
+      <button class="toolbar-btn" onclick="createNodeFromToolbar('character')">👤 角色</button>
+      <button class="toolbar-btn" onclick="createNodeFromToolbar('item')">🎁 物品</button>
+      <button class="toolbar-btn" onclick="createNodeFromToolbar('location')">📍 地点</button>
+      <button class="toolbar-btn" onclick="createNodeFromToolbar('plot')">📖 情节</button>
+      <button class="toolbar-btn" onclick="createNodeFromToolbar('world')">🌍 世界观</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" onclick="createConnectionBetweenSelected()">🔗 连线</button>
+      <button class="toolbar-btn" onclick="clearAll()">🗑️ 清空</button>
+    </div>
+    
+    <!-- 主体 -->
+    <div class="editor-main">
+      <!-- 画布 -->
+      <div class="editor-canvas-wrap">
+        <div class="editor-canvas" id="editor-canvas"></div>
+      </div>
+      
+      <!-- 右侧详情面板 -->
+      <div class="editor-panel" id="editor-panel">
+        <div class="panel-empty">👈 点击节点查看详情<br>或创建新节点</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="hint">💡 拖拽移动 | 双击编辑 | 点击选中查看详情</div>
+
+  <script>
+    const NodeTypes = {
+      character: { icon: '👤', label: '角色', color: '#6366f1' },
+      item: { icon: '🎁', label: '物品', color: '#f59e0b' },
+      location: { icon: '📍', label: '地点', color: '#10b981' },
+      plot: { icon: '📖', label: '情节', color: '#ef4444' },
+      world: { icon: '🌍', label: '世界观', color: '#8b5cf6' }
+    };
+
+    const state = {
+      nodes: [],
+      connections: [],
+      selectedNode: null,
+      dragging: null,
+      connecting: false,
+      connectSource: null
+    };
+
+    function createNode(type, x, y, data = {}) {
+      const node = {
+        id: 'node_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        type, x, y,
+        width: 160,
+        height: 90,
+        data: {
+          title: data.title || NodeTypes[type].label + '_' + (state.nodes.filter(n => n.type === type).length + 1),
+          description: data.description || '',
+          level: data.level || 1,
+          status: data.status || 'active',
+          ...data
+        }
+      };
+      state.nodes.push(node);
+      return node;
+    }
+
+    function createConnection(sourceId, targetId, label = '') {
+      if (sourceId === targetId) return;
+      const exists = state.connections.find(c => c.source === sourceId && c.target === targetId);
+      if (exists) return;
+      state.connections.push({ id: 'conn_' + Date.now(), source: sourceId, target: targetId, label });
+    }
+
+    function renderCanvas() {
+      const canvas = document.getElementById('editor-canvas');
+      if (!canvas) return;
+
+      // SVG连线
+      let svgHtml = '<svg class="editor-svg"><defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#6366f1"/></marker></defs>';
+      
+      state.connections.forEach(conn => {
+        const source = state.nodes.find(n => n.id === conn.source);
+        const target = state.nodes.find(n => n.id === conn.target);
+        if (!source || !target) return;
+        
+        const sx = source.x + source.width / 2;
+        const sy = source.y + source.height / 2;
+        const tx = target.x + target.width / 2;
+        const ty = target.y + target.height / 2;
+        const midX = (sx + tx) / 2;
+        const path = 'M ' + sx + ' ' + sy + ' Q ' + midX + ' ' + sy + ' ' + midX + ' ' + ((sy + ty) / 2) + ' T ' + tx + ' ' + ty;
+        
+        svgHtml += '<path d="' + path + '" fill="none" stroke="#6366f1" stroke-width="2" marker-end="url(#arrowhead)"/>';
+        if (conn.label) {
+          svgHtml += '<text x="' + midX + '" y="' + ((sy + ty) / 2 - 10) + '" fill="#e2e8f0" font-size="12" text-anchor="middle">' + conn.label + '</text>';
+        }
+      });
+      svgHtml += '</svg>';
+      
+      // 节点
+      let nodesHtml = '';
+      state.nodes.forEach(node => {
+        const typeStyle = NodeTypes[node.type];
+        const isSelected = state.selectedNode === node.id;
+        nodesHtml += '<div class="editor-node' + (isSelected ? ' selected' : '') + '" data-id="' + node.id + '" style="left:' + node.x + 'px;top:' + node.y + 'px;width:' + node.width + 'px;border-color:' + typeStyle.color + '">' +
+          '<div class="node-header" style="background:' + typeStyle.color + '">' +
+            '<span class="node-icon">' + typeStyle.icon + '</span>' +
+            '<span class="node-type">' + typeStyle.label + '</span>' +
+            '<span class="node-delete" onclick="event.stopPropagation();deleteNode(\'' + node.id + '\')">✕</span>' +
+          '</div>' +
+          '<div class="node-body">' +
+            '<div class="node-title">' + node.data.title + '</div>' +
+            '<div class="node-desc">' + (node.data.description || '') + '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      
+      canvas.innerHTML = svgHtml + nodesHtml;
+      bindEvents();
+    }
+
+    function renderPanel() {
+      const panel = document.getElementById('editor-panel');
+      if (!state.selectedNode) {
+        panel.innerHTML = '<div class="panel-empty">👈 点击节点查看详情<br>或创建新节点</div>';
+        return;
+      }
+      
+      const node = state.nodes.find(n => n.id === state.selectedNode);
+      if (!node) return;
+      
+      const typeStyle = NodeTypes[node.type];
+      const nodeConnections = state.connections.filter(c => c.source === node.id || c.target === node.id);
+      
+      panel.innerHTML = 
+        '<div class="panel-title"><span>' + typeStyle.icon + '</span> ' + typeStyle.label + ' 详情</div>' +
+        
+        '<div class="form-group">' +
+          '<label class="form-label">名称</label>' +
+          '<input class="form-input" id="panel-title" value="' + (node.data.title || '') + '" onchange="updateNodeField(\'' + node.id + '\', \'title\', this.value)">' +
+        '</div>' +
+        
+        '<div class="form-group">' +
+          '<label class="form-label">类型</label>' +
+          '<select class="form-select" id="panel-type" onchange="updateNodeType(\'' + node.id + '\', this.value)">' +
+            Object.entries(NodeTypes).map(([k, v]) => '<option value="' + k + '"' + (node.type === k ? ' selected' : '') + '>' + v.icon + ' ' + v.label + '</option>').join('') +
+          '</select>' +
+        '</div>' +
+        
+        '<div class="form-group">' +
+          '<label class="form-label">等级</label>' +
+          '<input class="form-input" type="number" id="panel-level" value="' + (node.data.level || 1) + '" onchange="updateNodeField(\'' + node.id + '\', \'level\', parseInt(this.value))">' +
+        '</div>' +
+        
+        '<div class="form-group">' +
+          '<label class="form-label">状态</label>' +
+          '<select class="form-select" id="panel-status" onchange="updateNodeField(\'' + node.id + '\', \'status\', this.value)">' +
+            '<option value="active"' + (node.data.status === 'active' ? ' selected' : '') + '>🟢 活动中</option>' +
+            '<option value="inactive"' + (node.data.status === 'inactive' ? ' selected' : '') + '>⚪  inactive</option>' +
+            '<option value="archived"' + (node.data.status === 'archived' ? ' selected' : '') + '>📦 已归档</option>' +
+          '</select>' +
+        '</div>' +
+        
+        '<div class="form-group">' +
+          '<label class="form-label">描述</label>' +
+          '<textarea class="form-input" id="panel-desc" onchange="updateNodeField(\'' + node.id + '\', \'description\', this.value)">' + (node.data.description || '') + '</textarea>' +
+        '</div>' +
+        
+        '<div class="form-group">' +
+          '<label class="form-label">关联 (' + nodeConnections.length + ')</label>' +
+          '<div class="conn-list">' +
+            nodeConnections.map(c => {
+              const other = state.nodes.find(n => n.id === (c.source === node.id ? c.target : c.source));
+              const isOutgoing = c.source === node.id;
+              return '<div class="conn-item"><span class="conn-icon">' + (isOutgoing ? '→' : '←') + '</span> ' + (other ? other.data.title : '?') + ' <span>' + (c.label || '关联') + '</span></div>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+        
+        '<button class="btn-delete" onclick="deleteNode(\'' + node.id + '\')">🗑️ 删除节点</button>';
+    }
+
+    function updateNodeField(nodeId, field, value) {
+      const node = state.nodes.find(n => n.id === nodeId);
+      if (node) {
+        node.data[field] = value;
+        renderCanvas();
+      }
+    }
+
+    function updateNodeType(nodeId, newType) {
+      const node = state.nodes.find(n => n.id === nodeId);
+      if (node) {
+        node.type = newType;
+        renderCanvas();
+        renderPanel();
+      }
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('.editor-node').forEach(el => {
+        el.addEventListener('mousedown', startDrag);
+        el.addEventListener('click', selectNode);
+      });
+    }
+
+    let dragState = null;
+    function startDrag(e) {
+      if (e.target.classList.contains('node-delete')) return;
+      const nodeEl = e.currentTarget;
+      const nodeId = nodeEl.dataset.id;
+      const node = state.nodes.find(n => n.id === nodeId);
+      if (!node) return;
+      
+      state.selectedNode = nodeId;
+      dragState = { node, startX: e.clientX - node.x, startY: e.clientY - node.y };
+      document.addEventListener('mousemove', onDrag);
+      document.addEventListener('mouseup', endDrag);
+      renderCanvas();
+      renderPanel();
+    }
+
+    function onDrag(e) {
+      if (!dragState) return;
+      dragState.node.x = e.clientX - dragState.startX;
+      dragState.node.y = e.clientY - dragState.startY;
+      renderCanvas();
+    }
+
+    function endDrag() {
+      dragState = null;
+      document.removeEventListener('mousemove', onDrag);
+      document.removeEventListener('mouseup', endDrag);
+    }
+
+    function selectNode(e) {
+      if (e.target.classList.contains('node-delete')) return;
+      state.selectedNode = e.currentTarget.dataset.id;
+      renderCanvas();
+      renderPanel();
+    }
+
+    function deleteNode(id) {
+      if (!confirm('确定删除这个节点？')) return;
+      state.nodes = state.nodes.filter(n => n.id !== id);
+      state.connections = state.connections.filter(c => c.source !== id && c.target !== id);
+      if (state.selectedNode === id) state.selectedNode = null;
+      renderCanvas();
+      renderPanel();
+    }
+
+    function createNodeFromToolbar(type) {
+      const x = 100 + Math.random() * 500;
+      const y = 50 + Math.random() * 300;
+      const node = createNode(type, x, y);
+      state.selectedNode = node.id;
+      renderCanvas();
+      renderPanel();
+    }
+
+    function createConnectionBetweenSelected() {
+      if (!state.connecting) {
+        state.connecting = true;
+        state.connectSource = state.selectedNode;
+        alert('点击另一个节点创建连线');
+        return;
+      }
+      if (state.selectedNode && state.selectedNode !== state.connectSource) {
+        const label = prompt('输入关系名称（如：朋友、敌人、持有）：') || '';
+        createConnection(state.connectSource, state.selectedNode, label);
+      }
+      state.connecting = false;
+      state.connectSource = null;
+      renderCanvas();
+    }
+
+    function clearAll() {
+      if (confirm('确定清空所有节点？此操作不可恢复！')) {
+        state.nodes = [];
+        state.connections = [];
+        state.selectedNode = null;
+        renderCanvas();
+        renderPanel();
+      }
+    }
+
+    // 示例数据
+    const char1 = createNode('character', 80, 100, { title: '主角', description: '穿越者', level: 5, status: 'active' });
+    const char2 = createNode('character', 400, 80, { title: '反派', description: '大Boss', level: 10, status: 'active' });
+    const item1 = createNode('item', 80, 280, { title: '神兵', description: '倚天剑', level: 8, status: 'active' });
+    const loc1 = createNode('location', 400, 280, { title: '城镇', description: '新手村', level: 1, status: 'active' });
+    
+    createConnection(char1.id, item1.id, '持有');
+    createConnection(char1.id, loc1.id, '所在');
+    createConnection(char2.id, loc1.id, '占领');
+    
+    renderCanvas();
+    renderPanel();
+  </script>
+</body>
+</html>

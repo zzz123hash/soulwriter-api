@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创世树 - SoulWriter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #0f0f23; color: #e2e8f0; overflow: hidden; }
+    
+    .container { display: flex; flex-direction: column; height: 100vh; }
+    
+    /* 顶部工具栏 */
+    .toolbar {
+      display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+      background: #16213e; border-bottom: 1px solid #2a2a4a;
+    }
+    .toolbar-title { font-size: 18px; font-weight: 600; color: #f5c518; }
+    .toolbar-hint { color: #666; font-size: 13px; }
+    
+    .toolbar-main { display: flex; gap: 8px; margin-left: auto; }
+    .btn {
+      padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid #333;
+      border-radius: 8px; color: #e2e8f0; cursor: pointer; font-size: 14px; transition: all 0.2s;
+    }
+    .btn:hover { background: rgba(99, 102, 241, 0.3); border-color: #6366f1; }
+    .btn-primary { background: #6366f1; border-color: #6366f1; }
+    .btn-danger { border-color: #ef4444; color: #ef4444; }
+    
+    /* 主体 */
+    .main { display: flex; flex: 1; overflow: hidden; }
+    
+    /* 左侧 - 种子配置 */
+    .panel-seed {
+      width: 280px; background: #1a1a2e; border-right: 1px solid #2a2a4a;
+      padding: 16px; overflow-y: auto;
+    }
+    .panel-title { font-weight: 600; color: #f5c518; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; }
+    .form-input {
+      width: 100%; padding: 10px 12px; background: #16213e; border: 1px solid #2a2a4a;
+      border-radius: 8px; color: #e2e8f0; font-size: 14px;
+    }
+    .form-input:focus { outline: none; border-color: #6366f1; }
+    textarea.form-input { min-height: 60px; resize: vertical; }
+    
+    /* 中间 - 画布 */
+    .canvas-wrap { flex: 1; position: relative; background: #16213e; overflow: hidden; }
+    .nodes-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .svg-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+    
+    /* 节点样式 */
+    .tree-node {
+      position: absolute; background: #1e293b; border-radius: 12px;
+      border: 2px solid #475569; cursor: move; user-select: none;
+      min-width: 140px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .tree-node:hover { box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3); }
+    .tree-node.selected { border-color: #f5c518; box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.3); }
+    .tree-node.root { border-color: #10b981; }
+    .tree-node.ending { border-color: #ef4444; }
+    .tree-node.plot-twist { border-color: #f59e0b; }
+    .tree-node.cliffhanger { border-color: #ec4899; }
+    
+    .node-header {
+      padding: 8px 12px; border-radius: 10px 10px 0 0;
+      display: flex; align-items: center; gap: 8px; color: white; font-size: 13px;
+    }
+    .node-body { padding: 10px 12px; }
+    .node-title { font-weight: 600; margin-bottom: 4px; }
+    .node-desc { font-size: 12px; color: #94a3b8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .node-type-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: auto;
+      background: rgba(255,255,255,0.2);
+    }
+    
+    /* 温度指示器 */
+    .temp-indicator {
+      position: absolute; top: -8px; right: -8px;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: bold; color: white;
+    }
+    .temp-cold { background: #3b82f6; }
+    .temp-warm { background: #f59e0b; }
+    .temp-hot { background: #ef4444; }
+    
+    /* 右侧 - 节点详情 */
+    .panel-detail {
+      width: 320px; background: #1a1a2e; border-left: 1px solid #2a2a4a;
+      padding: 16px; overflow-y: auto;
+    }
+    
+    /* 缩放控制 */
+    .zoom-controls {
+      position: absolute; bottom: 20px; right: 20px;
+      display: flex; gap: 8px; z-index: 100;
+    }
+    .zoom-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #16213e; border: 1px solid #333;
+      color: #e2e8f0; cursor: pointer; font-size: 18px;
+    }
+    .zoom-btn:hover { background: #1e293b; }
+    
+    /* 缩放提示 */
+    .zoom-hint {
+      position: absolute; bottom: 20px; left: 20px;
+      color: #666; font-size: 12px; z-index: 100;
+    }
+    
+    /* 路径显示 */
+    .path-bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+      background: #1e293b; border-radius: 8px; margin-bottom: 12px;
+      font-size: 12px; color: #94a3b8; overflow-x: auto;
+    }
+    .path-item { white-space: nowrap; }
+    .path-arrow { color: #475569; }
+    
+    /* 节点类型选择 */
+    .type-selector { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .type-btn {
+      padding: 6px 12px; border-radius: 6px; font-size: 12px;
+      background: #16213e; border: 1px solid #333; color: #e2e8f0; cursor: pointer;
+    }
+    .type-btn:hover { border-color: #6366f1; }
+    .type-btn.active { border-color: #f5c518; background: rgba(245, 197, 24, 0.1); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部工具栏 -->
+    <div class="toolbar">
+      <span class="toolbar-title">🌳 创世树</span>
+      <span class="toolbar-hint">剧情分支可视化，节点可拖拽</span>
+      
+      <div class="toolbar-main">
+        <button class="btn" onclick="createRootNode()">🌱 创建根节点</button>
+        <button class="btn" onclick="addChildNode()">➕ 添加子节点</button>
+        <button class="btn" onclick="autoLayout()">📐 自动布局</button>
+        <button class="btn btn-primary" onclick="saveTree()">💾 保存</button>
+      </div>
+    </div>
+    
+    <!-- 主体 -->
+    <div class="main">
+      <!-- 左侧 - 故事种子 -->
+      <div class="panel-seed">
+        <div class="panel-title">📝 故事种子</div>
+        
+        <div class="form-group">
+          <label class="form-label">核心冲突</label>
+          <input class="form-input" id="seedConflict" placeholder="故事的核心矛盾">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">背景基调</label>
+          <input class="form-input" id="seedTone" placeholder="如：黑暗、光明、悬疑">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">关键伏笔</label>
+          <textarea class="form-input" id="seedForeshadow" placeholder="埋下的伏笔"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">核心问题</label>
+          <input class="form-input" id="seedQuestion" placeholder="故事要回答的问题">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">主角</label>
+          <input class="form-input" id="seedProtagonist" placeholder="主角名">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">世界观</label>
+          <textarea class="form-input" id="seedWorld" placeholder="故事背景设定"></textarea>
+        </div>
+        
+        <button class="btn" style="width:100%" onclick="saveSeed()">保存种子设定</button>
+      </div>
+      
+      <!-- 中间 - 树画布 -->
+      <div class="canvas-wrap" id="canvasWrap">
+        <div class="nodes-canvas" id="nodesCanvas"></div>
+        <div class="zoom-hint">滚轮缩放 | 拖拽移动节点</div>
+        <div class="zoom-controls">
+          <button class="zoom-btn" onclick="zoomIn()">+</button>
+          <button class="zoom-btn" onclick="zoomOut()">−</button>
+          <button class="zoom-btn" onclick="resetZoom()">⟲</button>
+        </div>
+      </div>
+      
+      <!-- 右侧 - 节点详情 -->
+      <div class="panel-detail">
+        <div class="panel-title">📋 节点详情</div>
+        
+        <div id="nodeDetail">
+          <div style="color:#666;text-align:center;padding:40px 0;">
+            选择节点查看详情<br>
+            <span style="font-size:12px">或创建新节点</span>
+          </div>
+        </div>
+        
+        <div id="nodeTypes" style="display:none;">
+          <div class="form-label">节点类型</div>
+          <div class="type-selector">
+            <button class="type-btn active" data-type="root">🌱 起点</button>
+            <button class="type-btn" data-type="plot_twist">🔄 转折</button>
+            <button class="type-btn" data-type="cliffhanger">⛰️ 悬念</button>
+            <button class="type-btn" data-type="ending">🏁 结局</button>
+            <button class="type-btn" data-type="foreshadow">📜 伏笔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ==================== 旧代码精髓 - 创世树 ====================
+// 
+// 1. 【树形结构】
+//    - genesis_nodes 表存储节点
+//    - parentId 建立父子关系
+//    - depth 计算节点深度
+//    - childrenCount 记录子节点数
+//
+// 2. 【节点类型】
+//    - root: 起点
+//    - plot_twist: 剧情转折
+//    - cliffhanger: 悬念/ cliff
+//    - ending: 结局
+//    - foreshadow: 伏笔
+//
+// 3. 【事件温度】
+//    - temperature 字段（0-1）
+//    - cold < 0.3, warm 0.3-0.7, hot > 0.7
+//    - 影响叙事节奏
+//
+// 4. 【buildTree 构建】
+//    - 将数据库记录转换为前端树结构
+//    - 父子关系、边列表、根节点
+//
+// 5. 【自动布局算法】
+//    - 基于depth的层级布局
+//    - 同层级节点水平排列
+//
+// ====================
+
+const API_BASE = '/api';
+
+const NODE_TYPES = {
+  root: { icon: '🌱', label: '起点', color: '#10b981', class: 'root' },
+  plot_twist: { icon: '🔄', label: '转折', color: '#f59e0b', class: 'plot-twist' },
+  cliffhanger: { icon: '⛰️', label: '悬念', color: '#ec4899', class: 'cliffhanger' },
+  ending: { icon: '🏁', label: '结局', color: '#ef4444', class: 'ending' },
+  foreshadow: { icon: '📜', label: '伏笔', color: '#6366f1', class: '' }
+};
+
+// 状态
+let state = {
+  seedId: null,
+  nodes: [],
+  edges: [],
+  selectedNode: null,
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0,
+  dragging: null,
+  panning: false
+};
+
+// ==================== API ====================
+
+async function api(endpoint, data = {}) {
+  const res = await fetch(API_BASE + endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+// ==================== 树操作 ====================
+
+async function loadTree() {
+  const res = await api('/genesis/list');
+  if (res.seeds && res.seeds.length > 0) {
+    const seed = res.seeds[0];
+    state.seedId = seed.id;
+    
+    // 填充种子表单
+    document.getElementById('seedConflict').value = seed.coreConflict || '';
+    document.getElementById('seedTone').value = seed.tone || '';
+    document.getElementById('seedForeshadow').value = seed.keyForeshadowing || '';
+    document.getElementById('seedQuestion').value = seed.centralQuestion || '';
+    document.getElementById('seedProtagonist').value = seed.protagonist || '';
+    document.getElementById('seedWorld').value = seed.setting || '';
+    
+    // 加载节点
+    const treeRes = await api('/genesis/tree', { seedId: seed.id });
+    if (treeRes.success) {
+      state.nodes = treeRes.nodes || [];
+      state.edges = treeRes.edges || [];
+      renderTree();
+    }
+  }
+}
+
+async function saveSeed() {
+  const data = {
+    coreConflict: document.getElementById('seedConflict').value,
+    tone: document.getElementById('seedTone').value,
+    keyForeshadowing: document.getElementById('seedForeshadow').value,
+    centralQuestion: document.getElementById('seedQuestion').value,
+    protagonist: document.getElementById('seedProtagonist').value,
+    setting: document.getElementById('seedWorld').value
+  };
+  
+  if (state.seedId) {
+    await api('/genesis/updateSeed', { id: state.seedId, ...data });
+  } else {
+    const res = await api('/genesis/createSeed', data);
+    state.seedId = res.seedId;
+  }
+  
+  alert('种子已保存！');
+}
+
+function createRootNode() {
+  if (!state.seedId) {
+    alert('请先保存故事种子！');
+    return;
+  }
+  
+  const label = prompt('根节点标题:', '故事开始');
+  if (!label) return;
+  
+  api('/genesis/createNode', {
+    seedId: state.seedId,
+    type: 'root',
+    label,
+    positionX: 400,
+    positionY: 50
+  }).then(() => loadTree());
+}
+
+function addChildNode() {
+  if (!state.selectedNode) {
+    alert('请先选择父节点！');
+    return;
+  }
+  
+  const label = prompt('子节点标题:', '新事件');
+  if (!label) return;
+  
+  const parentNode = state.nodes.find(n => n.id === state.selectedNode);
+  
+  api('/genesis/createNode', {
+    seedId: state.seedId,
+    parentId: state.selectedNode,
+    type: 'plot_twist',
+    label,
+    positionX: parentNode.position.x + 50,
+    positionY: (parentNode.position.y || 0) + 150
+  }).then(() => loadTree());
+}
+
+async function saveTree() {
+  for (const node of state.nodes) {
+    await api('/genesis/updateNode', {
+      id: node.id,
+      positionX: node.position.x,
+      positionY: node.position.y
+    });
+  }
+  alert('布局已保存！');
+}
+
+// ==================== 渲染 ====================
+
+function renderTree() {
+  const canvas = document.getElementById('nodesCanvas');
+  
+  // 渲染SVG边
+  let svgHtml = '<svg class="svg-layer"><defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#475569"/></marker></defs>';
+  
+  state.edges.forEach(edge => {
+    const source = state.nodes.find(n => n.id === edge.source);
+    const target = state.nodes.find(n => n.id === edge.target);
+    if (!source || !target) return;
+    
+    const sx = (source.position.x || 0) + 70;
+    const sy = (source.position.y || 0) + 45;
+    const tx = (target.position.x || 0) + 70;
+    const ty = (target.position.y || 0);
+    
+    const midY = (sy + ty) / 2;
+    const path = `M ${sx} ${sy} Q ${sx} ${midY} ${(sx + tx) / 2} ${midY} T ${tx} ${ty}`;
+    
+    svgHtml += `<path d="${path}" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrowhead)"/>`;
+  });
+  svgHtml += '</svg>';
+  
+  // 渲染节点
+  let nodesHtml = '';
+  state.nodes.forEach(node => {
+    const typeConfig = NODE_TYPES[node.type] || NODE_TYPES.plot_twist;
+    const isSelected = state.selectedNode === node.id;
+    const temp = node.temperature || 0.5;
+    
+    let tempClass = 'temp-warm';
+    let tempIcon = '🌡️';
+    if (temp < 0.3) { tempClass = 'temp-cold'; tempIcon = '❄️'; }
+    if (temp > 0.7) { tempClass = 'temp-hot'; tempIcon = '🔥'; }
+    
+    nodesHtml += `
+      <div class="tree-node ${typeConfig.class} ${isSelected ? 'selected' : ''}"
+           data-id="${node.id}"
+           style="left:${node.position.x}px;top:${node.position.y}px;border-color:${typeConfig.color}"
+           onmousedown="startDrag(event, '${node.id}')"
+           onclick="selectNode('${node.id}')">
+        
+        <div class="temp-indicator ${tempClass}">${tempIcon}</div>
+        
+        <div class="node-header" style="background:${typeConfig.color}">
+          <span>${typeConfig.icon}</span>
+          <span class="node-type-badge">${typeConfig.label}</span>
+        </div>
+        
+        <div class="node-body">
+          <div class="node-title">${node.label}</div>
+          <div class="node-desc">${node.description || '点击编辑描述'}</div>
+        </div>
+      </div>
+    `;
+  });
+  
+  canvas.innerHTML = svgHtml + nodesHtml;
+}
+
+// ==================== 交互 ====================
+
+function selectNode(nodeId) {
+  state.selectedNode = nodeId;
+  renderTree();
+  renderDetail();
+  document.getElementById('nodeTypes').style.display = 'block';
+}
+
+function renderDetail() {
+  const panel = document.getElementById('nodeDetail');
+  const node = state.nodes.find(n => n.id === state.selectedNode);
+  
+  if (!node) {
+    panel.innerHTML = '<div style="color:#666;text-align:center;padding:40px 0;">选择节点查看详情</div>';
+    return;
+  }
+  
+  // 显示路径
+  const path = getPathToNode(node.id);
+  const pathHtml = path.map(n => `<span class="path-item">${n.label}</span>`).join('<span class="path-arrow"> → </span>');
+  
+  panel.innerHTML = `
+    <div class="path-bar">${pathHtml}</div>
+    
+    <div class="form-group">
+      <label class="form-label">标题</label>
+      <input class="form-input" value="${node.label}" 
+        onchange="updateNode('${node.id}', {label: this.value})">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">描述</label>
+      <textarea class="form-input" 
+        onchange="updateNode('${node.id}', {description: this.value})">${node.description || ''}</textarea>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">事件温度</label>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="range" min="0" max="100" value="${(node.temperature || 0.5) * 100}"
+          style="flex:1" onchange="updateNode('${node.id}', {temperature: this.value / 100})">
+        <span style="color:#f5c518;width:40px;">${Math.round((node.temperature || 0.5) * 100)}%</span>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">深度</label>
+      <div style="color:#94a3b8;">第 ${node.depth || 0} 层</div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">子节点</label>
+      <div style="color:#94a3b8;">${node.childrenCount || 0} 个</div>
+    </div>
+    
+    <button class="btn btn-danger" style="width:100%;margin-top:16px;" onclick="deleteNode('${node.id}')">🗑️ 删除节点</button>
+  `;
+}
+
+async function updateNode(nodeId, data) {
+  await api('/genesis/updateNode', { id: nodeId, ...data });
+  loadTree();
+}
+
+async function deleteNode(nodeId) {
+  if (!confirm('删除此节点及其所有子节点？')) return;
+  await api('/genesis/deleteNode', { id: nodeId });
+  state.selectedNode = null;
+  loadTree();
+}
+
+function getPathToNode(nodeId) {
+  const path = [];
+  let current = state.nodes.find(n => n.id === nodeId);
+  
+  while (current) {
+    path.unshift(current);
+    current = state.nodes.find(n => n.id === current.parentId);
+  }
+  
+  return path;
+}
+
+// ==================== 拖拽 ====================
+
+let dragState = { node: null, startX: 0, startY: 0 };
+
+function startDrag(e, nodeId) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  
+  const node = state.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  
+  state.selectedNode = nodeId;
+  dragState = {
+    node,
+    startX: e.clientX - node.position.x,
+    startY: e.clientY - node.position.y
+  };
+  
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup', endDrag);
+  renderTree();
+  renderDetail();
+}
+
+function onDrag(e) {
+  if (!dragState.node) return;
+  
+  dragState.node.position.x = (e.clientX - dragState.startX);
+  dragState.node.position.y = (e.clientY - dragState.startY);
+  
+  renderTree();
+}
+
+function endDrag() {
+  dragState = { node: null, startX: 0, startY: 0 };
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup', endDrag);
+}
+
+// ==================== 缩放 ====================
+
+function zoomIn() {
+  state.scale = Math.min(state.scale + 0.2, 3);
+  applyZoom();
+}
+
+function zoomOut() {
+  state.scale = Math.max(state.scale - 0.2, 0.3);
+  applyZoom();
+}
+
+function resetZoom() {
+  state.scale = 1;
+  state.offsetX = 0;
+  state.offsetY = 0;
+  applyZoom();
+}
+
+function applyZoom() {
+  const canvas = document.getElementById('nodesCanvas');
+  canvas.style.transform = `translate(${state.offsetX}px, ${state.offsetY}px) scale(${state.scale})`;
+}
+
+// ==================== 自动布局 ====================
+
+function autoLayout() {
+  // 简单的层级布局算法
+  const roots = state.nodes.filter(n => !n.parentId);
+  
+  roots.forEach((root, ri) => {
+    layoutNode(root, 100 + ri * 300, 50, 0);
+  });
+  
+  renderTree();
+}
+
+function layoutNode(node, x, y, depth) {
+  node.position = { x, y };
+  node.depth = depth;
+  
+  const children = state.nodes.filter(n => n.parentId === node.id);
+  const childCount = children.length;
+  
+  if (childCount === 0) return;
+  
+  const startX = x - (childCount - 1) * 75;
+  children.forEach((child, i) => {
+    layoutNode(child, startX + i * 150, y + 150, depth + 1);
+  });
+}
+
+// ==================== 初始化 ====================
+
+document.addEventListener('DOMContentLoaded', loadTree);
+  </script>
+</body>
+</html>

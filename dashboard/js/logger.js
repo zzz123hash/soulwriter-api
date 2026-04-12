@@ -85,6 +85,7 @@ class SoulWriterLogger {
         </select>
         <button class="toolbar-btn" id="btn-log">📋 ${this.getLabel('title')}</button>
         <button class="toolbar-btn" id="btn-docs">📖 Docs</button>
+        <button class="toolbar-btn" id="btn-settings" onclick="showGlobalSettings()">⚙️ 设置</button>
       </div>
     `;
     document.body.insertBefore(toolbar, document.body.firstChild);

@@ -559,6 +559,101 @@ window.DrawerApp = {
 
 
 
+
+// ============ 全局设置 ============
+function showGlobalSettings() {
+  var modal = document.getElementById('settings-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'settings-modal';
+    modal.className = 'detail-modal';
+    modal.innerHTML = '<div class="detail-modal-backdrop" onclick="closeGlobalSettings()"></div>' +
+      '<div class="detail-modal-box">' +
+      '<div class="detail-modal-header">' +
+      '<span class="detail-modal-title">⚙️ 全局设置</span>' +
+      '<button class="detail-modal-close" onclick="closeGlobalSettings()">×</button>' +
+      '</div>' +
+      '<div class="detail-modal-body" id="settings-body"></div>' +
+      '</div>';
+    document.body.appendChild(modal);
+  }
+  renderGlobalSettings();
+  modal.classList.add('open');
+}
+
+function closeGlobalSettings() {
+  var modal = document.getElementById('settings-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function renderGlobalSettings() {
+  var body = document.getElementById('settings-body');
+  if (!body) return;
+  
+  var currentTheme = localStorage.getItem('sw-theme') || 'dark';
+  var fontSize = localStorage.getItem('sw-font-size') || '14';
+  var apiProvider = localStorage.getItem('sw-api-provider') || 'MOSS';
+  var mossApi = localStorage.getItem('sw-moss-api') || '';
+  
+  body.innerHTML = '<div style="padding:16px;">' +
+    '<h4 style="margin:0 0 16px 0;color:var(--text);">外观</h4>' +
+    '<div class="form-field"><label style="display:block;margin-bottom:8px;font-size:13px;color:var(--text2);">主题</label>' +
+    '<select id="setting-theme" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);">' +
+    '<option value="dark" ' + (currentTheme === 'dark' ? 'selected' : '') + '>🌙 暗色</option>' +
+    '<option value="soft" ' + (currentTheme === 'soft' ? 'selected' : '') + '>🌤️ 柔和</option>' +
+    '<option value="blue" ' + (currentTheme === 'blue' ? 'selected' : '') + '>💙 蓝色</option>' +
+    '<option value="green" ' + (currentTheme === 'green' ? 'selected' : '') + '>🌿 绿色</option>' +
+    '</select></div>' +
+    '<div class="form-field"><label style="display:block;margin-bottom:8px;font-size:13px;color:var(--text2);">字体大小</label>' +
+    '<select id="setting-fontsize" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);">' +
+    '<option value="12" ' + (fontSize === '12' ? 'selected' : '') + '>小 (12px)</option>' +
+    '<option value="14" ' + (fontSize === '14' ? 'selected' : '') + '>中 (14px)</option>' +
+    '<option value="16" ' + (fontSize === '16' ? 'selected' : '') + '>大 (16px)</option>' +
+    '<option value="18" ' + (fontSize === '18' ? 'selected' : '') + '>特大 (18px)</option>' +
+    '</select></div>' +
+    
+    '<h4 style="margin:24px 0 16px 0;color:var(--text);">API 设置</h4>' +
+    '<div class="form-field"><label style="display:block;margin-bottom:8px;font-size:13px;color:var(--text2);">API 提供商</label>' +
+    '<select id="setting-api-provider" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);">' +
+    '<option value="MOSS" ' + (apiProvider === 'MOSS' ? 'selected' : '') + '>MOSS-Core</option>' +
+    '<option value="OPENAI" ' + (apiProvider === 'OPENAI' ? 'selected' : '') + '>OpenAI</option>' +
+    '<option value="CLAUDE" ' + (apiProvider === 'CLAUDE' ? 'selected' : '') + '>Claude</option>' +
+    '</select></div>' +
+    '<div class="form-field"><label style="display:block;margin-bottom:8px;font-size:13px;color:var(--text2);">MOSS API Key</label>' +
+    '<input type="password" id="setting-moss-api" value="' + mossApi + '" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);box-sizing:border-box;" placeholder="sk-..."></div>' +
+    
+    '<h4 style="margin:24px 0 16px 0;color:var(--text);">关于</h4>' +
+    '<div style="font-size:13px;color:var(--text2);line-height:1.6;">' +
+    '<p>SoulWriter v2.0</p>' +
+    '<p>世界架构设计师</p>' +
+    '</div>' +
+    
+    '<button onclick="saveGlobalSettings()" style="width:100%;padding:10px;background:var(--primary);color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin-top:20px;">保存设置</button>' +
+    '</div>';
+}
+
+function saveGlobalSettings() {
+  var theme = document.getElementById('setting-theme').value;
+  var fontSize = document.getElementById('setting-fontsize').value;
+  var apiProvider = document.getElementById('setting-api-provider').value;
+  var mossApi = document.getElementById('setting-moss-api').value;
+  
+  localStorage.setItem('sw-theme', theme);
+  localStorage.setItem('sw-font-size', fontSize);
+  localStorage.setItem('sw-api-provider', apiProvider);
+  localStorage.setItem('sw-moss-api', mossApi);
+  
+  // Apply theme
+  document.documentElement.setAttribute('data-theme', theme);
+  
+  // Apply font size
+  document.documentElement.style.fontSize = fontSize + 'px';
+  
+  closeGlobalSettings();
+  alert('设置已保存！');
+}
+
+
 function loadDrawerConfig() {
 
   try {

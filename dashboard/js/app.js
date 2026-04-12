@@ -102,9 +102,28 @@ function renderApp() {
 
 // ============ 欢迎页 ============
 function renderWelcome() {
-  return '<div class="welcome-page"><header class="welcome-header"><h1 class="app-logo">SoulWriter</h1><p class="app-slogan">'+t('app.subtitle')+'</p></header><section class="bookshelf-section"><h2 class="section-title">📚 '+t('common.bookshelf')+'</h2><div class="bookshelf" id="books-list"><div class="loading-text">'+t('common.loading')+'</div></div></section><div class="create-book-area"><button class="btn-create-book" id="create-book-btn"><span class="btn-icon">+</span><span class="btn-text">'+t('book.create')+'</span></button>
-<button class="btn-create-book" id="import-book-btn" style="background:#4f46e5"><span class="btn-icon">📥</span><span class="btn-text">导入</span></button>
-</div></div>';
+  return `<div class="welcome-page">
+    <header class="welcome-header">
+      <h1 class="app-logo">SoulWriter</h1>
+      <p class="app-slogan">${t('app.subtitle')}</p>
+    </header>
+    <section class="bookshelf-section">
+      <h2 class="section-title">&#x1F4DA; ${t('common.bookshelf')}</h2>
+      <div class="bookshelf" id="books-list">
+        <div class="loading-text">${t('common.loading')}</div>
+      </div>
+    </section>
+    <div class="create-book-area">
+      <button class="btn-create-book" id="create-book-btn" onclick="showCreateBook()">
+        <span class="btn-icon">+</span>
+        <span class="btn-text">${t('book.create')}</span>
+      </button>
+      <button class="btn-create-book" id="import-book-btn" onclick="importBook()">
+        <span class="btn-icon">&#x1F4E5;</span>
+        <span class="btn-text">&#x5BFC;&#x5165;</span>
+      </button>
+    </div>
+  </div>`;
 }
 
 // ============ 主布局 ============

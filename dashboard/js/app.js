@@ -1,5 +1,25 @@
-// SoulWriter - 抽屉式内页架构 v2
-// 布局: 左侧导航(200px) + 主画布(flex) + 详情面板(320px)
+/**
+ * SoulWriter v2 - 分层导航 + 自定义布局
+ * 2026-04-12
+ */
+
+const state = {
+  currentView: 'welcome',
+  currentTab: 'home',
+  currentEntity: 'roles',
+  currentBook: null,
+  books: [],
+  leftDrawerOpen: true,
+  selectedEntity: null,
+  roles: [], items: [], locations: [], nodes: [], units: [],
+  events: [],
+  entityCounts: {},
+  drawerConfig: null,
+  nvwaSelectedChar: null,
+  nvwaActiveLayer: 'buffer',
+  nvwaMemoryData: {},
+  currentEventArc: 'all',
+};
 
 const Icons = {
   roles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
@@ -20,778 +40,794 @@ const Icons = {
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
   chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
   save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>',
   trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+  building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20"/><path d="M9 22V18h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  tension: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
 };
 
-const state = {
-  currentView: 'welcome', currentTab: 'genesis', currentEntity: 'roles',
-  currentBook: null, books: [], leftDrawerOpen: true, selectedEntity: null,
-  roles: [], items: [], locations: [], nodes: [], units: []
-};
-
-
-function renderToolbar() {
-  const lang = getLang();
-  const langOptions = ['zh-CN', 'en-US'].map(function(l) {
-    return '<option value="' + l + '"' + (lang === l ? ' selected' : '') + '>' + (l === 'zh-CN' ? '中文' : 'English') + '</option>';
-  }).join('');
-  const themes = [
-    { value: 'dark', label: '🌙 暗色' },
-    { value: 'soft', label: '🌤️ 柔和' },
-    { value: 'blue', label: '💙 蓝色' },
-    { value: 'green', label: '🌿 绿色' }
-  ];
-  const currentTheme = document.body.getAttribute('data-theme') || 'dark';
-  const themeOptions = themes.map(function(t) {
-    return '<option value="' + t.value + '"' + (currentTheme === t.value ? ' selected' : '') + '>' + t.label + '</option>';
-  }).join('');
-  return '<div id="sw-toolbar">' +
-    '<div class="toolbar-left">' +
-      '<span class="toolbar-logo">SoulWriter</span>' +
-    '</div>' +
-    '<div class="toolbar-right">' +
-      '<select class="toolbar-select" id="btn-theme">' + themeOptions + '</select>' +
-      '<select class="toolbar-select" id="btn-lang">' + langOptions + '</select>' +
-      '<button class="toolbar-btn" id="btn-log">📋</button>' +
-      '<button class="toolbar-btn" id="btn-settings">⚙️</button>' +
-      '<button class="toolbar-btn" id="upload-btn" title="上传分析">' + icon('upload') + '</button>' +
-    '</div>' +
-  '</div>';
-}
-
-const i18n = {
-  'zh-CN': {
-    app: { name: 'SoulWriter', subtitle: '灵魂创作者' },
-    tabs: { home: '首页', genesis: '创世树', event: '事件线', nvwa: '女娲', novel: '小说' },
-    nav: { roles: '角色', items: '物品', locations: '地点', nodes: '节点', units: '单元', world: '世界观', settings: '设定', prompts: '提示词', map: '地图' },
-    book: { create: '创建新书', noBooks: '书架空空' },
-    common: { back: '返回', loading: '加载中...', save: '保存', cancel: '取消', delete: '删除', close: '关闭' }
-  },
-  'en-US': {
-    app: { name: 'SoulWriter', subtitle: 'Soul Creator' },
-    tabs: { home: 'Home', genesis: 'Genesis', event: 'Event', nvwa: 'Nvwa', novel: 'Novel' },
-    nav: { roles: 'Roles', items: 'Items', locations: 'Locations', nodes: 'Nodes', units: 'Units', world: 'World', settings: 'Settings', prompts: 'Prompts', map: 'Map' },
-    book: { create: 'Create Book', noBooks: 'Empty shelf' },
-    common: { back: 'Back', loading: 'Loading...', save: 'Save', cancel: 'Cancel', delete: 'Delete', close: 'Close' }
-  }
-};
-
-function getLang() { return localStorage.getItem('soulwriter-lang') || 'zh-CN'; }
-function t(key) {
-  const lang = getLang();
-  const keys = key.split('.');
-  let v = i18n[lang];
-  for (const k of keys) { v = v && v[k]; if (!v) return key; }
-  return v;
-}
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
 function icon(name) { return Icons[name] || ''; }
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ============ 主渲染 ============
 function renderApp() {
-  const app = document.getElementById('app');
+  var app = document.getElementById('app');
   if (!app) return;
-  const toolbar = renderToolbar();
   if (!state.currentBook) {
-    app.innerHTML = toolbar + renderWelcome();
-    bindToolbarEvents();
+    app.innerHTML = renderWelcome();
     bindWelcomeEvents();
   } else {
-    app.innerHTML = toolbar + renderBookView();
-    bindToolbarEvents();
+    app.innerHTML = renderBookView();
     bindBookEvents();
     loadBookData();
   }
 }
 
+// ============ 欢迎页 ============
 function renderWelcome() {
-  return `<div class="welcome-page">
-    <div class="welcome-logo">
-      <h1 class="app-logo">SoulWriter</h1>
-      <p class="app-slogan">${t('app.subtitle')}</p>
-    </div>
-    <section class="bookshelf-section">
-      <h2 class="section-title">书架</h2>
-      <div class="bookshelf" id="books-list"><div class="loading-text">${t('common.loading')}</div></div>
-    </section>
-    <div class="create-book-area">
-      <button class="btn-create-book" id="create-book-btn">
-        <span class="btn-icon">${icon('plus')}</span>
-        <span class="btn-text">${t('book.create')}</span>
-      </button>
-    </div>
-  </div>`;
+  return '<div class="welcome-page">' +
+    '<div class="welcome-logo"><h1 class="app-logo">SoulWriter</h1><p class="app-slogan">灵魂创作者</p></div>' +
+    '<section class="bookshelf-section"><h2 class="section-title">书架</h2><div class="bookshelf" id="books-list"><div class="loading-text">加载中...</div></div></section>' +
+    '<div class="create-book-area"><button class="btn-create-book" id="create-book-btn"><span class="btn-icon">+</span><span class="btn-text">创建新书</span></button></div>' +
+  '</div>';
 }
 
+// ============ 书本视图 ============
 function renderBookView() {
-  return `<div class="book-layout">
-    <header class="book-header">
-      <div class="book-tabs">
-        <button class="book-tab ${state.currentTab === 'home' ? 'active' : ''}" data-tab="home">${icon('home')} ${t('tabs.home')}</button>
-        <button class="book-tab ${state.currentTab === 'genesis' ? 'active' : ''}" data-tab="genesis">${icon('genesis')} ${t('tabs.genesis')}</button>
-        <button class="book-tab ${state.currentTab === 'event' ? 'active' : ''}" data-tab="event">${icon('event')} ${t('tabs.event')}</button>
-        <button class="book-tab ${state.currentTab === 'nvwa' ? 'active' : ''}" data-tab="nvwa">${icon('nvwa')} ${t('tabs.nvwa')}</button>
-        <button class="book-tab ${state.currentTab === 'novel' ? 'active' : ''}" data-tab="novel">${icon('novel')} ${t('tabs.novel')}</button>
-      </div>
-      <div class="book-info">
-        <span class="book-name">${escapeHtml(state.currentBook && state.currentBook.title || '')}</span>
-        <button class="btn-back" id="back-to-books">${icon('chevronLeft')} ${t('common.back')}</button>
-      </div>
-    </header>
-    <div class="book-body">
-      ${renderLeftDrawer()}
-      ${renderMainCanvas()}
-      ${renderDetailPanel()}
-    </div>
-  </div>`;
+  return '<div class="book-layout">' +
+    '<header class="book-header">' +
+      '<div class="book-tabs">' +
+        '<button class="book-tab ' + (state.currentTab === 'home' ? 'active' : '') + '" data-tab="home">' + icon('home') + ' 导航页</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'genesis' ? 'active' : '') + '" data-tab="genesis">' + icon('genesis') + ' 创世树</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'event' ? 'active' : '') + '" data-tab="event">' + icon('event') + ' 事件线</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'nvwa' ? 'active' : '') + '" data-tab="nvwa">' + icon('nvwa') + ' 女娲</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'novel' ? 'active' : '') + '" data-tab="novel">' + icon('novel') + ' 小说</button>' +
+      '</div>' +
+      '<div class="book-info">' +
+        '<span class="book-name">' + escapeHtml(state.currentBook && state.currentBook.title || '') + '</span>' +
+        '<button class="btn-back" id="back-to-books">← 返回</button>' +
+      '</div>' +
+    '</header>' +
+    '<div class="book-body">' +
+      '<aside class="left-drawer ' + (state.leftDrawerOpen ? 'open' : 'collapsed') + '" id="left-drawer">' +
+        '<div class="drawer-header">' +
+          '<span class="drawer-title">导航</span>' +
+          '<button class="drawer-toggle" id="toggle-left">' + icon('chevronLeft') + '</button>' +
+        '</div>' +
+        '<nav class="drawer-nav-tree" id="drawer-nav-tree">' + renderLeftDrawerNav() + '</nav>' +
+      '</aside>' +
+      '<main class="main-canvas" id="main-canvas">' +
+        '<div class="tab-canvas" id="tab-canvas">' + renderTabContent() + '</div>' +
+      '</main>' +
+      '<aside class="right-drawer ' + (state.selectedEntity ? 'open' : '') + '" id="detail-panel">' +
+        '<div class="drawer-header">' +
+          '<span class="drawer-title">详情</span>' +
+          '<button class="drawer-toggle" id="close-detail">' + icon('close') + '</button>' +
+        '</div>' +
+        '<div class="drawer-content" id="detail-content">' + (state.selectedEntity ? renderEntityDetail() : '<div class="empty-hint">← 点击实体查看详情</div>') + '</div>' +
+      '</aside>' +
+    '</div>' +
+  '</div>';
 }
 
-function renderEntityListInDrawer() {
-  const data = state[state.currentEntity] || [];
-  if (data.length === 0) {
-    return '<div class="empty-hint" style="padding:16px 12px;font-size:12px;text-align:center;color:var(--text2);">暂无数据</div>';
-  }
-  return data.map(function(item) {
-    return '<div class="entity-list-item-sm" data-id="' + item.id + '">' +
-      '<span style="width:16px;height:16px;display:inline-flex;align-items:center;">' + icon(state.currentEntity) + '</span>' +
-      '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(item.title || item.name || '未命名') + '</span></div>';
-  }).join('');
-}
-
-function renderLeftDrawer() {
-  const collapsed = !state.leftDrawerOpen ? 'collapsed' : '';
-  const navItems = [
-    { key: 'roles', icon: 'roles' }, { key: 'items', icon: 'items' },
-    { key: 'locations', icon: 'locations' }, { key: 'nodes', icon: 'nodes' },
-    { key: 'units', icon: 'units' }, { key: 'world', icon: 'world' },
-    { key: 'settings', icon: 'settings' }, { key: 'prompts', icon: 'prompts' },
-    { key: 'map', icon: 'map' }
-  ];
-  const listHtml = renderEntityListInDrawer();
-  const entityCount = (state[state.currentEntity] || []).length;
-  return `<aside class="left-drawer ${collapsed}" id="left-drawer">
-    <div class="drawer-header">
-      <span class="drawer-title">导航</span>
-      <button class="drawer-toggle" id="toggle-left" title="切换导航">${icon('chevronLeft')}</button>
-    </div>
-    <nav class="entity-nav">
-      ${navItems.map(item => `<div class="entity-nav-item ${state.currentEntity === item.key ? 'active' : ''}" data-entity="${item.key}" title="${t('nav.' + item.key)}">${icon(item.icon)}<span class="nav-label">${t('nav.' + item.key)}</span></div>`).join('')}
-    </nav>
-
-  </aside>`;
-}
-function renderMainCanvas() {
-  return `<main class="main-canvas" id="main-canvas">
-    <div class="tab-canvas">${renderTabContent()}</div>
-  </main>`;
-}
-
-function renderDetailPanel() {
-  const hidden = !state.selectedEntity ? 'hidden' : '';
-  return `<aside class="detail-panel ${hidden}" id="detail-panel">
-    <div class="drawer-header">
-      <span class="drawer-title">详情</span>
-      <button class="drawer-toggle" id="close-detail" title="${t('common.close')}">${icon('close')}</button>
-    </div>
-    <div class="drawer-content" id="entity-detail-drawer">
-      ${state.selectedEntity ? renderEntityDetail() : ''}
-    </div>
-  </aside>`;
-}
-
+// ============ Tab 内容 ============
 function renderTabContent() {
-  const tab = state.currentTab;
-  if (tab === 'home') return renderHomeTab();
-  if (tab === 'genesis') return renderGenesisTab();
-  if (tab === 'event') return renderEventTab();
-  if (tab === 'nvwa') return renderNvwaTab();
-  if (tab === 'novel') return renderNovelTab();
-  return renderHomeTab();
-}
-
-function renderHomeTab() {
-  const stats = [
-    { label: '角色', count: 0, icon: 'roles', color: '#e94560' },
-    { label: '物品', count: 0, icon: 'items', color: '#0ea5e9' },
-    { label: '地点', count: 0, icon: 'locations', color: '#22c55e' },
-    { label: '节点', count: 0, icon: 'nodes', color: '#f59e0b' },
-    { label: '单元', count: 0, icon: 'units', color: '#8b5cf6' },
-  ];
-  const dataMap = { roles: state.roles, items: state.items, locations: state.locations, nodes: state.nodes, units: state.units };
-  stats.forEach(function(s) { s.count = (dataMap[s.label === '角色' ? 'roles' : s.label === '物品' ? 'items' : s.label === '地点' ? 'locations' : s.label === '节点' ? 'nodes' : 'units'] || []).length; });
-  const statCards = stats.map(function(s) {
-    return '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;">' +
-      '<div style="font-size:2em;font-weight:700;color:' + s.color + ';margin-bottom:8px;">' + s.count + '</div>' +
-      '<div style="display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text2);font-size:13px;">' + icon(s.icon) + ' ' + s.label + '</div></div>';
-  }).join('');
-  return '<div style="padding:24px;max-width:900px;margin:0 auto;">' +
-    '<h2 style="font-size:1.4em;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">' + icon('home') + ' 书架总览</h2>' +
-    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;margin-bottom:32px;">' + statCards + '</div>' +
-    '<h3 style="font-size:1.1em;color:var(--text2);margin-bottom:12px;">最近编辑</h3>' +
-    '<div style="color:var(--text2);font-size:13px;">在左侧选择实体类型开始编辑</div></div>';
+  switch (state.currentTab) {
+    case 'home': return renderHomeTab();
+    case 'genesis': return renderGenesisTab();
+    case 'event': return renderEventTab();
+    case 'nvwa': return renderNvwaTab();
+    case 'novel': return renderNovelTab();
+    default: return renderHomeTab();
+  }
 }
 
 function renderGenesisTab() {
-  const nodes = state.nodes || [];
-  if (nodes.length === 0) {
-    return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="margin-bottom:12px;font-size:2em;">' + icon('genesis') + '</div><div>暂无节点，点击左侧「节点」添加</div></div>';
+  var nodes = state.nodes || [];
+  if (!nodes.length) {
+    return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('genesis') + '</div><div style="margin-bottom:8px;">暂无节点</div><div style="font-size:12px;">从左侧添加角色或节点</div></div>';
   }
-  const treeItems = nodes.map(function(n) {
-    var desc = n.description ? escapeHtml(n.description).substring(0, 30) + '...' : '';
-    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;" data-id="' + n.id + '">' +
+  var html = '<div style="padding:24px;max-width:800px;margin:0 auto;">' +
+    '<h2 style="font-size:1.4em;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">' + icon('genesis') + ' 创世树</h2>';
+  nodes.forEach(function(n) {
+    var desc = (n.description || '').substring(0, 30);
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;" data-id="' + n.id + '">' +
       '<span style="color:var(--accent);">' + icon('nodes') + '</span>' +
       '<span style="flex:1;font-weight:500;">' + escapeHtml(n.title || n.name || '未命名') + '</span>' +
-      '<span style="font-size:11px;color:var(--text2);">' + desc + '</span></div>';
-  }).join('');
-  return '<div style="padding:24px;max-width:800px;margin:0 auto;">' +
-    '<h2 style="font-size:1.4em;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px;">' + icon('genesis') + ' 创世树</h2>' +
-    '<div>' + treeItems + '</div></div>';
-}
-
-
-
+      '<span style="font-size:11px;color:var(--text2);">' + escapeHtml(desc) + '</span></div>';
+  });
+  html += '</div>';
+  return html;
 }
 
 function renderNovelTab() {
-  return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="margin-bottom:12px;font-size:2em;">' + icon('novel') + '</div><div style="margin-bottom:8px;">小说视图</div><div style="font-size:12px;">功能开发中...</div></div>';
+  return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('novel') + '</div><div style="margin-bottom:8px;">小说视图</div><div style="font-size:12px;">功能开发中...</div></div>';
 }
 
+// ============ 分层导航树 ============
+var NAV_TREE = [
+  { label: '导航', id: 'nav-root', icon: 'compass', children: [
+    { label: '角色', id: 'roles', icon: 'roles' },
+    { label: '物品', id: 'items', icon: 'items' },
+    { label: '地点', id: 'locations', icon: 'locations' },
+    { label: '建筑', id: 'buildings', icon: 'building' },
+  ]},
+  { label: '背景', id: 'background-root', icon: 'world', children: [
+    { label: '设定', id: 'world', icon: 'world' },
+    { label: '世界观', id: 'worldview', icon: 'world' },
+  ]},
+  { label: '剧情', id: 'plot-root', icon: 'event', children: [
+    { label: '事件线', id: 'event', icon: 'event' },
+    { label: '章节目录', id: 'chapters', icon: 'units' },
+  ]},
+  { label: '推演', id: 'genesis-root', icon: 'genesis', children: [
+    { label: '创世树', id: 'genesis', icon: 'genesis' },
+    { label: '女娲推演', id: 'nvwa', icon: 'nvwa' },
+  ]},
+  { label: '分析', id: 'analysis-root', icon: 'chart', children: [
+    { label: '合册分析', id: 'analysis', icon: 'chart' },
+    { label: '张力曲线', id: 'tension', icon: 'tension' },
+  ]},
+  { label: '地图', id: 'map-root', icon: 'map', children: [
+    { label: '地图视图', id: 'map', icon: 'map' },
+  ]},
+];
+
+var SPECIAL_TABS = { genesis: true, event: true, nvwa: true, analysis: true, tension: true, map: true, chapters: true, world: true, worldview: true, novel: true };
+
+function renderLeftDrawerNav() {
+  var cfg = state.drawerConfig = loadDrawerConfig();
+  var html = '';
+  NAV_TREE.forEach(function(group) {
+    var isOpen = cfg.collapsed[group.id] !== true;
+    html += '<div class="drawer-group' + (isOpen ? ' open' : '') + '" data-group="' + group.id + '">';
+    html += '<div class="drawer-group-header" data-group="' + group.id + '">' +
+      '<span class="drawer-chevron">' + (isOpen ? icon('chevronDown') : icon('chevronRight')) + '</span>' +
+      '<span class="drawer-icon">' + icon(group.icon) + '</span>' +
+      '<span class="drawer-group-label">' + escapeHtml(group.label) + '</span></div>';
+    if (isOpen) {
+      html += '<div class="drawer-group-children">';
+      group.children.forEach(function(child) {
+        var isActive = state.currentEntity === child.id;
+        html += '<div class="drawer-item' + (isActive ? ' active' : '') + '" data-id="' + child.id + '" data-group="' + group.id + '">' +
+          '<span class="drawer-chevron small"></span>' +
+          '<span class="drawer-icon small">' + icon(child.icon) + '</span>' +
+          '<span class="drawer-item-label">' + escapeHtml(child.label) + '</span></div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  return html;
+}
+
+function loadDrawerConfig() {
+  try {
+    var saved = localStorage.getItem('sw_drawer_config_v2');
+    if (saved) { var cfg = JSON.parse(saved); cfg.collapsed = cfg.collapsed || {}; return cfg; }
+  } catch(e) {}
+  return { collapsed: {} };
+}
+
+function saveDrawerConfig(cfg) {
+  try { localStorage.setItem('sw_drawer_config_v2', JSON.stringify(cfg)); } catch(e) {}
+}
+
+// ============ 导航页 ============
+function renderHomeTab() {
+  // 当前选中的实体类型（默认角色）
+  var activeType = state.currentEntity || 'roles';
+  var counts = state.entityCounts || {};
+
+  // 获取对应类型的列表数据
+  var entityMap = {
+    roles: state.roles || [],
+    items: state.items || [],
+    locations: state.locations || [],
+    buildings: [],
+  };
+  var list = entityMap[activeType] || [];
+
+  // AI分析区（右侧面板 or 顶部入口）
+  var aiPanel = '<div class="home-ai-panel">' +
+    '<div class="home-ai-title-bar"><span class="home-ai-title-text">⚡ AI 助手</span></div>' +
+    '<div class="home-ai-actions">' +
+      '<div class="home-ai-btn" id="home-upload-zone">' +
+        '<div class="home-ai-btn-icon">' + icon('upload') + '</div>' +
+        '<div class="home-ai-btn-label">上传分析</div>' +
+        '<div class="home-ai-btn-desc">上传文本/文档，AI提取角色物品</div>' +
+      '</div>' +
+      '<div class="home-ai-btn" id="home-longtext-zone">' +
+        '<div class="home-ai-btn-icon">' + icon('prompts') + '</div>' +
+        '<div class="home-ai-btn-label">长文本分析</div>' +
+        '<div class="home-ai-btn-desc">粘贴文字，提取人物关系和故事线</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  // 实体类型切换tab
+  var typeTabs = ['roles', 'items', 'locations', 'buildings'].map(function(t) {
+    var label = { roles: '角色', items: '物品', locations: '地点', buildings: '建筑' }[t];
+    var cnt = counts[t] || 0;
+    return '<button class="entity-type-tab' + (activeType === t ? ' active' : '') + '" data-type="' + t + '">' +
+      '<span class="entity-type-icon">' + icon(t) + '</span>' +
+      '<span class="entity-type-label">' + label + '</span>' +
+      '<span class="entity-type-count">' + cnt + '</span>' +
+    '</button>';
+  }).join('');
+
+  // 实体列表
+  var listHtml = '';
+  if (!list.length) {
+    listHtml = '<div class="entity-list-empty">' +
+      '<div style="font-size:2em;margin-bottom:8px;">' + icon(activeType) + '</div>' +
+      '<div style="color:var(--text2);margin-bottom:12px;">暂无' + ({ roles: '角色', items: '物品', locations: '地点', buildings: '建筑' }[activeType] || '') + '</div>' +
+      '<button class="btn-create-entity" data-type="' + activeType + '">' + icon('plus') + ' 新建</button>' +
+    '</div>';
+  } else {
+    list.forEach(function(e) {
+      listHtml += '<div class="entity-list-item" data-id="' + e.id + '">' +
+        '<div class="entity-list-icon">' + icon(activeType) + '</div>' +
+        '<div class="entity-list-body">' +
+          '<div class="entity-list-name">' + escapeHtml(e.title || e.name || '未命名') + '</div>' +
+          '<div class="entity-list-desc">' + escapeHtml((e.description || '').substring(0, 40)) + '</div>' +
+        '</div>' +
+        '<div class="entity-list-arrow">' + icon('chevronRight') + '</div>' +
+      '</div>';
+    });
+    listHtml += '<div class="entity-list-footer">' +
+      '<button class="btn-create-entity" data-type="' + activeType + '">' + icon('plus') + ' 添加</button>' +
+    '</div>';
+  }
+
+  // 概览统计条
+  var statsBar = '<div class="home-stats-bar">' +
+    '<div class="stat-item" data-type="roles"><span class="stat-icon">' + icon('roles') + '</span><span class="stat-num" id="stat-roles">' + (counts.roles||0) + '</span><span class="stat-label">角色</span></div>' +
+    '<div class="stat-item" data-type="items"><span class="stat-icon">' + icon('items') + '</span><span class="stat-num" id="stat-items">' + (counts.items||0) + '</span><span class="stat-label">物品</span></div>' +
+    '<div class="stat-item" data-type="locations"><span class="stat-icon">' + icon('locations') + '</span><span class="stat-num" id="stat-locations">' + (counts.locations||0) + '</span><span class="stat-label">地点</span></div>' +
+    '<div class="stat-item" data-type="buildings"><span class="stat-icon">' + icon('building') + '</span><span class="stat-num" id="stat-buildings">' + (counts.buildings||0) + '</span><span class="stat-label">建筑</span></div>' +
+    '<div class="stat-item" data-type="event"><span class="stat-icon">' + icon('event') + '</span><span class="stat-num" id="stat-events">' + (state.events ? state.events.length : 0) + '</span><span class="stat-label">事件</span></div>' +
+  '</div>';
+
+  return '<div class="home-tab-root" id="home-tab-root">' +
+    // 顶部统计条
+    statsBar +
+    // 双栏主体
+    '<div class="home-two-col">' +
+      // 左栏：类型tab + 列表
+      '<div class="home-left-col">' +
+        '<div class="entity-type-tabs">' + typeTabs + '</div>' +
+        '<div class="entity-list-container" id="entity-list-container">' + listHtml + '</div>' +
+      '</div>' +
+      // 右栏：AI分析
+      '<div class="home-right-col">' + aiPanel + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+
+
+// 导航页实体列表（供切换tab时刷新）
+function renderHomeTab_entityList(type) {
+  type = type || state.currentEntity || 'roles';
+  var counts = state.entityCounts || {};
+  var entityMap = { roles: state.roles || [], items: state.items || [], locations: state.locations || [], buildings: [] };
+  var list = entityMap[type] || [];
+  var labels = { roles: '角色', items: '物品', locations: '地点', buildings: '建筑' };
+  var html = '';
+  if (!list.length) {
+    html = '<div class="entity-list-empty">' +
+      '<div style="font-size:2em;margin-bottom:8px;">' + icon(type) + '</div>' +
+      '<div style="color:var(--text2);margin-bottom:12px;">暂无' + (labels[type] || '') + '</div>' +
+      '<button class="btn-create-entity" data-type="' + type + '">' + icon('plus') + ' 新建</button>' +
+    '</div>';
+  } else {
+    list.forEach(function(e) {
+      html += '<div class="entity-list-item" data-id="' + e.id + '">' +
+        '<div class="entity-list-icon">' + icon(type) + '</div>' +
+        '<div class="entity-list-body">' +
+          '<div class="entity-list-name">' + escapeHtml(e.title || e.name || '未命名') + '</div>' +
+          '<div class="entity-list-desc">' + escapeHtml((e.description || '').substring(0, 40)) + '</div>' +
+        '</div>' +
+        '<div class="entity-list-arrow">' + icon('chevronRight') + '</div>' +
+      '</div>';
+    });
+    html += '<div class="entity-list-footer">' +
+      '<button class="btn-create-entity" data-type="' + type + '">' + icon('plus') + ' 添加</button>' +
+    '</div>';
+  }
+  return html;
+}
+
+// ============ 事件线 Tab ============
+function renderEventTab() {
+  return '<div class="event-tab-root" id="event-tab-root">' +
+    '<div class="event-toolbar"><div class="event-arcs-filter" id="event-arcs-filter"></div>' +
+    '<button class="event-add-btn" id="event-add-btn">' + icon('plus') + ' 新增事件</button></div>' +
+    '<div class="event-timeline" id="event-timeline"><div class="event-loading">加载中...</div></div>' +
+  '</div>';
+}
+
+// ============ 女娲 Tab ============
+function renderNvwaTab() {
+  return '<div class="nvwa-tab-root" id="nvwa-tab-root"><div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">加载中...</div></div>';
+}
+
+// ============ 实体详情 ============
 function renderEntityDetail() {
-  if (!state.selectedEntity) return '';
-  const e = state.selectedEntity;
-  return `<div class="entity-detail">
-    <div class="detail-header">
-      <div class="detail-icon">${icon(sta);
-  }
-  // Theme switch
-  const themeSelect = document.getElementById('btn-theme');
-  if (themeSelect) {
-    themeSelect.addEventListener('change', function() {
-      var theme = this.value;
-      document.body.setAttribute('data-theme', theme);
-      localStorage.setItem('soulwriter-theme', theme);
-      if (typeof logger !== 'undefined' && logger.applyTheme) logger.applyTheme(theme);
-    });
-  }
-  // Log button
-  var logBtn = document.getElementById('btn-log');
-  if (logBtn && !logBtn.dataset.bound) {
-    logBtn.dataset.bound = '1';
-    logBtn.addEventListener('click', function() { window.open('/dashboard/logs.html', '_blank'); });
-  }
-  // Docs button
-  var settingsBtn = document.getElementById('btn-settings');
-  if (docsBtn && !docsBtn.dataset.bound) {
-    docsBtn.dataset.bound = '1';
-    docsBtn.addEventListener('click', function() { location.href = '/dashboard/settings.html'; });
-  }
+  if (!state.selectedEntity) return '<div class="empty-hint">← 点击实体查看详情</div>';
+  var e = state.selectedEntity;
+  return '<div class="entity-detail">' +
+    '<div class="detail-header"><div class="detail-icon">' + icon(state.currentEntity) + '</div><div class="detail-title">' + escapeHtml(e.title || e.name || '未命名') + '</div></div>' +
+    '<div class="detail-body">' +
+      '<div class="detail-field"><label>名称</label><input type="text" class="detail-input" id="detail-title" value="' + escapeHtml(e.title || e.name || '') + '"></div>' +
+      '<div class="detail-field"><label>描述</label><textarea class="detail-textarea" id="detail-desc" rows="5">' + escapeHtml(e.description || '') + '</textarea></div>' +
+    '</div>' +
+    '<div class="detail-actions">' +
+      '<button class="btn-save-detail" id="save-entity-btn">' + icon('save') + ' 保存</button>' +
+      '<button class="btn-delete-detail" id="delete-entity-btn">' + icon('trash') + ' 删除</button>' +
+    '</div>' +
+  '</div>';
 }
 
-function bindWelcomeEvents() {
-  bindUploadModal();
-  document.getElementById('create-book-btn') && document.getElementById('create-book-btn').addEventListener('click', showCreateBookModal);
-  loadBooks();
-}
-
-function bindBookEvents() {
-  bindUploadModal();
-  // Bind entity nav clicks (角色/物品/地点 etc)
-  document.querySelectorAll('.entity-nav-item').forEach(function(item) {
-    item.addEventListener('click', function() {
-      var entity = this.dataset.entity;
-      state.currentEntity = entity;
-      state.selectedEntity = null;
-      document.querySelectorAll('.entity-nav-item').forEach(function(i) { i.classList.remove('active'); });
-      this.classList.add('active');
-      // Re-render left drawer and main canvas
-      var leftDrawer = document.getElementById('left-drawer');
-      var mainCanvas = document.getElementById('main-canvas');
-      if (leftDrawer && mainCanvas) {
-        leftDrawer.outerHTML = renderLeftDrawer();
-        mainCanvas.querySelector('.tab-canvas').innerHTML = renderTabContent();
-        bindEntityListInDrawer();
-      } else {
-        renderApp();
-      }
-    });
-  });
-  // Bind entity list clicks
-  bindEntityListInDrawer();
-
-  document.getElementById('back-to-books') && document.getElementById('back-to-books').addEventListener('click', () => {
-    state.currentBook = null; state.currentView = 'welcome'; state.selectedEntity = null; renderApp();
-  });
-  document.querySelectorAll('.book-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.book-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      state.currentTab = tab.dataset.tab;
-      state.selectedEntity = null;
-      if (tab.dataset.tab === 'event') { renderApp(); loadEventTimeline(); }
-      else if (tab.dataset.tab === 'nvwa') { state.nvwaSelectedChar = null; state.nvwaMemoryData = null; state.nvwaActiveLayer = 'buffer'; renderApp(); loadNvwaData(); }
-      else renderApp();
-    });
-  });
-  const toggleBtn = document.getElementById('toggle-left');
-  if (toggleBtn) toggleBtn.addEventListener('click', () => {
-    state.leftDrawerOpen = !state.leftDrawerOpen;
-    const drawer = document.getElementById('left-drawer');
-    if (drawer) drawer.classList.toggle('collapsed', !state.leftDrawerOpen);
-    const btn = document.getElementById('toggle-left');
-    if (btn) btn.innerHTML = state.leftDrawerOpen ? icon('chevronLeft') : icon('chevronRight');
-  });
-  document.querySelectorAll('.entity-nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.entity-nav-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-      state.currentEntity = item.dataset.entity;
-      state.selectedEntity = null;
-      renderApp();
-    });
-  });
-  const closeBtn = document.getElementById('close-detail');
-  if (closeBtn) closeBtn.addEventListener('click', () => {
-    state.selectedEntity = null;
-    const panel = document.getElementById('detail-panel');
-    if (panel) panel.classList.add('hidden');
-  });
-  const saveBtn = document.getElementById('save-entity-btn');
-  if (saveBtn) saveBtn.addEventListener('click', saveEntityDetail);
-  const delBtn = document.getElementById('delete-entity-btn');
-  if (delBtn) delBtn.addEventListener('click', () => { if (confirm('确定删除？')) deleteCurrentEntity(); });
-}
-
-async function saveEntityDetail() {
-  if (!state.selectedEntity) return;
-  const title = (document.getElementById('detail-title') && document.getElementById('detail-title').value) || '';
-  const description = (document.getElementById('detail-desc') && document.getElementById('detail-desc').value) || '';
-  const result = await booksApi('update_' + state.currentEntity.replace(/s$/, ''), {
-    bookId: state.currentBook.id, id: state.selectedEntity.id, title, description
-  });
-  if (result.success) { state.selectedEntity.title = title; state.selectedEntity.description = description; renderApp(); }
-  else alert('保存失败');
-}
-
-async function deleteCurrentEntity() {
-  if (!state.selectedEntity) return;
-  const result = await booksApi('delete_' + state.currentEntity.replace(/s$/, ''), {
-    bookId: state.currentBook.id, id: state.selectedEntity.id
-  });
-  if (result.success) { state.selectedEntity = null; loadBookData(); renderApp(); }
-  else alert('删除失败');
-}
-
+// ============ Books API ============
 async function booksApi(action, data) {
   data = data || {};
+  var method = 'GET';
+  var url = '/api/v1/works/books';
+  if (action === 'list') { url = '/api/v1/works/books'; method = 'GET'; }
+  else if (action === 'get') { url = '/api/v1/works/books/' + data.id; method = 'GET'; }
+  else if (action === 'create') { data.bookId = data.bookId || ('b_' + Date.now() + '_' + Math.random().toString(36).substr(2,6)); url = '/api/v1/works/books'; method = 'POST'; }
+  else if (action === 'delete') { url = '/api/v1/works/books/' + data.id; method = 'DELETE'; }
+  else { url = '/api/v1/works/books'; method = 'POST'; }
   try {
-    const res = await fetch('/api/books', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: action, ...data })
-    });
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    if (method === 'POST') opts.body = JSON.stringify(data);
+    var res = await fetch(url, opts);
     return await res.json();
-  } catch (e) { return { error: e.message }; }
+  } catch(e) { return { error: e.message }; }
 }
 
 async function loadBooks() {
-  const result = await booksApi('list');
-  state.books = (result.data && Array.isArray(result.data)) ? result.data : [];
+  var result = await booksApi('list');
+  state.books = (result.data || result.books || []);
   renderBooksList();
 }
 
 function renderBooksList() {
-  const c = document.getElementById('books-list');
+  var c = document.getElementById('books-list');
   if (!c) return;
-  if (state.books.length === 0) { c.innerHTML = '<div class="empty-bookshelf"><p>' + t('book.noBooks') + '</p></div>'; return; }
+  if (!state.books.length) { c.innerHTML = '<div class="empty-bookshelf"><p>书架空空，点击下方创建新书</p></div>'; return; }
   c.innerHTML = state.books.map(function(book) {
     return '<div class="book-item" data-id="' + book.id + '">' +
-      '<div class="book-cover"><div class="book-spine"></div><div class="book-front"><span class="book-name">' + (book.title && book.title.charAt(0) || '?') + '</span></div></div>' +
-      '<div class="book-info"><h3 class="book-title">' + escapeHtml(book.title) + '</h3>' +
-      '<p class="book-desc">' + escapeHtml(book.author || '未知作者') + ' · ' + (book.wordCount || 0) + '字</p>' +
-      '<div class="book-actions">' +
-      '<button class="btn btn-sm btn-open" data-id="' + book.id + '">打开</button>' +
-      '<button class="btn btn-sm btn-danger" data-id="' + book.id + '">' + t('common.delete') + '</button>' +
-      '</div></div></div>';
+      '<div class="book-cover"><div class="book-spine"></div><div class="book-front"><span class="book-name">' + (book.title ? book.title.charAt(0) : '?') + '</span></div></div>' +
+      '<div class="book-info"><h3 class="book-title">' + escapeHtml(book.title) + '</h3><p class="book-desc">' + escapeHtml(book.author || '未知作者') + ' · ' + (book.wordCount || 0) + '字</p>' +
+      '<div class="book-actions"><button class="btn btn-sm btn-open" data-id="' + book.id + '">打开</button><button class="btn btn-sm btn-danger" data-id="' + book.id + '">删除</button></div></div></div>';
   }).join('');
   c.querySelectorAll('.btn-open').forEach(function(btn) { btn.addEventListener('click', function(e) { e.stopPropagation(); openBook(btn.dataset.id); }); });
   c.querySelectorAll('.btn-danger').forEach(function(btn) { btn.addEventListener('click', function(e) { e.stopPropagation(); deleteBook(btn.dataset.id); }); });
 }
 
 async function openBook(id) {
-  const result = await booksApi('get', { id: id });
-  if (result.success && result.data) {
-    state.currentBook = result.data; state.currentView = 'book'; state.currentTab = 'home';
-    state.leftDrawerOpen = true; state.selectedEntity = null; renderApp();
+  var result = await booksApi('get', { id: id });
+  if (result.success && (result.data || result.meta || result.books)) {
+    state.currentBook = result.data || result.meta || result.books[0];
+    state.currentView = 'book';
+    state.currentTab = 'home';
+    state.leftDrawerOpen = true;
+    state.selectedEntity = null;
+    state.events = [];
+    state.entityCounts = {};
+    renderApp();
   }
 }
 
 async function deleteBook(id) {
   if (!confirm('确定删除？')) return;
-  const result = await booksApi('delete', { id: id });
+  var result = await booksApi('delete', { id: id });
   if (result.success) loadBooks();
 }
 
 function showCreateBookModal() {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.innerHTML = '<div class="modal">' +
-    '<div class="modal-header"><h3>' + t('book.create') + '</h3><button class="modal-close">' + icon('close') + '</button></div>' +
-    '<form class="modal-body" id="book-form">' +
-    '<div class="form-group"><label>书名</label><input type="text" name="title" class="input" required placeholder="输入书名"></div>' +
-    '<div class="form-group"><label>作者</label><input type="text" name="author" class="input" placeholder="作者名称"></div>' +
-    '<div class="modal-actions">' +
-    '<button type="button" class="btn btn-secondary" id="modal-cancel">' + t('common.cancel') + '</button>' +
-    '<button type="submit" class="btn btn-primary">' + t('common.save') + '</button>' +
-    '</div></form></div>';
+  var modal = document.createElement('div');
+  modal.className = 'modal-overlay open';
+  modal.innerHTML = '<div class="modal-box"><div class="modal-title">创建新书</div><div class="modal-body">' +
+    '<div class="field"><label>书名</label><input id="new-book-title" type="text" placeholder="输入书名"></div>' +
+    '<div class="field"><label>作者</label><input id="new-book-author" type="text" placeholder="作者名称"></div></div>' +
+    '<div class="modal-actions"><button class="btn btn-primary" id="do-create-book">创建</button><button class="btn btn-secondary" id="cancel-create-book">取消</button></div></div>';
   document.body.appendChild(modal);
-  modal.querySelector('#modal-cancel') && modal.querySelector('#modal-cancel').addEventListener('click', function() { modal.remove(); });
-  modal.querySelector('.modal-close') && modal.querySelector('.modal-close').addEventListener('click', function() { modal.remove(); });
-  modal.querySelector('#book-form') && modal.querySelector('#book-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    var title = e.target.title && e.target.title.value && e.target.title.value.trim();
-    var author = e.target.author && e.target.author.value && e.target.author.value.trim();
+  document.getElementById('do-create-book').addEventListener('click', async function() {
+    var title = document.getElementById('new-book-title').value.trim();
+    var author = document.getElementById('new-book-author').value.trim();
     if (!title) { alert('请输入书名'); return; }
-    booksApi('create', { title: title, author: author }).then(function(result) {
-      modal.remove();
-      if (result.success && result.data) openBook(result.data.id);
-    });
+    var result = await booksApi('create', { title: title, author: author });
+    modal.remove();
+    if (result.success && (result.data || result.meta)) openBook(result.data.id);
   });
+  document.getElementById('cancel-create-book').addEventListener('click', function() { modal.remove(); });
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
 }
 
-function init() { renderApp(); }
-document.addEventListener('DOMContentLoaded', init);
-
-function bindEntityListInDrawer() {
-  document.querySelectorAll('.entity-list-item-sm').forEach(function(item) {
-    item.addEventListener('click', function() {
-      var id = item.dataset.id;
-      var data = state[state.currentEntity] || [];
-      state.selectedEntity = data.find(function(e) { return e.id == id; });
-      document.querySelectorAll('.entity-list-item-sm').forEach(function(i) { i.classList.remove('active'); });
-      item.classList.add('active');
-      renderApp();
-    });
-  });
-  // Toggle entity list
-  var toggleBtn = document.getElementById('toggle-entity-list');
-  if (toggleBtn && !toggleBtn.dataset.bound) {
-    toggleBtn.dataset.bound = '1';
-    toggleBtn.addEventListener('click', function() {
-      var wrap = document.getElementById('entity-list-wrap');
-      if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
-    });
-  }
-}
-// ============ Upload Modal ============
-function renderUploadModal() {
-  return '<div id="upload-modal" class="modal-overlay hidden">' +
-    '<div class="modal-content">' +
-      '<div class="modal-header">' +
-        '<h3>上传分解</h3>' +
-        '<button class="modal-close" id="upload-modal-close">' + icon('close') + '</button>' +
-      '</div>' +
-      '<div class="modal-body" id="upload-modal-body">' +
-        '<div class="upload-drop-zone" id="upload-drop-zone">' +
-          '<div class="upload-icon">' + icon('upload') + '</div>' +
-          '<p>点击选择文件 或 拖拽文件到此处</p>' +
-          '<p class="upload-hint">支持 TXT / MD / DOCX / EPUB</p>' +
-          '<input type="file" id="upload-file-input" accept=".txt,.md,.docx,.epub" style="display:none">' +
-        '</div>' +
-        '<div id="upload-result" class="hidden"></div>' +
-        '<div id="upload-loading" class="hidden">' +
-          '<div class="spinner"></div>' +
-          '<p>AI 分析中，请稍候...</p>' +
-        '</div>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
-}
-
-async function handleFileUpload(file) {
-  if (!state.currentBook) {
-    alert('请先打开一本书');
-    return;
-  }
-  var formData = new FormData();
-  formData.append('file', file);
-  document.getElementById('upload-loading').classList.remove('hidden');
-  document.getElementById('upload-drop-zone').classList.add('hidden');
+// ============ 加载书本数据 ============
+async function loadBookData() {
+  if (!state.currentBook || !state.currentBook.id) return;
   try {
-    var res = await fetch('/api/upload', { method: 'POST', body: formData });
-    var result = await res.json();
-    if (!result.success) throw new Error(result.message);
-    var splitRes = await fetch('/api/split', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: result.data.content || String(result.data.totalLength), bookId: state.currentBook.id })
-    });
-    var split = await splitRes.json();
-    document.getElementById('upload-loading').classList.add('hidden');
-    if (!split.success) throw new Error(split.message);
-    showUploadResult(split.data);
-  } catch (e) {
-    document.getElementById('upload-loading').classList.add('hidden');
-    document.getElementById('upload-drop-zone').classList.remove('hidden');
-    alert('Error: ' + e.message);
-  }
+    var res, result;
+    res = await fetch('/api/v1/works/' + state.currentBook.id + '/roles');
+    result = await res.json();
+    if (result.success) { state.roles = result.entities || []; state.entityCounts.roles = state.roles.length; }
+    res = await fetch('/api/v1/works/' + state.currentBook.id + '/items');
+    result = await res.json();
+    if (result.success) { state.items = result.entities || []; state.entityCounts.items = state.items.length; }
+    res = await fetch('/api/v1/works/' + state.currentBook.id + '/locations');
+    result = await res.json();
+    if (result.success) { state.locations = result.entities || []; state.entityCounts.locations = state.locations.length; }
+    try {
+      var evRes = await fetch('/api/events/timeline/' + state.currentBook.id);
+      var evResult = await evRes.json();
+      if (evResult.success) { state.events = evResult.data.events || []; }
+    } catch(e) {}
+    var drawerNav = document.getElementById('drawer-nav-tree');
+    if (drawerNav) drawerNav.innerHTML = renderLeftDrawerNav();
+  } catch(e) { console.error('loadBookData error:', e); }
 }
 
-function showUploadResult(data) {
-  var saved = data._saved || {};
-  var chars = data.characters || [];
-  var items = data.items || [];
-  var locs = data.locations || [];
-  document.getElementById('upload-drop-zone').classList.add('hidden');
-  document.getElementById('upload-result').classList.remove('hidden');
-  var html = '<div class="split-summary"><h4>分析完成！</h4>';
-  html += '<div class="split-stats">';
-  html += '<div class="split-stat"><span>' + icon('roles') + '</span><b>' + saved.roles + '</b> 角色</div>';
-  html += '<div class="split-stat"><span>' + icon('items') + '</span><b>' + saved.items + '</b> 物品</div>';
-  html += '<div class="split-stat"><span>' + icon('locations') + '</span><b>' + saved.locations + '</b> 地点</div>';
-  html += '</div>';
-  if (chars.length) {
-    html += '<details class="split-list"><summary>角色 (' + chars.length + ')</summary><ul>';
-    chars.forEach(function(c) { html += '<li><b>' + c.name + '</b> - ' + (c.role || '') + '</li>'; });
-    html += '</ul></details>';
-  }
-  if (items.length) {
-    html += '<details class="split-list"><summary>物品 (' + items.length + ')</summary><ul>';
-    items.forEach(function(i) { html += '<li><b>' + i.name + '</b> - ' + (i.description || '') + '</li>'; });
-    html += '</ul></details>';
-  }
-  if (locs.length) {
-    html += '<details class="split-list"><summary>地点 (' + locs.length + ')</summary><ul>';
-    locs.forEach(function(l) { html += '<li><b>' + l.name + '</b> - ' + (l.description || '') + '</li>'; });
-    html += '</ul></details>';
-  }
-  html += '<p class="split-note">以上实体已自动导入到当前书本</p></div>';
-  document.getElementById('upload-result').innerHTML = html;
-  if (state.currentBook) loadEntities(state.currentBook.id);
+// ============ 事件绑定 ============
+function bindWelcomeEvents() {
+  document.getElementById('create-book-btn').addEventListener('click', showCreateBookModal);
+  loadBooks();
 }
 
-function bindUploadModal() {
-  var uploadBtn = document.getElementById('upload-btn');
-
-  if (uploadBtn && !uploadBtn.dataset.bound) {
-    uploadBtn.dataset.bound = '1';
-    uploadBtn.addEventListener('click', function() {
-      var modal = document.getElementById('upload-modal');
-      if (!modal) {
-        document.body.insertAdjacentHTML('beforeend', renderUploadModal());
-        bindUploadModal();
-        modal = document.getElementById('upload-modal');
-      }
-      modal.classList.remove('hidden');
-      resetUploadModal();
-    });
-  }
-
-  var modal = document.getElementById('upload-modal');
-  if (!modal) return;
-  var dropZone = document.getElementById('upload-drop-zone');
-  var fileInput = document.getElementById('upload-file-input');
-  var closeBtn = document.getElementById('upload-modal-close');
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', function() {
-      modal.classList.add('hidden');
-    });
-  }
-
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) modal.classList.add('hidden');
+function bindBookEvents() {
+  document.getElementById('back-to-books').addEventListener('click', function() {
+    state.currentBook = null;
+    state.currentView = 'welcome';
+    state.events = [];
+    renderApp();
   });
 
-  if (dropZone) {
-    dropZone.addEventListener('click', function() { fileInput.click(); });
-    dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('drag-over'); });
-    dropZone.addEventListener('drop', function(e) {
-      e.preventDefault();
-      dropZone.classList.remove('drag-over');
-      var f = e.dataTransfer.files[0];
-      if (f) handleFileUpload(f);
+  document.querySelectorAll('.book-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.book-tab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      state.currentTab = tab.dataset.tab;
+      state.selectedEntity = null;
+      var tabCanvas = document.getElementById('tab-canvas');
+      if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+      bindTabContentEvents();
+      if (tab.dataset.tab === 'event') loadEventTimeline();
+      if (tab.dataset.tab === 'nvwa') { state.nvwaSelectedChar = null; loadNvwaData(); }
     });
-  }
+  });
 
-  if (fileInput) {
-    fileInput.addEventListener('change', function(e) {
-      var f = e.target.files[0];
-      if (f) handleFileUpload(f);
+  document.getElementById('toggle-left').addEventListener('click', function() {
+    state.leftDrawerOpen = !state.leftDrawerOpen;
+    var drawer = document.getElementById('left-drawer');
+    drawer.classList.toggle('open', state.leftDrawerOpen);
+    drawer.classList.toggle('collapsed', !state.leftDrawerOpen);
+    this.innerHTML = state.leftDrawerOpen ? icon('chevronLeft') : icon('chevronRight');
+  });
+
+  document.getElementById('close-detail').addEventListener('click', function() {
+    state.selectedEntity = null;
+    document.getElementById('detail-panel').classList.remove('open');
+    document.getElementById('detail-content').innerHTML = '<div class="empty-hint">← 点击实体查看详情</div>';
+  });
+
+  bindDrawerNavEvents();
+  bindTabContentEvents();
+  bindDetailEvents();
+}
+
+function bindDrawerNavEvents() {
+  document.querySelectorAll('.drawer-group-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+      var groupId = this.dataset.group;
+      var group = this.closest('.drawer-group');
+      var isOpen = group.classList.contains('open');
+      if (isOpen) {
+        group.classList.remove('open');
+        state.drawerConfig.collapsed[groupId] = true;
+        this.querySelector('.drawer-chevron').innerHTML = icon('chevronRight');
+      } else {
+        group.classList.add('open');
+        state.drawerConfig.collapsed[groupId] = false;
+        this.querySelector('.drawer-chevron').innerHTML = icon('chevronDown');
+      }
+      saveDrawerConfig(state.drawerConfig);
+    });
+  });
+
+  document.querySelectorAll('.drawer-item[data-id]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var id = this.dataset.id;
+      document.querySelectorAll('.drawer-item').forEach(function(i) { i.classList.remove('active'); });
+      this.classList.add('active');
+
+      if (SPECIAL_TABS[id]) {
+        state.currentTab = id;
+        state.currentEntity = id;
+        document.querySelectorAll('.book-tab').forEach(function(t) {
+          t.classList.toggle('active', t.dataset.tab === id);
+        });
+        var tabCanvas = document.getElementById('tab-canvas');
+        if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+        bindTabContentEvents();
+        if (id === 'event') loadEventTimeline();
+        if (id === 'nvwa') { state.nvwaSelectedChar = null; loadNvwaData(); }
+      } else {
+        state.currentEntity = id;
+        state.currentTab = 'genesis';
+        document.querySelectorAll('.book-tab').forEach(function(t) {
+          t.classList.toggle('active', t.dataset.tab === 'genesis');
+        });
+        var tabCanvas = document.getElementById('tab-canvas');
+        if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+        bindTabContentEvents();
+      }
+    });
+  });
+}
+
+function bindTabContentEvents() {
+  var uploadZone = document.getElementById('home-upload-zone');
+  if (uploadZone) uploadZone.addEventListener('click', function() { var btn = document.getElementById('upload-btn'); if (btn) btn.click(); });
+
+  var ltZone = document.getElementById('home-longtext-zone');
+  if (ltZone) ltZone.addEventListener('click', function() { showLongTextAnalyzeModal(); });
+
+  document.querySelectorAll('.home-stat-card[data-id]').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var id = this.dataset.id;
+      if (SPECIAL_TABS[id]) {
+        state.currentTab = id;
+        state.currentEntity = id;
+      } else {
+        state.currentTab = 'genesis';
+        state.currentEntity = id;
+      }
+      document.querySelectorAll('.book-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === state.currentTab);
+      });
+      var tabCanvas = document.getElementById('tab-canvas');
+      if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+      bindTabContentEvents();
+    });
+  });
+
+  document.querySelectorAll('.home-action-btn[data-action]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var action = this.dataset.action;
+      if (action === 'newEvent') {
+        state.selectedEntity = { __isNew: true };
+        state.currentTab = 'event';
+        state.currentEntity = 'event';
+        document.querySelectorAll('.book-tab').forEach(function(t) {
+          t.classList.toggle('active', t.dataset.tab === 'event');
+        });
+        var tabCanvas = document.getElementById('tab-canvas');
+        if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+        bindTabContentEvents();
+        loadEventTimeline();
+      }
+    });
+  });
+
+  var addEventBtn = document.getElementById('event-add-btn');
+  if (addEventBtn && !addEventBtn.dataset.bound) {
+    addEventBtn.dataset.bound = '1';
+    addEventBtn.addEventListener('click', function() {
+      state.selectedEntity = { __isNew: true, id: null, title: '', cause: '', process: '', result: '', arc: '主线', chapter: '', timestamp: 0, isKeyEvent: false, tension: 50, status: 'open', characters: [], locations: [], items: [] };
+      state.currentEntity = 'event';
+      var dp = document.getElementById('detail-panel');
+      if (dp) { dp.classList.add('open'); document.getElementById('detail-content').innerHTML = renderEventDetail(); bindEventDetailEvents(); }
     });
   }
 }
 
-function resetUploadModal() {
-  var dz = document.getElementById('upload-drop-zone');
-  var loading = document.getElementById('upload-loading');
-  var result = document.getElementById('upload-result');
-  if (dz) dz.classList.remove('hidden');
-  if (loading) loading.classList.add('hidden');
-  if (result) { result.classList.add('hidden'); result.innerHTML = ''; }
+
+  // 实体类型tab切换（导航页）
+  document.querySelectorAll('.entity-type-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var type = this.dataset.type;
+      state.currentEntity = type;
+      document.querySelectorAll('.entity-type-tab').forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+      var container = document.getElementById('entity-list-container');
+      if (container) container.innerHTML = renderHomeTab_entityList(type);
+    });
+  });
+
+  // 实体列表项点击 → 打开详情
+  document.querySelectorAll('.entity-list-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var id = this.dataset.id;
+      var type = state.currentEntity;
+      var entityMap = { roles: state.roles, items: state.items, locations: state.locations };
+      var list = entityMap[type] || [];
+      var entity = list.find(function(e) { return e.id === id; });
+      if (entity) {
+        state.selectedEntity = entity;
+        var dp = document.getElementById('detail-panel');
+        if (dp) { dp.classList.add('open'); document.getElementById('detail-content').innerHTML = renderEntityDetail(); bindDetailEvents(); }
+      }
+    });
+  });
+
+  // 新建实体按钮
+  document.querySelectorAll('.btn-create-entity').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var type = this.dataset.type;
+      var newEntity = { __isNew: true, id: null, title: '', description: '' };
+      state.selectedEntity = newEntity;
+      state.currentEntity = type;
+      var dp = document.getElementById('detail-panel');
+      if (dp) { dp.classList.add('open'); document.getElementById('detail-content').innerHTML = renderEntityDetail(); bindDetailEvents(); }
+    });
+  });
+
+  // 统计条点击 → 切换tab
+  document.querySelectorAll('.stat-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var type = this.dataset.type;
+      if (type === 'event') {
+        state.currentTab = 'event';
+        state.currentEntity = 'event';
+      } else {
+        state.currentTab = 'home';
+        state.currentEntity = type;
+      }
+      document.querySelectorAll('.book-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === state.currentTab);
+      });
+      var tabCanvas = document.getElementById('tab-canvas');
+      if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+      bindTabContentEvents();
+      if (state.currentTab === 'event') loadEventTimeline();
+    });
+  });
+
+function bindDetailEvents() {
+  var saveBtn = document.getElementById('save-entity-btn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function() {
+      var title = (document.getElementById('detail-title') || {}).value || '';
+      var description = (document.getElementById('detail-desc') || {}).value || '';
+      if (state.selectedEntity && state.selectedEntity.__isNew) {
+        fetch('/api/v1/works/' + state.currentBook.id + '/' + state.currentEntity, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: title, description: description })
+        }).then(function(r) { return r.json(); }).then(function(result) {
+          if (result.success) { state.selectedEntity = null; document.getElementById('detail-panel').classList.remove('open'); loadBookData(); }
+        });
+      } else if (state.selectedEntity && state.selectedEntity.id) {
+        fetch('/api/v1/works/' + state.currentBook.id + '/' + state.currentEntity + '/' + state.selectedEntity.id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: title, description: description })
+        }).then(function(r) { return r.json(); }).then(function(result) {
+          if (result.success) { state.selectedEntity.title = title; state.selectedEntity.description = description; }
+        });
+      }
+    });
+  }
+  var deleteBtn = document.getElementById('delete-entity-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', function() {
+      if (!state.selectedEntity || !state.selectedEntity.id || !confirm('确定删除？')) return;
+      fetch('/api/v1/works/' + state.currentBook.id + '/' + state.currentEntity + '/' + state.selectedEntity.id, { method: 'DELETE' })
+        .then(function(r) { return r.json(); })
+        .then(function(result) {
+          if (result.success) { state.selectedEntity = null; document.getElementById('detail-panel').classList.remove('open'); loadBookData(); }
+        });
+    });
+  }
 }
-function renderEventTab() {
-  return '<div class="event-tab-root" id="event-tab-root">' +
-    '<div class="event-toolbar">' +
-      '<div class="event-arcs" id="event-arcs-filter"></div>' +
-      '<button class="event-add-btn" id="event-add-btn">' + icon('plus') + ' 新增事件</button>' +
-    '</div>' +
-    '<div class="event-timeline" id="event-timeline">' +
-      '<div class="event-loading">加载中...</div>' +
-    '</div>' +
-  '</div>';
+
+// ============ 事件线功能 ============
+async function loadEventTimeline() {
+  if (!state.currentBook) return;
+  try {
+    var res = await fetch('/api/events/timeline/' + state.currentBook.id);
+    var result = await res.json();
+    if (result.success) {
+      state.events = result.data.events || [];
+      var timeline = document.getElementById('event-timeline');
+      if (timeline) {
+        if (!state.events.length) {
+          timeline.innerHTML = '<div class="event-empty" style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('event') + '</div><div style="margin-bottom:8px;">暂无事件</div><div style="font-size:12px;">点击右上角"新增事件"开始构建故事线</div></div>';
+        } else {
+          timeline.innerHTML = renderEventTimeline(state.events, result.data.arcs || {});
+          bindEventCardEvents();
+        }
+      }
+    }
+  } catch(e) { console.error('loadEventTimeline error:', e); }
 }
 
 function renderEventTimeline(events, arcs) {
-  if (!events || events.length === 0) {
-    return '<div class="event-empty">' +
-      '<div style="font-size:2em;margin-bottom:12px;">' + icon('event') + '</div>' +
-      '<div style="margin-bottom:8px;">暂无事件</div>' +
-      '<div style="font-size:12px;color:var(--text2);">点击右上角"新增事件"开始构建故事线</div>' +
-    '</div>';
-  }
-
-  var arcNames = Object.keys(arcs);
-  var currentArc = state.currentEventArc || 'all';
-
-  // Arc filter tabs
-  var arcTabsHtml = '<div class="event-arc-tabs">';
-  arcTabsHtml += '<button class="event-arc-tab ' + (currentArc === 'all' ? 'active' : '') + '" data-arc="all">全部</button>';
-  arcNames.forEach(function(arc) {
-    arcTabsHtml += '<button class="event-arc-tab ' + (currentArc === arc ? 'active' : '') + '" data-arc="' + escapeHtml(arc) + '">' + escapeHtml(arc) + ' (' + arcs[arc].length + ')</button>';
-  });
-  arcTabsHtml += '</div>';
-
-  // Timeline
-  var filteredEvents = currentArc === 'all' ? events : (arcs[currentArc] || []);
-  var timelineHtml = '<div class="event-list">';
-
-  filteredEvents.forEach(function(ev) {
+  var html = '<div class="event-list">';
+  events.forEach(function(ev) {
     var chars = [];
     try { chars = JSON.parse(ev.characters || '[]'); } catch(e) {}
     var locs = [];
     try { locs = JSON.parse(ev.locations || '[]'); } catch(e) {}
-
-    var tensionClass = ev.tension >= 70 ? 'high' : (ev.tension >= 40 ? 'mid' : 'low');
-    var statusBadge = ev.status === 'open' ? '<span class="event-status open">进行中</span>' : '<span class="event-status closed">已解决</span>';
-    var keyBadge = ev.isKeyEvent ? '<span class="event-key">关键</span>' : '';
-
-    timelineHtml += '<div class="event-card ' + (ev.isKeyEvent ? 'key' : '') + '" data-id="' + ev.id + '">' +
-      '<div class="event-card-left">' +
-        '<div class="event-tension-bar ' + tensionClass + '" style="height:' + ev.tension + '%;"></div>' +
-      '</div>' +
+    var tc = ev.tension >= 70 ? 'high' : (ev.tension >= 40 ? 'mid' : 'low');
+    html += '<div class="event-card' + (ev.isKeyEvent ? ' key' : '') + '" data-id="' + ev.id + '">' +
+      '<div class="event-card-left"><div class="event-tension-bar ' + tc + '" style="height:' + ev.tension + '%;"></div></div>' +
       '<div class="event-card-body">' +
         '<div class="event-card-header">' +
           '<span class="event-chapter">' + escapeHtml(ev.chapter || '') + '</span>' +
           '<b class="event-title">' + escapeHtml(ev.title) + '</b>' +
-          statusBadge + keyBadge +
+          '<span class="event-status ' + (ev.status === 'open' ? 'open' : 'closed') + '">' + (ev.status === 'open' ? '进行中' : '已解决') + '</span>' +
+          (ev.isKeyEvent ? '<span class="event-key">关键</span>' : '') +
         '</div>' +
         '<div class="event-card-meta">' +
           (chars.length ? '<span class="event-meta-item">' + icon('roles') + ' ' + chars.join(', ') + '</span>' : '') +
           (locs.length ? '<span class="event-meta-item">' + icon('locations') + ' ' + locs.join(', ') + '</span>' : '') +
-          '<span class="event-meta-item tension-badge ' + tensionClass + '">张力 ' + ev.tension + '%</span>' +
+          '<span class="event-meta-item tension-badge ' + tc + '">张力 ' + ev.tension + '%</span>' +
         '</div>' +
         '<div class="event-result">' + escapeHtml(ev.result || '') + '</div>' +
-      '</div>' +
-    '</div>';
+      '</div></div>';
   });
-
-  timelineHtml += '</div>';
-
-  return arcTabsHtml + timelineHtml;
+  html += '</div>';
+  return html;
 }
 
-function bindEventTabEvents() {
-  // Arc filter clicks
-  document.querySelectorAll('.event-arc-tab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      state.currentEventArc = this.dataset.arc;
-      loadEventTimeline();
-    });
-  });
-
-  // Add event button
-  var addBtn = document.getElementById('event-add-btn');
-  if (addBtn && !addBtn.dataset.bound) {
-    addBtn.dataset.bound = '1';
-    addBtn.addEventListener('click', function() {
-      state.selectedEntity = { __isNew: true, id: null, title: '', cause: '', process: '', result: '', arc: '主线', chapter: '', timestamp: 0, isKeyEvent: false, tension: 50, status: 'open', characters: [], locations: [], items: [] };
-      state.currentEntity = 'events';
-      renderApp();
-    });
-  }
-
-  // Event card clicks
+function bindEventCardEvents() {
   document.querySelectorAll('.event-card').forEach(function(card) {
     card.addEventListener('click', function() {
       var id = this.dataset.id;
-      var eventData = (state.events || []).find(function(e) { return e.id === id; });
-      if (eventData) {
-        state.selectedEntity = eventData;
-        state.currentEntity = 'events';
-        document.querySelectorAll('.event-card').forEach(function(c) { c.classList.remove('active'); });
-        this.classList.add('active');
-        // Show detail panel
+      var ev = state.events.find(function(e) { return e.id === id; });
+      if (ev) {
+        state.selectedEntity = ev;
         var dp = document.getElementById('detail-panel');
-        if (dp) {
-          dp.classList.remove('hidden');
-          dp.innerHTML = renderEventDetail(eventData);
-          bindEventDetailEvents();
-        }
+        if (dp) { dp.classList.add('open'); document.getElementById('detail-content').innerHTML = renderEventDetail(); bindEventDetailEvents(); }
       }
     });
   });
 }
 
-function renderEventDetail(ev) {
+function renderEventDetail() {
+  var ev = state.selectedEntity;
+  if (!ev) return '';
+  var isNew = ev.__isNew;
   var chars = [];
   try { chars = JSON.parse(ev.characters || '[]'); } catch(e) { chars = []; }
   var locs = [];
   try { locs = JSON.parse(ev.locations || '[]'); } catch(e) { locs = []; }
-  var isNew = ev.__isNew;
-
-  return '<div class="drawer-header">' +
-    '<span class="drawer-title">' + (isNew ? '新增事件' : '事件详情') + '</span>' +
-    '<button class="drawer-toggle" id="close-detail">' + icon('close') + '</button>' +
-  '</div>' +
-  '<div class="drawer-content">' +
-    '<div class="detail-field"><label>标题</label><input class="detail-input" id="ev-title" value="' + escapeHtml(ev.title || '') + '" placeholder="事件标题"></div>' +
-    '<div class="detail-field"><label>章节/位置</label><input class="detail-input" id="ev-chapter" value="' + escapeHtml(ev.chapter || '') + '" placeholder="第X回"></div>' +
-    '<div class="detail-row">' +
-      '<div class="detail-field"><label>剧情线</label>' +
-        '<select class="detail-input" id="ev-arc"><option value="主线"' + (ev.arc === '主线' ? ' selected' : '') + '>主线</option><option value="支线"' + (ev.arc === '支线' ? ' selected' : '') + '>支线</option><option value="暗线"' + (ev.arc === '暗线' ? ' selected' : '') + '>暗线</option><option value="感情线"' + (ev.arc === '感情线' ? ' selected' : '') + '>感情线</option><option value="成长线"' + (ev.arc === '成长线' ? ' selected' : '') + '>成长线</option></select>' +
-      '</div>' +
-      '<div class="detail-field"><label>序号</label><input class="detail-input" id="ev-timestamp" type="number" value="' + (ev.timestamp || 0) + '"></div>' +
+  return '<div class="entity-detail">' +
+    '<div class="detail-header"><div class="detail-icon">' + icon('event') + '</div><div class="detail-title">' + (isNew ? '新增事件' : escapeHtml(ev.title)) + '</div></div>' +
+    '<div class="detail-body">' +
+      '<div class="detail-field"><label>标题</label><input class="detail-input" id="ev-title" value="' + escapeHtml(ev.title || '') + '" placeholder="事件标题"></div>' +
+      '<div class="detail-field"><label>章节/位置</label><input class="detail-input" id="ev-chapter" value="' + escapeHtml(ev.chapter || '') + '" placeholder="第X回"></div>' +
+      '<div class="detail-row"><div class="detail-field"><label>剧情线</label>' +
+        '<select class="detail-input" id="ev-arc"><option value="主线"' + (ev.arc === '主线' ? ' selected' : '') + '>主线</option><option value="支线"' + (ev.arc === '支线' ? ' selected' : '') + '>支线</option><option value="暗线"' + (ev.arc === '暗线' ? ' selected' : '') + '>暗线</option><option value="感情线"' + (ev.arc === '感情线' ? ' selected' : '') + '>感情线</option></select>' +
+      '</div><div class="detail-field"><label>序号</label><input class="detail-input" id="ev-timestamp" type="number" value="' + (ev.timestamp || 0) + '"></div></div>' +
+      '<div class="detail-field"><label>起因</label><textarea class="detail-textarea" id="ev-cause" rows="2">' + escapeHtml(ev.cause || '') + '</textarea></div>' +
+      '<div class="detail-field"><label>经过</label><textarea class="detail-textarea" id="ev-process" rows="3">' + escapeHtml(ev.process || '') + '</textarea></div>' +
+      '<div class="detail-field"><label>结果</label><textarea class="detail-textarea" id="ev-result" rows="2">' + escapeHtml(ev.result || '') + '</textarea></div>' +
+      '<div class="detail-row"><div class="detail-field"><label>张力</label><input class="detail-input" id="ev-tension" type="range" min="0" max="100" value="' + (ev.tension || 50) + '"><span id="ev-tension-val">' + (ev.tension || 50) + '</span></div>' +
+      '<div class="detail-field"><label>状态</label><select class="detail-input" id="ev-status"><option value="open"' + (ev.status === 'open' ? ' selected' : '') + '>进行中</option><option value="closed"' + (ev.status === 'closed' ? ' selected' : '') + '>已解决</option></select></div></div>' +
+      '<div class="detail-field"><label>涉及角色（逗号分隔）</label><input class="detail-input" id="ev-characters" value="' + escapeHtml(chars.join(', ')) + '"></div>' +
+      '<div class="detail-field"><label>涉及地点（逗号分隔）</label><input class="detail-input" id="ev-locations" value="' + escapeHtml(locs.join(', ')) + '"></div>' +
     '</div>' +
-    '<div class="detail-field"><label>起因</label><textarea class="detail-textarea" id="ev-cause" rows="2" placeholder="事件起因...">' + escapeHtml(ev.cause || '') + '</textarea></div>' +
-    '<div class="detail-field"><label>经过</label><textarea class="detail-textarea" id="ev-process" rows="3" placeholder="事件经过...">' + escapeHtml(ev.process || '') + '</textarea></div>' +
-    '<div class="detail-field"><label>结果</label><textarea class="detail-textarea" id="ev-result" rows="2" placeholder="事件结果...">' + escapeHtml(ev.result || '') + '</textarea></div>' +
-    '<div class="detail-row">' +
-      '<div class="detail-field"><label>张力</label><input class="detail-input" id="ev-tension" type="range" min="0" max="100" value="' + (ev.tension || 50) + '"><span id="ev-tension-val">' + (ev.tension || 50) + '</span></div>' +
-      '<div class="detail-field"><label>状态</label>' +
-        '<select class="detail-input" id="ev-status"><option value="open"' + (ev.status === 'open' ? ' selected' : '') + '>进行中</option><option value="closed"' + (ev.status === 'closed' ? ' selected' : '') + '>已解决</option></select>' +
-      '</div>' +
-    '</div>' +
-    '<div class="detail-field"><label>关键事件</label><input type="checkbox" id="ev-isKeyEvent"' + (ev.isKeyEvent ? ' checked' : '') + '></div>' +
-    '<div class="detail-field"><label>涉及角色（逗号分隔）</label><input class="detail-input" id="ev-characters" value="' + escapeHtml(chars.join(', ')) + '" placeholder="贾宝玉, 林黛玉"></div>' +
-    '<div class="detail-field"><label>涉及地点（逗号分隔）</label><input class="detail-input" id="ev-locations" value="' + escapeHtml(locs.join(', ')) + '" placeholder="荣国府, 大观园"></div>' +
     '<div class="detail-actions">' +
-      '<button class="btn-save" id="ev-save-btn">' + icon('save') + ' 保存</button>' +
-      (!isNew ? '<button class="btn-delete" id="ev-delete-btn">' + icon('trash') + ' 删除</button>' : '') +
-    '</div>' +
-  '</div>';
+      '<button class="btn-save-detail" id="ev-save-btn">' + icon('save') + ' 保存</button>' +
+      (!isNew ? '<button class="btn-delete-detail" id="ev-delete-btn">' + icon('trash') + ' 删除</button>' : '') +
+    '</div></div>';
 }
 
 function bindEventDetailEvents() {
-  var closeBtn = document.getElementById('close-detail');
-  if (closeBtn) closeBtn.addEventListener('click', function() {
-    var dp = document.getElementById('detail-panel');
-    if (dp) dp.classList.add('hidden');
-  });
-
   var tensionInput = document.getElementById('ev-tension');
   if (tensionInput) {
     tensionInput.addEventListener('input', function() {
@@ -799,453 +835,185 @@ function bindEventDetailEvents() {
       if (val) val.textContent = this.value;
     });
   }
-
   var saveBtn = document.getElementById('ev-save-btn');
-  if (saveBtn && !saveBtn.dataset.bound) {
-    saveBtn.dataset.bound = '1';
-    saveBtn.addEventListener('click', saveEvent);
-  }
-
-  var deleteBtn = document.getElementById('ev-delete-btn');
-  if (deleteBtn && !deleteBtn.dataset.bound) {
-    deleteBtn.dataset.bound = '1';
-    deleteBtn.addEventListener('click', function() {
-      if (!state.selectedEntity || !state.selectedEntity.id) return;
-      if (!confirm('确认删除此事件？')) return;
-      booksApi('delete_event', { id: state.selectedEntity.id }).then(function(res) {
-        if (res.success) {
-          state.selectedEntity = null;
-          loadEventTimeline();
-          var dp = document.getElementById('detail-panel');
-          if (dp) dp.classList.add('hidden');
-        }
-      });
-    });
-  }
-}
-
-async function saveEvent() {
-  var ev = state.selectedEntity;
-  if (!ev) return;
-  var data = {
-    title: document.getElementById('ev-title').value,
-    chapter: document.getElementById('ev-chapter').value,
-    arc: document.getElementById('ev-arc').value,
-    timestamp: parseInt(document.getElementById('ev-timestamp').value) || 0,
-    cause: document.getElementById('ev-cause').value,
-    process: document.getElementById('ev-process').value,
-    result: document.getElementById('ev-result').value,
-    tension: parseInt(document.getElementById('ev-tension').value) || 50,
-    status: document.getElementById('ev-status').value,
-    isKeyEvent: document.getElementById('ev-isKeyEvent').checked,
-    characters: document.getElementById('ev-characters').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
-    locations: document.getElementById('ev-locations').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
-  };
-
-  var res;
-  if (ev.__isNew) {
-    data.bookId = state.currentBook.id;
-    res = await fetch('/api/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    }).then(function(r) { return r.json(); });
-  } else {
-    res = await fetch('/api/events/' + ev.id, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    }).then(function(r) { return r.json(); });
-  }
-
-  if (res.success) {
-    state.selectedEntity = null;
-    loadEventTimeline();
-    var dp = document.getElementById('detail-panel');
-    if (dp) dp.classList.add('hidden');
-  } else {
-    alert('保存失败: ' + res.message);
-  }
-}
-
-async function loadEventTimeline() {
-  if (!state.currentBook) return;
-  try {
-    var res = await fetch('/api/events/timeline/' + state.currentBook.id);
-    var result = await res.json();
-    if (result.success) {
-      state.events = result.data.events;
-      state.arcs = result.data.arcs;
-      var timeline = document.getElementById('event-timeline');
-      if (timeline) {
-        if (!state.events || state.events.length === 0) {
-          timeline.innerHTML = '<div class="event-empty" style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('event') + '</div><div style="margin-bottom:8px;">暂无事件</div><div style="font-size:12px;color:var(--text2);">点击右上角"新增事件"开始构建故事线</div></div>';
-        } else {
-          timeline.innerHTML = renderEventTimeline(state.events, state.arcs);
-          bindEventTabEvents();
-        }
+  if (saveBtn) {
+    saveBtn.addEventListener('click', function() {
+      var ev = state.selectedEntity;
+      var data = {
+        title: document.getElementById('ev-title').value,
+        chapter: document.getElementById('ev-chapter').value,
+        arc: document.getElementById('ev-arc').value,
+        timestamp: parseInt(document.getElementById('ev-timestamp').value) || 0,
+        cause: document.getElementById('ev-cause').value,
+        process: document.getElementById('ev-process').value,
+        result: document.getElementById('ev-result').value,
+        tension: parseInt(document.getElementById('ev-tension').value) || 50,
+        status: document.getElementById('ev-status').value,
+        characters: document.getElementById('ev-characters').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+        locations: document.getElementById('ev-locations').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+      };
+      if (ev.__isNew) {
+        data.bookId = state.currentBook.id;
+        fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+          .then(function(r) { return r.json(); })
+          .then(function(result) { if (result.success) { state.selectedEntity = null; document.getElementById('detail-panel').classList.remove('open'); loadEventTimeline(); } });
+      } else {
+        fetch('/api/events/' + ev.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+          .then(function(r) { return r.json(); })
+          .then(function(result) { if (result.success) { state.selectedEntity = null; document.getElementById('detail-panel').classList.remove('open'); loadEventTimeline(); } });
       }
-    }
-  } catch (e) {
-    console.error('loadEventTimeline error:', e);
-  }
-}
-function renderNvwaTab() {
-  return '<div class="nvwa-tab-root" id="nvwa-tab-root">' +
-    '<div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">加载中...</div>' +
-  '</div>';
-}
-
-function renderNvwaContent(roles, memoryData) {
-  if (!roles || roles.length === 0) {
-    return '<div class="nvwa-empty" style="padding:40px;text-align:center;color:var(--text2);">' +
-      '<div style="font-size:2em;margin-bottom:12px;">' + icon('nvwa') + '</div>' +
-      '<div>请先创建角色</div>' +
-    '</div>';
-  }
-
-  var html = '<div class="nvwa-layout">';
-
-  // Left: character list
-  html += '<div class="nvwa-char-list">' +
-    '<div class="nvwa-section-title">选择角色</div>';
-  roles.forEach(function(r) {
-    var isActive = state.nvwaSelectedChar === r.id ? 'active' : '';
-    html += '<div class="nvwa-char-item ' + isActive + '" data-id="' + r.id + '">' +
-      '<div class="nvwa-char-avatar">' + icon('roles') + '</div>' +
-      '<div class="nvwa-char-name">' + escapeHtml(r.title || r.name || '未命名') + '</div>' +
-    '</div>';
-  });
-  html += '</div>';
-
-  // Right: memory view
-  html += '<div class="nvwa-memory-view" id="nvwa-memory-view">';
-  if (state.nvwaSelectedChar) {
-    var mem = memoryData[state.nvwaSelectedChar] || { buffer: [], core: [], recall: [], archival: [], summary: '' };
-    html += renderNvwaMemoryPanel(state.nvwaSelectedChar, mem);
-  } else {
-    html += '<div class="nvwa-hint">请从左侧选择一个角色</div>';
-  }
-  html += '</div></div>';
-
-  return html;
-}
-
-function renderNvwaMemoryPanel(characterId, mem) {
-  var bufferCount = (mem.buffer || []).length;
-  var coreCount = (mem.core || []).length;
-  var recallCount = (mem.recall || []).length;
-  var archivalCount = (mem.archival || []).length;
-
-  var html = '<div class="nvwa-panel-header">' +
-    '<div class="nvwa-layer-stats">' +
-      '<span class="nvwa-stat buffer"><span class="nvwa-stat-num">' + bufferCount + '</span><span class="nvwa-stat-label">缓冲区</span></span>' +
-      '<span class="nvwa-stat core"><span class="nvwa-stat-num">' + coreCount + '</span><span class="nvwa-stat-label">核心</span></span>' +
-      '<span class="nvwa-stat recall"><span class="nvwa-stat-num">' + recallCount + '</span><span class="nvwa-stat-label">召回</span></span>' +
-      '<span class="nvwa-stat archival"><span class="nvwa-stat-num">' + archivalCount + '</span><span class="nvwa-stat-label">归档</span></span>' +
-    '</div>' +
-    '<button class="nvwa-add-btn" id="nvwa-add-btn">+ 添加记忆</button>' +
-  '</div>';
-
-  if (mem.summary) {
-    html += '<div class="nvwa-summary">' +
-      '<div class="nvwa-summary-label">角色摘要</div>' +
-      '<div class="nvwa-summary-text">' + escapeHtml(mem.summary) + '</div>' +
-    '</div>';
-  }
-
-  // Tabs for each layer
-  html += '<div class="nvwa-layer-tabs">' +
-    '<button class="nvwa-layer-tab active" data-layer="buffer">缓冲区 (' + bufferCount + ')</button>' +
-    '<button class="nvwa-layer-tab" data-layer="core">核心记忆 (' + coreCount + ')</button>' +
-    '<button class="nvwa-layer-tab" data-layer="recall">召回索引 (' + recallCount + ')</button>' +
-    '<button class="nvwa-layer-tab" data-layer="archival">归档 (' + archivalCount + ')</button>' +
-  '</div>';
-
-  // Layer content
-  var activeLayer = state.nvwaActiveLayer || 'buffer';
-  var layerEntries = mem[activeLayer] || [];
-  html += '<div class="nvwa-layer-content" id="nvwa-layer-content">';
-  if (layerEntries.length === 0) {
-    html += '<div class="nvwa-empty-layer">此层暂无记忆</div>';
-  } else {
-    layerEntries.forEach(function(entry) {
-      var emotionTags = (entry.emotions || []).map(function(e) { return '<span class="nvwa-emotion-tag">' + escapeHtml(e) + '</span>'; }).join('');
-      html += '<div class="nvwa-entry" data-id="' + entry.id + '">' +
-        '<div class="nvwa-entry-header">' +
-          '<span class="nvwa-entry-time">' + formatTime(entry.timestamp) + '</span>' +
-          '<span class="nvwa-entry-importance" style="color: hsl(' + (entry.importance * 9.6) + ', 70%, 60%);">★' + entry.importance + '</span>' +
-          emotionTags +
-          '<div class="nvwa-entry-actions">' +
-            '<button class="nvwa-entry-edit" data-id="' + entry.id + '">编辑</button>' +
-            '<button class="nvwa-entry-delete" data-id="' + entry.id + '">删除</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="nvwa-entry-content">' + escapeHtml(entry.content) + '</div>' +
-      '</div>';
     });
   }
-  html += '</div>';
-
-  return html;
+  var deleteBtn = document.getElementById('ev-delete-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', function() {
+      if (!confirm('确认删除？')) return;
+      fetch('/api/events/' + state.selectedEntity.id, { method: 'DELETE' })
+        .then(function(r) { return r.json(); })
+        .then(function(result) { if (result.success) { state.selectedEntity = null; document.getElementById('detail-panel').classList.remove('open'); loadEventTimeline(); } });
+    });
+  }
 }
 
-function formatTime(ts) {
-  if (!ts) return '';
-  var d = new Date(ts);
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+// ============ 女娲记忆功能 ============
+async function loadNvwaData() {
+  if (!state.currentBook) return;
+  var root = document.getElementById('nvwa-tab-root');
+  if (!root) return;
+  try {
+    var res = await fetch('/api/v1/works/' + state.currentBook.id + '/roles');
+    var result = await res.json();
+    var roles = result.success ? (result.entities || []) : [];
+    if (!state.nvwaSelectedChar && roles.length > 0) state.nvwaSelectedChar = roles[0].id;
+
+    var memoryData = {};
+    for (var i = 0; i < roles.length; i++) {
+      var r = roles[i];
+      try {
+        var mRes = await fetch('/api/memory/' + state.currentBook.id + '/' + r.id);
+        var mResult = await mRes.json();
+        memoryData[r.id] = mResult.success ? mResult.data : { buffer: [], core: [], recall: [], archival: [], summary: '' };
+      } catch(e) { memoryData[r.id] = { buffer: [], core: [], recall: [], archival: [], summary: '' }; }
+    }
+    state.nvwaMemoryData = memoryData;
+
+    var html = '<div class="nvwa-layout">';
+    html += '<div class="nvwa-char-list"><div class="nvwa-section-title">选择角色</div>';
+    roles.forEach(function(r) {
+      html += '<div class="nvwa-char-item' + (state.nvwaSelectedChar === r.id ? ' active' : '') + '" data-id="' + r.id + '">' +
+        '<div class="nvwa-char-avatar">' + icon('roles') + '</div>' +
+        '<div class="nvwa-char-name">' + escapeHtml(r.title || r.name || '未命名') + '</div></div>';
+    });
+    html += '</div><div class="nvwa-memory-view">';
+    if (state.nvwaSelectedChar) {
+      var mem = memoryData[state.nvwaSelectedChar] || { buffer: [], core: [], recall: [], archival: [], summary: '' };
+      var bc = (mem.buffer || []).length, cc = (mem.core || []).length, rc = (mem.recall || []).length, ac = (mem.archival || []).length;
+      html += '<div class="nvwa-panel-header"><div class="nvwa-layer-stats">' +
+        '<span class="nvwa-stat"><span class="nvwa-stat-num" style="color:#3b82f6;">' + bc + '</span><span class="nvwa-stat-label">缓冲</span></span>' +
+        '<span class="nvwa-stat"><span class="nvwa-stat-num" style="color:#f59e0b;">' + cc + '</span><span class="nvwa-stat-label">核心</span></span>' +
+        '<span class="nvwa-stat"><span class="nvwa-stat-num" style="color:#8b5cf6;">' + rc + '</span><span class="nvwa-stat-label">召回</span></span>' +
+        '<span class="nvwa-stat"><span class="nvwa-stat-num" style="color:#6b7280;">' + ac + '</span><span class="nvwa-stat-label">归档</span></span>' +
+        '</div><button class="nvwa-add-btn" id="nvwa-add-btn">' + icon('plus') + ' 添加记忆</button></div>';
+      if (mem.summary) html += '<div class="nvwa-summary"><div class="nvwa-summary-label">角色摘要</div><div class="nvwa-summary-text">' + escapeHtml(mem.summary) + '</div></div>';
+      html += '<div class="nvwa-layer-tabs">' +
+        '<button class="nvwa-layer-tab active" data-layer="buffer">缓冲 (' + bc + ')</button>' +
+        '<button class="nvwa-layer-tab" data-layer="core">核心 (' + cc + ')</button>' +
+        '<button class="nvwa-layer-tab" data-layer="recall">召回 (' + rc + ')</button>' +
+        '<button class="nvwa-layer-tab" data-layer="archival">归档 (' + ac + ')</button></div>';
+      html += '<div class="nvwa-layer-content">';
+      var layer = state.nvwaActiveLayer || 'buffer';
+      var entries = mem[layer] || [];
+      if (!entries.length) { html += '<div class="nvwa-empty-layer">此层暂无记忆</div>'; }
+      else { entries.forEach(function(entry) { html += '<div class="nvwa-entry"><div class="nvwa-entry-header"><span style="color:hsl(' + (entry.importance * 9.6) + ',70%,60%);font-size:12px;">★' + entry.importance + '</span><span class="nvwa-entry-time">' + new Date(entry.timestamp || 0).toLocaleDateString() + '</span></div><div class="nvwa-entry-content">' + escapeHtml(entry.content) + '</div></div>'; }); }
+      html += '</div>';
+    } else { html += '<div class="nvwa-hint">请从左侧选择角色</div>'; }
+    html += '</div></div>';
+    root.innerHTML = html;
+    bindNvwaTabEvents();
+  } catch(e) { console.error('loadNvwaData error:', e); }
 }
 
 function bindNvwaTabEvents() {
-  // Character selection
   document.querySelectorAll('.nvwa-char-item').forEach(function(item) {
-    item.addEventListener('click', function() {
-      state.nvwaSelectedChar = this.dataset.id;
-      state.nvwaActiveLayer = 'buffer';
-      loadNvwaData();
-    });
+    item.addEventListener('click', function() { state.nvwaSelectedChar = this.dataset.id; loadNvwaData(); });
   });
-
-  // Layer tabs
   document.querySelectorAll('.nvwa-layer-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       state.nvwaActiveLayer = this.dataset.layer;
       document.querySelectorAll('.nvwa-layer-tab').forEach(function(t) { t.classList.remove('active'); });
       this.classList.add('active');
-      // Re-render layer content
-      var charId = state.nvwaSelectedChar;
-      if (charId && state.nvwaMemoryData && state.nvwaMemoryData[charId]) {
-        var mem = state.nvwaMemoryData[charId];
-        var content = document.getElementById('nvwa-layer-content');
-        if (content) {
-          var entries = mem[state.nvwaActiveLayer] || [];
-          var html = '';
-          if (entries.length === 0) {
-            html = '<div class="nvwa-empty-layer">此层暂无记忆</div>';
-          } else {
-            entries.forEach(function(entry) {
-              var emotionTags = (entry.emotions || []).map(function(e) { return '<span class="nvwa-emotion-tag">' + escapeHtml(e) + '</span>'; }).join('');
-              html += '<div class="nvwa-entry" data-id="' + entry.id + '">' +
-                '<div class="nvwa-entry-header">' +
-                  '<span class="nvwa-entry-time">' + formatTime(entry.timestamp) + '</span>' +
-                  '<span class="nvwa-entry-importance" style="color: hsl(' + (entry.importance * 9.6) + ', 70%, 60%);">★' + entry.importance + '</span>' +
-                  emotionTags +
-                  '<div class="nvwa-entry-actions">' +
-                    '<button class="nvwa-entry-edit" data-id="' + entry.id + '">编辑</button>' +
-                    '<button class="nvwa-entry-delete" data-id="' + entry.id + '">删除</button>' +
-                  '</div>' +
-                '</div>' +
-                '<div class="nvwa-entry-content">' + escapeHtml(entry.content) + '</div>' +
-              '</div>';
-            });
-          }
-          content.innerHTML = html;
-          bindNvwaEntryEvents();
-        }
-      }
+      loadNvwaData();
     });
   });
-
-  // Add memory button
   var addBtn = document.getElementById('nvwa-add-btn');
   if (addBtn && !addBtn.dataset.bound) {
     addBtn.dataset.bound = '1';
-    addBtn.addEventListener('click', showNvwaAddMemoryModal);
+    addBtn.addEventListener('click', function() { showNvwaAddModal(); });
   }
-
-  bindNvwaEntryEvents();
 }
 
-function bindNvwaEntryEvents() {
-  document.querySelectorAll('.nvwa-entry-edit').forEach(function(btn) {
-    if (!btn.dataset.bound) {
-      btn.dataset.bound = '1';
-      btn.addEventListener('click', function() {
-        var entryId = this.dataset.id;
-        var layer = state.nvwaActiveLayer;
-        var mem = state.nvwaMemoryData[state.nvwaSelectedChar];
-        var entry = (mem[layer] || []).find(function(e) { return e.id === entryId; });
-        if (entry) showNvwaEditMemoryModal(entry, layer);
-      });
-    }
-  });
-
-  document.querySelectorAll('.nvwa-entry-delete').forEach(function(btn) {
-    if (!btn.dataset.bound) {
-      btn.dataset.bound = '1';
-      btn.addEventListener('click', function() {
-        var entryId = this.dataset.id;
-        if (!confirm('确认删除此记忆？')) return;
-        deleteNvwaEntry(entryId);
-      });
-    }
-  });
-}
-
-function showNvwaAddMemoryModal() {
+function showNvwaAddModal() {
   var charId = state.nvwaSelectedChar;
   if (!charId) return;
-  var modal = document.getElementById('nvwa-add-modal');
-  if (!modal) {
-    var m = document.createElement('div');
-    m.id = 'nvwa-add-modal';
-    m.className = 'modal-overlay';
-    m.innerHTML = '<div class="modal-box">' +
-      '<div class="modal-title">添加记忆</div>' +
-      '<div class="modal-body">' +
-        '<div class="field"><label>内容</label><textarea id="nvwa-new-content" rows="5" placeholder="记忆内容..."></textarea></div>' +
-        '<div class="field-row">' +
-          '<div class="field"><label>重要性 (1-10)</label><input id="nvwa-new-importance" type="range" min="1" max="10" value="5"><span id="nvwa-imp-val">5</span></div>' +
-          '<div class="field"><label>情感标签</label><input id="nvwa-new-emotions" placeholder="如: 开心, 悲伤 (逗号分隔)"></div>' +
-        '</div>' +
-        '<div class="field"><label>目标层级</label>' +
-          '<select id="nvwa-new-status">' +
-            '<option value="buffer">缓冲区</option>' +
-            '<option value="core">核心记忆</option>' +
-            '<option value="recall">召回索引</option>' +
-            '<option value="archival">归档</option>' +
-          '</select>' +
-        '</div>' +
-      '</div>' +
-      '<div class="modal-actions">' +
-        '<button class="btn btn-primary" id="nvwa-save-btn">保存</button>' +
-        '<button class="btn btn-secondary" id="nvwa-cancel-btn">取消</button>' +
-      '</div>' +
-    '</div>';
-    document.body.appendChild(m);
-    modal = m;
-
-    document.getElementById('nvwa-new-importance').addEventListener('input', function() {
-      document.getElementById('nvwa-imp-val').textContent = this.value;
-    });
-    document.getElementById('nvwa-cancel-btn').addEventListener('click', function() {
-      modal.classList.remove('open');
-    });
-    document.getElementById('nvwa-save-btn').addEventListener('click', function() {
-      var content = document.getElementById('nvwa-new-content').value.trim();
-      if (!content) { alert('请输入记忆内容'); return; }
-      var bookId = state.currentBook ? state.currentBook.id : '';
-      fetch('/api/memory/' + bookId + '/' + charId, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: content,
-          importance: parseInt(document.getElementById('nvwa-new-importance').value),
-          emotions: document.getElementById('nvwa-new-emotions').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
-          status: document.getElementById('nvwa-new-status').value
-        })
-      }).then(function(r) { return r.json(); }).then(function(res) {
-        if (res.success) {
-          modal.classList.remove('open');
-          loadNvwaData();
-        }
-      });
-    });
-  }
-  modal.classList.add('open');
-}
-
-function showNvwaEditMemoryModal(entry, layer) {
-  var modal = document.getElementById('nvwa-edit-modal');
-  if (!modal) {
-    var m = document.createElement('div');
-    m.id = 'nvwa-edit-modal';
-    m.className = 'modal-overlay';
-    m.innerHTML = '<div class="modal-box">' +
-      '<div class="modal-title">编辑记忆</div>' +
-      '<div class="modal-body">' +
-        '<div class="field"><label>内容</label><textarea id="nvwa-edit-content" rows="5"></textarea></div>' +
-        '<div class="field-row">' +
-          '<div class="field"><label>重要性</label><input id="nvwa-edit-importance" type="range" min="1" max="10"><span id="nvwa-edit-imp-val"></span></div>' +
-          '<div class="field"><label>状态</label>' +
-            '<select id="nvwa-edit-status">' +
-              '<option value="buffer">缓冲区</option>' +
-              '<option value="core">核心记忆</option>' +
-              '<option value="recall">召回索引</option>' +
-              '<option value="archival">归档</option>' +
-            '</select>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="modal-actions">' +
-        '<button class="btn btn-primary" id="nvwa-edit-save-btn">保存</button>' +
-        '<button class="btn btn-secondary" id="nvwa-edit-cancel-btn">取消</button>' +
-      '</div>' +
-    '</div>';
-    document.body.appendChild(m);
-    modal = m;
-    document.getElementById('nvwa-edit-importance').addEventListener('input', function() {
-      document.getElementById('nvwa-edit-imp-val').textContent = this.value;
-    });
-    document.getElementById('nvwa-edit-cancel-btn').addEventListener('click', function() {
-      modal.classList.remove('open');
-    });
-  }
-
-  document.getElementById('nvwa-edit-content').value = entry.content || '';
-  document.getElementById('nvwa-edit-importance').value = entry.importance || 5;
-  document.getElementById('nvwa-edit-imp-val').textContent = entry.importance || 5;
-  document.getElementById('nvwa-edit-status').value = layer;
-  var saveBtn = document.getElementById('nvwa-edit-save-btn');
-  saveBtn.onclick = function() {
-    var bookId = state.currentBook ? state.currentBook.id : '';
-    fetch('/api/memory/' + bookId + '/' + state.nvwaSelectedChar + '/' + entry.id, {
-      method: 'PUT',
+  var modal = document.createElement('div');
+  modal.className = 'modal-overlay open';
+  modal.innerHTML = '<div class="modal-box"><div class="modal-title">添加记忆</div><div class="modal-body">' +
+    '<div class="field"><label>内容</label><textarea id="nvwa-new-content" rows="5" placeholder="记忆内容..."></textarea></div>' +
+    '<div class="detail-row"><div class="detail-field"><label>重要性</label><input id="nvwa-new-imp" type="range" min="1" max="10" value="5"><span id="nvwa-imp-val">5</span></div>' +
+    '<div class="detail-field"><label>层级</label><select id="nvwa-new-status"><option value="buffer">缓冲区</option><option value="core">核心记忆</option><option value="recall">召回</option><option value="archival">归档</option></select></div></div>' +
+    '</div><div class="modal-actions"><button class="btn btn-primary" id="nvwa-do-add">保存</button><button class="btn btn-secondary" id="nvwa-cancel-add">取消</button></div></div>';
+  document.body.appendChild(modal);
+  document.getElementById('nvwa-new-imp').addEventListener('input', function() { document.getElementById('nvwa-imp-val').textContent = this.value; });
+  document.getElementById('nvwa-cancel-add').addEventListener('click', function() { modal.remove(); });
+  document.getElementById('nvwa-do-add').addEventListener('click', function() {
+    var content = document.getElementById('nvwa-new-content').value.trim();
+    if (!content) { alert('请输入内容'); return; }
+    fetch('/api/memory/' + state.currentBook.id + '/' + charId, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: document.getElementById('nvwa-edit-content').value,
-        importance: parseInt(document.getElementById('nvwa-edit-importance').value),
-        status: document.getElementById('nvwa-edit-status').value
-      })
-    }).then(function(r) { return r.json(); }).then(function(res) {
-      if (res.success) {
-        modal.classList.remove('open');
-        loadNvwaData();
-      }
-    });
-  };
-  modal.classList.add('open');
+      body: JSON.stringify({ content: content, importance: parseInt(document.getElementById('nvwa-new-imp').value), status: document.getElementById('nvwa-new-status').value })
+    }).then(function(r) { return r.json(); }).then(function(res) { if (res.success) { modal.remove(); loadNvwaData(); } });
+  });
 }
 
-async function deleteNvwaEntry(entryId) {
-  var bookId = state.currentBook ? state.currentBook.id : '';
-  await fetch('/api/memory/' + bookId + '/' + state.nvwaSelectedChar + '/' + entryId, { method: 'DELETE' });
-  loadNvwaData();
+// ============ 长文本分析弹窗 ============
+function showLongTextAnalyzeModal() {
+  var modal = document.createElement('div');
+  modal.className = 'modal-overlay open';
+  modal.innerHTML = '<div class="modal-box" style="width:560px;"><div class="modal-title">长文本分析</div><div class="modal-body">' +
+    '<div class="field"><label>粘贴文本</label><textarea id="lt-content" rows="8" placeholder="粘贴要分析的文字..." style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:6px;font-size:13px;resize:vertical;font-family:inherit;"></textarea></div>' +
+    '<div class="field"><label>分析深度</label><select id="lt-depth" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;"><option value="quick">快速（提取主要角色和地点）</option><option value="normal" selected>标准</option><option value="deep">深度</option></select></div>' +
+    '<div id="lt-result" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;max-height:300px;overflow-y:auto;font-size:13px;line-height:1.8;"></div>' +
+    '</div><div class="modal-actions"><button class="btn btn-primary" id="lt-analyze-btn">分析</button><button class="btn btn-secondary" id="lt-close-btn">关闭</button></div></div>';
+  document.body.appendChild(modal);
+  document.getElementById('lt-close-btn').addEventListener('click', function() { modal.remove(); });
+  document.getElementById('lt-analyze-btn').addEventListener('click', async function() {
+    var content = document.getElementById('lt-content').value.trim();
+    var depth = document.getElementById('lt-depth').value;
+    if (!content) { alert('请输入文本'); return; }
+    var btn = this;
+    btn.disabled = true; btn.textContent = '分析中...';
+    var resultEl = document.getElementById('lt-result');
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">AI 分析中...</div>';
+    try {
+      var res = await fetch('/api/split', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: content, depth: depth, bookId: state.currentBook ? state.currentBook.id : '' }) });
+      var result = await res.json();
+      if (result.success) {
+        var data = result.data || {};
+        var html = '<div>';
+        if (data.characters && data.characters.length) html += '<div style="margin-bottom:8px;"><b style="color:var(--accent);">角色：</b>' + data.characters.join('、') + '</div>';
+        if (data.locations && data.locations.length) html += '<div style="margin-bottom:8px;"><b style="color:var(--accent);">地点：</b>' + data.locations.join('、') + '</div>';
+        if (data.items && data.items.length) html += '<div style="margin-bottom:8px;"><b style="color:var(--accent);">物品：</b>' + data.items.join('、') + '</div>';
+        if (html === '<div>') html = '<div style="color:var(--text2);">未提取到信息</div>';
+        html += '</div>';
+        resultEl.innerHTML = html;
+      } else { resultEl.innerHTML = '<div style="color:#ef4444;">分析失败</div>'; }
+    } catch(e) { resultEl.innerHTML = '<div style="color:#ef4444;">请求失败：' + e.message + '</div>'; }
+    btn.disabled = false; btn.textContent = '分析';
+  });
 }
 
-async function loadNvwaData() {
-  if (!state.currentBook) {
-    var root = document.getElementById('nvwa-tab-root');
-    if (root) root.innerHTML = '<div class="nvwa-empty" style="padding:40px;text-align:center;color:var(--text2);">请先打开一本书</div>';
-    return;
-  }
-  try {
-    // Load characters
-    var res = await fetch('/api/entities/' + state.currentBook.id + '/roles');
-    var result = await res.json();
-    var roles = result.success ? (result.data || []) : [];
-
-    // Load memory for each character
-    var memoryData = {};
-    for (var i = 0; i < roles.length; i++) {
-      var r = roles[i];
-      var mRes = await fetch('/api/memory/' + state.currentBook.id + '/' + r.id);
-      var mResult = await mRes.json();
-      if (mResult.success) memoryData[r.id] = mResult.data;
-    }
-
-    // Select first if none
-    if (!state.nvwaSelectedChar && roles.length > 0) {
-      state.nvwaSelectedChar = roles[0].id;
-    }
-    state.nvwaMemoryData = memoryData;
-
-    var root = document.getElementById('nvwa-tab-root');
-    if (root) {
-      root.innerHTML = renderNvwaContent(roles, memoryData);
-      bindNvwaTabEvents();
-    }
-  } catch (e) {
-    console.error('loadNvwaData error:', e);
-  }
-}
+// ============ 初始化 ============
+function init() { renderApp(); }
+document.addEventListener('DOMContentLoaded', init);

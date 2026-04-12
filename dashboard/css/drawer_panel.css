@@ -1,30 +1,108 @@
 /**
- * Drawer Panel Styles - 左侧抽屉
+ * Drawer Panel - 从主内容区右侧边缘左侧滑出
+ * 向左展开，停在右侧边栏左边
  */
 
-/* 抽屉面板容器 - 从左边滑出 */
+/* 容器 */
 .drawer-panel-container {
   position: absolute;
+  right: 0; /* 靠着主内容区右边缘 */
   top: 0;
-  left: 0;  /* 改为左边 */
   height: 100%;
-  width: 0;
-  z-index: 100;
+  width: 0; /* 默认关闭 */
+  z-index: 99;
   transition: width 0.3s ease;
   overflow: hidden;
 }
 
 .drawer-panel-container.open {
-  width: 280px;
+  width: 280px; /* 展开宽度 */
 }
 
-/* 抽屉面板 */
+/* 面板 */
 .drawer-panel {
+  position: absolute;
+  right: 0; /* 固定在容器右边 */
+  top: 0;
   width: 280px;
   height: 100%;
   background: var(--bg2);
-  border-right: 1px solid var(--border);  /* 改为右边边框 */
+  border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);  /* 阴影方向也改 */
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 头部 */
+.drawer-panel-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.drawer-panel-back {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text2);
+  background: var(--bg3);
+  border: none;
+  margin-right: 8px;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.drawer-panel-back:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.drawer-panel-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* 内容 */
+.drawer-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* 项 */
+.drawer-panel-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.drawer-panel-item:hover {
+  background: var(--bg3);
+}
+
+.drawer-panel-item-prefix {
+  font-size: 12px;
+  color: var(--accent);
+  margin-right: 8px;
+}
+
+.drawer-panel-item-label {
+  flex: 1;
+  font-size: 14px;
+}
+
+.drawer-panel-item-arrow {
+  color: var(--text2);
+  font-size: 12px;
 }

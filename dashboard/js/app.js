@@ -472,7 +472,7 @@ window.DrawerApp = {
       container = document.createElement('div');
       container.id = 'drawer-panel-container';
       container.className = 'drawer-panel-container';
-      document.querySelector('.book-body').appendChild(container);
+      document.querySelector('#main-canvas').appendChild(container);
     }
     
     var html = '<div class="drawer-panel">' +
@@ -506,27 +506,23 @@ window.DrawerApp = {
     // Close drawer panel
     this.closePanel();
 
-    // Determine what to show based on childId
-    // For entity types (roles, items, locations), show them in the main content
+    // For entity types (roles, items, locations), show entity list in main content
     var entityTypes = ['roles', 'items', 'locations', 'buildings', 'events', 'chapters'];
     if (entityTypes.indexOf(childId) !== -1) {
       // Switch to home tab and show entity list
       state.currentTab = 'home';
       state.currentEntity = childId;
 
-      // Update tab UI
       document.querySelectorAll('.book-tab').forEach(function(t) {
         t.classList.toggle('active', t.dataset.tab === 'home');
       });
 
-      // Update content
       var tabCanvas = document.getElementById('tab-canvas');
       if (tabCanvas) {
         tabCanvas.innerHTML = renderTabContent();
         bindTabContentEvents();
       }
 
-      // Update entity type tabs
       document.querySelectorAll('.entity-type-tab').forEach(function(t) {
         t.classList.toggle('active', t.dataset.type === childId);
       });
@@ -548,6 +544,74 @@ window.DrawerApp = {
         bindTabContentEvents();
       }
     }
+  },
+
+  // Show entity detail as modal
+  showEntityModal: function(entityType, entityId) {
+    var entity = state[entityType] ? state[entityType].find(function(e) { return e.id === entityId; }) : null;
+    if (!entity) return;
+
+    var modal = document.getElementById('entity-modal');
+    if (!modal) {
+      // Create modal if not exists
+      var modalHtml = '<div class="entity-modal-backdrop" id="entity-modal-backdrop">' +
+        '<div class="entity-modal" id="entity-modal">' +
+          '<div class="entity-modal-header">' +
+            '<div class="entity-modal-icon" id="entity-modal-icon"></div>' +
+            '<div class="entity-modal-title" id="entity-modal-title">详情</div>' +
+            '<button class="entity-modal-close" onclick="DrawerApp.closeEntityModal()">×</button>' +
+          '</div>' +
+          '<div class="entity-modal-body" id="entity-modal-body"></div>' +
+          '<div class="entity-modal-footer">' +
+            '<button class="btn btn-cancel" onclick="DrawerApp.closeEntityModal()">取消</button>' +
+            '<button class="btn btn-save" id="entity-modal-save">保存</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      modal = document.getElementById('entity-modal-backdrop');
+
+      // Close on backdrop click
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) DrawerApp.closeEntityModal();
+      });
+    }
+
+    // Fill modal content
+    document.getElementById('entity-modal-icon').innerHTML = icon(entityType);
+    document.getElementById('entity-modal-title').textContent = entity.title || entity.name || '未命名';
+    document.getElementById('entity-modal-body').innerHTML =
+      '<div class="entity-modal-field">' +
+        '<label>名称</label>' +
+        '<input type="text" id="entity-modal-name" value="' + escapeHtml(entity.title || entity.name || '') + '">' +
+      '</div>' +
+      '<div class="entity-modal-field">' +
+        '<label>描述</label>' +
+        '<textarea id="entity-modal-desc" rows="5">' + escapeHtml(entity.description || '') + '</textarea>' +
+      '</div>';
+
+    // Save handler
+    document.getElementById('entity-modal-save').onclick = function() {
+      var newName = document.getElementById('entity-modal-name').value;
+      var newDesc = document.getElementById('entity-modal-desc').value;
+      entity.title = newName;
+      entity.name = newName;
+      entity.description = newDesc;
+      DrawerApp.closeEntityModal();
+      // Re-render current content
+      var tabCanvas = document.getElementById('tab-canvas');
+      if (tabCanvas) {
+        tabCanvas.innerHTML = renderTabContent();
+        bindTabContentEvents();
+      }
+    };
+
+    modal.classList.add('open');
+  },
+
+  closeEntityModal: function() {
+    var modal = document.getElementById('entity-modal-backdrop');
+    if (modal) modal.classList.remove('open');
   },
   
   closeDetail: function() {

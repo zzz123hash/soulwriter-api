@@ -252,13 +252,8 @@ function renderGenesisTab() {
     '<div>' + treeItems + '</div></div>';
 }
 
-function renderEventTab() {
-  return '<div class="event-tab-root" id="event-tab-root"><div class="event-toolbar"><div class="event-arcs-filter" id="event-arcs-filter"></div><button class="event-add-btn" id="event-add-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 新增事件</button></div><div class="event-timeline" id="event-timeline"><div class="event-empty" style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('event') + '</div><div style="margin-bottom:8px;">加载中...</div></div></div></div>';
-}
 
-function renderNvwaTab() {
-  setTimeout(function() { loadNvwaData(); }, 0);
-  return '<div class="nvwa-tab-root" id="nvwa-tab-root"><div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">加载中...</div></div>';
+
 }
 
 function renderNovelTab() {
@@ -270,44 +265,7 @@ function renderEntityDetail() {
   const e = state.selectedEntity;
   return `<div class="entity-detail">
     <div class="detail-header">
-      <div class="detail-icon">${icon(state.currentEntity)}</div>
-      <div class="detail-title">${escapeHtml(e.title || e.name || '未命名')}</div>
-    </div>
-    <div class="detail-body">
-      <div class="detail-field"><label>名称</label>
-        <input type="text" class="detail-input" id="detail-title" value="${escapeHtml(e.title || e.name || '')}">
-      </div>
-      <div class="detail-field"><label>描述</label>
-        <textarea class="detail-textarea" id="detail-desc" rows="5">${escapeHtml(e.description || '')}</textarea>
-      </div>
-    </div>
-    <div class="detail-actions">
-      <button class="btn-save-detail" id="save-entity-btn">${icon('save')} ${t('common.save')}</button>
-      <button class="btn-delete-detail" id="delete-entity-btn">${icon('trash')} ${t('common.delete')}</button>
-    </div>
-  </div>`;
-}
-
-async function loadBookData() {
-  if (!state.currentBook || !state.currentBook.id) return;
-  const result = await booksApi('get', { id: state.currentBook.id });
-  if (result.success && result.data) {
-    state.roles = result.data.roles || [];
-    state.items = result.data.items || [];
-    state.locations = result.data.locations || [];
-    state.nodes = result.data.nodes || [];
-    state.units = result.data.units || [];
-  }
-}
-
-function bindToolbarEvents() {
-  // Language switch
-  const langSelect = document.getElementById('btn-lang');
-  if (langSelect) {
-    langSelect.addEventListener('change', function() {
-      localStorage.setItem('soulwriter-lang', this.value);
-      renderApp();
-    });
+      <div class="detail-icon">${icon(sta);
   }
   // Theme switch
   const themeSelect = document.getElementById('btn-theme');

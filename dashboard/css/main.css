@@ -765,6 +765,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
 /* ============ 顶部 Tab 栏 ============ */
 .book-header {
+  margin-top: 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;

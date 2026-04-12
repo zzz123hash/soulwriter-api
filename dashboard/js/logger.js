@@ -1,5 +1,5 @@
 /**
- * SoulWriter - 操作日志系统 v5
+ * SoulWriter - 操作日志系统 v6
  * 永久工具栏：主题 + 语言 + 日志 + 文档
  */
 class SoulWriterLogger {
@@ -13,6 +13,12 @@ class SoulWriterLogger {
       SUCCESS: { color: '#4ade80', symbol: '✓' },
       WARN: { color: '#fbbf24', symbol: '⚠' },
       ERROR: { color: '#f87171', symbol: '✗' }
+    };
+    this.themes = {
+      'dark': { name: '暗色', icon: '🌙' },
+      'soft': { name: '柔和', icon: '🌤️' },
+      'blue': { name: '蓝色', icon: '💙' },
+      'green': { name: '绿色', icon: '🌿' }
     };
     this.labels = {
       'zh-CN': { title: '日志', clear: '清空', copy: '复制' },
@@ -36,25 +42,21 @@ class SoulWriterLogger {
   
   applyTheme(theme) {
     const root = document.documentElement;
-    if (theme === 'soft') {
-      root.style.setProperty('--bg', '#f0f0f5');
-      root.style.setProperty('--bg2', '#ffffff');
-      root.style.setProperty('--bg3', '#e8e8f0');
-      root.style.setProperty('--text', '#2a2a3a');
-      root.style.setProperty('--text2', '#6b6b80');
-      root.style.setProperty('--accent', '#8b5cf6');
-      root.style.setProperty('--accent2', '#a78bfa');
-      root.style.setProperty('--border', '#d0d0e0');
-    } else {
-      root.style.setProperty('--bg', '#1a1a2e');
-      root.style.setProperty('--bg2', '#16213e');
-      root.style.setProperty('--bg3', '#0f3460');
-      root.style.setProperty('--text', '#e8e8e8');
-      root.style.setProperty('--text2', '#a0a0a0');
-      root.style.setProperty('--accent', '#e94560');
-      root.style.setProperty('--accent2', '#533483');
-      root.style.setProperty('--border', '#2a2a4a');
-    }
+    const themes = {
+      'dark': { bg: '#1a1a2e', bg2: '#16213e', bg3: '#0f3460', text: '#e8e8e8', text2: '#a0a0a0', accent: '#e94560', accent2: '#533483', border: '#2a2a4a' },
+      'soft': { bg: '#f0f0f5', bg2: '#ffffff', bg3: '#e8e8f0', text: '#2a2a3a', text2: '#6b6b80', accent: '#8b5cf6', accent2: '#a78bfa', border: '#d0d0e0' },
+      'blue': { bg: '#0a1628', bg2: '#0f2847', bg3: '#1a3a5c', text: '#e8f0ff', text2: '#8ba4c7', accent: '#3b82f6', accent2: '#60a5fa', border: '#1e3a5f' },
+      'green': { bg: '#0a1f1a', bg2: '#0f3328', bg3: '#1a4a3a', text: '#e8fff0', text2: '#8bc4a7', accent: '#10b981', accent2: '#34d399', border: '#1e4a3f' }
+    };
+    const t = themes[theme] || themes['dark'];
+    root.style.setProperty('--bg', t.bg);
+    root.style.setProperty('--bg2', t.bg2);
+    root.style.setProperty('--bg3', t.bg3);
+    root.style.setProperty('--text', t.text);
+    root.style.setProperty('--text2', t.text2);
+    root.style.setProperty('--accent', t.accent);
+    root.style.setProperty('--accent2', t.accent2);
+    root.style.setProperty('--border', t.border);
   }
   
   initUI() {
@@ -62,6 +64,11 @@ class SoulWriterLogger {
       this.applyTheme(this.getTheme());
       return;
     }
+    
+    const currentTheme = this.getTheme();
+    const themeOptions = Object.entries(this.themes).map(([k, v]) => 
+      `<option value="${k}" ${k === currentTheme ? 'selected' : ''}>${v.icon} ${v.name}</option>`
+    ).join('');
     
     // 永久工具栏
     const toolbar = document.createElement('div');
@@ -71,8 +78,8 @@ class SoulWriterLogger {
         <span class="toolbar-logo">SoulWriter</span>
       </div>
       <div class="toolbar-right">
-        <button class="toolbar-btn" id="btn-theme" title="切换主题">${this.getTheme() === 'dark' ? '☀️' : '🌙'}</button>
-        <select class="toolbar-lang" id="btn-lang">
+        <select class="toolbar-select" id="btn-theme">${themeOptions}</select>
+        <select class="toolbar-select" id="btn-lang">
           <option value="zh-CN" ${this.getLang() === 'zh-CN' ? 'selected' : ''}>🇨🇳 中文</option>
           <option value="en-US" ${this.getLang() === 'en-US' ? 'selected' : ''}>🇺🇸 EN</option>
         </select>
@@ -91,7 +98,7 @@ class SoulWriterLogger {
       .toolbar-right{display:flex;align-items:center;gap:8px}
       .toolbar-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid transparent;border-radius:8px;color:#e8e8e8;cursor:pointer;font-size:13px;transition:all 0.15s}
       .toolbar-btn:hover{background:rgba(255,255,255,0.1);border-color:#3b82f6}
-      .toolbar-lang{padding:6px 10px;background:rgba(255,255,255,0.05);border:1px solid #2a2a4a;border-radius:8px;color:#e8e8e8;font-size:13px;cursor:pointer}
+      .toolbar-select{padding:6px 10px;background:rgba(255,255,255,0.05);border:1px solid #2a2a4a;border-radius:8px;color:#e8e8e8;font-size:13px;cursor:pointer}
       #log-panel{position:fixed;top:56px;right:16px;width:420px;max-height:60vh;background:rgba(26,26,46,0.98);border:1px solid #2a2a4a;border-radius:12px;font-family:monospace;font-size:12px;z-index:1000;display:none;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
       #log-panel.open{display:flex}
       .log-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#16213e;border-bottom:1px solid #2a2a4a;border-radius:12px 12px 0 0}
@@ -130,12 +137,9 @@ class SoulWriterLogger {
     document.body.appendChild(logPanel);
     
     // 事件绑定
-    document.getElementById('btn-theme').addEventListener('click', () => {
-      const newTheme = this.getTheme() === 'dark' ? 'soft' : 'dark';
-      this.setTheme(newTheme);
-      document.getElementById('btn-theme').textContent = newTheme === 'dark' ? '☀️' : '🌙';
-      // 触发自定义事件通知 app.js
-      window.dispatchEvent(new CustomEvent('theme-change', { detail: { theme: newTheme } }));
+    document.getElementById('btn-theme').addEventListener('change', (e) => {
+      this.setTheme(e.target.value);
+      window.dispatchEvent(new CustomEvent('theme-change', { detail: { theme: e.target.value } }));
     });
     
     document.getElementById('btn-lang').addEventListener('change', (e) => {
@@ -164,7 +168,8 @@ class SoulWriterLogger {
   
   clear() {
     this.logs = [];
-    document.getElementById('log-content').innerHTML = '<div class="log-empty">' + this.getLabel('empty') + '</div>';
+    const content = document.getElementById('log-content');
+    if (content) content.innerHTML = '<div class="log-empty">' + this.getLabel('empty') + '</div>';
   }
   
   copyLogs() {

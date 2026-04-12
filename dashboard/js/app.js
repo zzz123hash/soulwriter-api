@@ -428,16 +428,32 @@ function renderTabContent() {
 }
 
 // ============ Books API ============
+// 根据 action 调用不同 API
 async function booksApi(action, data = {}) {
   try {
-    const res = await fetch('/api/books', {
+    let endpoint = '/api/books';
+    let body = { action, ...data };
+    
+    // 根据 action 确定 endpoint
+    if (action.startsWith('save_role')) {
+      endpoint = '/api/roles';
+      body = { action: 'create', bookId: data.bookId, title: data.title, description: data.description };
+    } else if (action.startsWith('save_item')) {
+      endpoint = '/api/items';
+      body = { action: 'create', bookId: data.bookId, title: data.title, description: data.description };
+    } else if (action.startsWith('save_location')) {
+      endpoint = '/api/locations';
+      body = { action: 'create', bookId: data.bookId, title: data.title, description: data.description };
+    }
+    
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, ...data })
+      body: JSON.stringify(body)
     });
     return await res.json();
   } catch (e) {
-    console.error('Books API error:', e);
+    console.error('API error:', e);
     return { error: e.message };
   }
 }

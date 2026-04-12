@@ -51,7 +51,9 @@
     "translate": "翻译",
     "createBook": "创建新书",
     "openBook": "打开",
-    "backToBooks": "← 返回"
+    "backToBooks": "← 返回",
+    "copy": "复制",
+    "copied": "已复制"
   },
   "home": {
     "stats": "内容概览",
@@ -94,7 +96,26 @@
     "noChanges": "暂无变更",
     "autoChange": "自动",
     "manualConfirm": "人工确认",
-    "versionHistory": "版本历史"
+    "versionHistory": "版本历史",
+    "light": "受限改造",
+    "full": "完全重写",
+    "originalPlaceholder": "输入或粘贴要翻译的文本",
+    "translating": "翻译中...",
+    "translateBtn": "翻译",
+    "sourceLang": "源语言",
+    "targetLang": "目标语言",
+    "autoDetect": "自动检测",
+    "chinese": "中文",
+    "english": "英语",
+    "korean": "韩语",
+    "japanese": "日语",
+    "french": "法语",
+    "german": "德语",
+    "spanish": "西班牙语",
+    "portuguese": "葡萄牙语",
+    "italian": "意大利语",
+    "russian": "俄语",
+    "arabic": "阿拉伯语"
   },
   "event": {
     "title": "事件线",

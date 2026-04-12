@@ -51,7 +51,9 @@
     "translate": "Translate",
     "createBook": "New Book",
     "openBook": "Open",
-    "backToBooks": "Back"
+    "backToBooks": "Back",
+    "copy": "Copy",
+    "copied": "Copied!"
   },
   "home": {
     "stats": "Overview",
@@ -88,7 +90,26 @@
     "noChanges": "No changes",
     "autoChange": "Auto",
     "manualConfirm": "Manual Review",
-    "versionHistory": "Version History"
+    "versionHistory": "Version History",
+    "light": "Light",
+    "full": "Full Rewrite",
+    "originalPlaceholder": "Enter or paste text to translate",
+    "translating": "Translating...",
+    "translateBtn": "Translate",
+    "sourceLang": "Source",
+    "targetLang": "Target",
+    "autoDetect": "Auto",
+    "chinese": "Chinese",
+    "english": "English",
+    "korean": "Korean",
+    "japanese": "Japanese",
+    "french": "French",
+    "german": "German",
+    "spanish": "Spanish",
+    "portuguese": "Portuguese",
+    "italian": "Italian",
+    "russian": "Russian",
+    "arabic": "Arabic"
   },
   "event": {
     "title": "Event Timeline",

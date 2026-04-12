@@ -77,6 +77,7 @@ const Icons = {
   event: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   nvwa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 0 1 7 7"/><circle cx="12" cy="12" r="3"/></svg>',
   upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  translate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M3 12h18"/><path d="M12 3v18"/><path d="M12 16l4-4-4-4-4 4z"/></svg>',
   novel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   chevronLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
@@ -136,7 +137,7 @@ function renderToolbar() {
 }
 
 function renderWelcome() {
-  return renderToolbar() + '<div class="welcome-page">'; +
+  return renderToolbar() + '<div class="welcome-page">' +
     '<div class="welcome-logo"><h1 class="app-logo">SoulWriter</h1><p class="app-slogan">灵魂创作者</p></div>' +
     '<section class="bookshelf-section"><h2 class="section-title">书架</h2><div class="bookshelf" id="books-list"><div class="loading-text">'+t('errors.loading')+'</div></div></section>' +
     '<div class="create-book-area"><button class="btn-create-book" id="create-book-btn"><span class="btn-icon">+</span><span class="btn-text">创建新书</span></button></div>' +
@@ -153,6 +154,7 @@ function renderBookView() {
         '<button class="book-tab ' + (state.currentTab === 'genesis' ? 'active' : '') + '" data-tab="genesis">' + icon('genesis') + ' ' + t('genesis.title') + '</button>' +
         '<button class="book-tab ' + (state.currentTab === 'event' ? 'active' : '') + '" data-tab="event">' + icon('event') + ' ' + t('event.title') + '</button>' +
         '<button class="book-tab ' + (state.currentTab === 'nvwa' ? 'active' : '') + '" data-tab="nvwa">' + icon('nvwa') + ' ' + t('nvwa.title') + '</button>' +
+        '<button class="book-tab" data-tab="translate">' + icon('translate') + ' ' + t('translate.title') + '</button>' +
         '<button class="book-tab ' + (state.currentTab === 'novel' ? 'active' : '') + '" data-tab="novel">' + icon('novel') + ' ' + t('entity.novels') + '</button>' +
       '</div>' +
       '<div class="book-info">' +
@@ -189,6 +191,7 @@ function renderTabContent() {
     case 'genesis': return renderGenesisTab();
     case 'event': return renderEventTab();
     case 'nvwa': return renderNvwaTab();
+    case 'translate': return renderTranslateTab();
     case 'novel': return renderNovelTab();
     default: return renderHomeTab();
   }
@@ -546,12 +549,36 @@ async function loadBookData() {
 
 // ============ 事件绑定 ============
 function bindWelcomeEvents() {
+  // Toolbar lang/theme bindings
+  var btnLang = document.getElementById('btn-lang');
+  if (btnLang) btnLang.addEventListener('change', function() {
+    var locale = this.value === 'en-US' ? 'en' : 'zh';
+    if (window._i18n) window._i18n.setLocale(locale);
+  });
+  var btnTheme = document.getElementById('btn-theme');
+  if (btnTheme) btnTheme.addEventListener('change', function() {
+    document.documentElement.setAttribute('data-theme', this.value);
+    localStorage.setItem('sw-theme', this.value);
+  });
+
   var btn = document.getElementById('create-book-btn');
   if (btn) btn.addEventListener('click', showCreateBookModal);
   loadBooks();
 }
 
 function bindBookEvents() {
+  // Toolbar lang/theme bindings
+  var btnLang = document.getElementById('btn-lang');
+  if (btnLang) btnLang.addEventListener('change', function() {
+    var locale = this.value === 'en-US' ? 'en' : 'zh';
+    if (window._i18n) window._i18n.setLocale(locale);
+  });
+  var btnTheme = document.getElementById('btn-theme');
+  if (btnTheme) btnTheme.addEventListener('change', function() {
+    document.documentElement.setAttribute('data-theme', this.value);
+    localStorage.setItem('sw-theme', this.value);
+  });
+
   var btnBack = document.getElementById('back-to-books'); if (btnBack) btnBack.addEventListener('click', function() {
     state.currentBook = null;
     state.currentView = 'welcome';
@@ -570,6 +597,7 @@ function bindBookEvents() {
       bindTabContentEvents();
       if (tab.dataset.tab === 'event') loadEventTimeline();
       if (tab.dataset.tab === 'nvwa') { state.nvwaSelectedChar = null; loadNvwaData(); }
+      if (tab.dataset.tab === 'translate') setTimeout(bindTranslateTabEvents, 50);
     });
   });
 
@@ -1094,3 +1122,212 @@ function init() {
   }
 }
 document.addEventListener('DOMContentLoaded', init);
+/**
+ * translate_routes.js - 前端翻译UI
+ */
+
+function renderTranslateTab() {
+  return '<div class="translate-tab-root" id="translate-tab-root">' +
+    '<div class="translate-header">' +
+      '<div class="translate-lang-selects">' +
+        '<div class="translate-select-group">' +
+          '<label>' + t('translate.source') + '</label>' +
+          '<select id="tl-source-lang">' +
+            '<option value="zh" selected>中文</option>' +
+            '<option value="en">English</option>' +
+            '<option value="ja">日本語</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="translate-arrow">→</div>' +
+        '<div class="translate-select-group">' +
+          '<label>' + t('translate.target') + '</label>' +
+          '<select id="tl-target-lang">' +
+            '<option value="en" selected>English</option>' +
+            '<option value="zh">中文</option>' +
+            '<option value="ja">日本語</option>' +
+            '<option value="ko">한국어</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="translate-strength-section">' +
+        '<div class="translate-strength-header">' +
+          '<label>' + t('translate.strength') + ': <span id="tl-strength-val">50</span></label>' +
+          '<span class="translate-strength-label" id="tl-strength-label">智能适配</span>' +
+        '</div>' +
+        '<input type="range" id="tl-strength" min="0" max="100" value="50" class="translate-slider">' +
+        '<div class="translate-strength-marks">' +
+          '<span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="translate-body">' +
+      '<div class="translate-original-pane">' +
+        '<div class="translate-pane-header">' +
+          '<span>' + t('translate.original') + '</span>' +
+          '<button class="btn-tl-load-book" id="tl-load-book">' + t('actions.import') + '</button>' +
+        '</div>' +
+        '<textarea id="tl-original-text" class="translate-textarea" placeholder="' + t('translate.originalPlaceholder') + '"></textarea>' +
+        '<div class="translate-actions">' +
+          '<button class="btn btn-primary" id="tl-translate-btn">' + t('actions.translate') + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="translate-changes-pane">' +
+        '<div class="translate-pane-header">' +
+          '<span>' + t('translate.changes') + ' <span id="tl-changes-count">(0)</span></span>' +
+        '</div>' +
+        '<div class="translate-changes-list" id="tl-changes-list">' +
+          '<div class="translate-changes-empty">' + t('translate.noChanges') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="translate-result-pane">' +
+        '<div class="translate-pane-header">' +
+          '<span>' + t('translate.result') + '</span>' +
+          '<div class="translate-result-actions">' +
+            '<button class="btn btn-sm" id="tl-copy-result">' + t('actions.copy') + '</button>' +
+            '<button class="btn btn-sm btn-primary" id="tl-save-version">' + t('translate.saveVersion') + '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="tl-result-text" class="translate-result-text"></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function bindTranslateTabEvents() {
+  // Strength slider
+  var slider = document.getElementById('tl-strength');
+  var valEl = document.getElementById('tl-strength-val');
+  var labelEl = document.getElementById('tl-strength-label');
+
+  function updateStrengthLabel(v) {
+    valEl.textContent = v;
+    var labels = {
+      basic: t('translate.basic'),
+      light: t('translate.light'),
+      smart: t('translate.smart'),
+      deep: t('translate.deep'),
+      full: t('translate.full')
+    };
+    var label = v < 20 ? labels.basic : v < 40 ? labels.light : v < 60 ? labels.smart : v < 80 ? labels.deep : labels.full;
+    labelEl.textContent = label;
+    labelEl.className = 'translate-strength-label strength-' + (v < 20 ? 'basic' : v < 40 ? 'light' : v < 60 ? 'smart' : v < 80 ? 'deep' : 'full');
+  }
+
+  if (slider) {
+    slider.addEventListener('input', function() { updateStrengthLabel(this.value); });
+    updateStrengthLabel(slider.value);
+  }
+
+  // Translate button
+  var btn = document.getElementById('tl-translate-btn');
+  console.log('[DEBUG] bindTranslateTabEvents called, btn:', btn, 'bound:', btn && btn.dataset.bound);
+  if (btn && !btn.dataset.bound) {
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', async function() {
+      console.log('[DEBUG] translate button clicked!');
+      var text = (document.getElementById('tl-original-text') || {}).value || '';
+      console.log('[DEBUG] text:', text.length, 'chars');
+      if (!text.trim()) { alert(t('errors.required')); return; }
+
+      btn.disabled = true;
+      btn.textContent = t('errors.analyzing') + '...';
+
+      var sourceLang = (document.getElementById('tl-source-lang') || {}).value || 'zh';
+      var targetLang = (document.getElementById('tl-target-lang') || {}).value || 'en';
+      var strength = parseInt((document.getElementById('tl-strength') || {}).value) || 50;
+      console.log('[DEBUG] calling API with strength:', strength);
+
+      try {
+        var res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, sourceLang, targetLang, strength })
+        });
+        console.log('[DEBUG] API response status:', res.status);
+        var result = await res.json();
+        console.log('[DEBUG] API result:', JSON.stringify(result).substring(0, 200));
+
+        if (result.success && result.data) {
+          var data = result.data;
+
+          // Show result
+          var resultEl = document.getElementById('tl-result-text');
+          console.log('[DEBUG] resultEl:', resultEl);
+          if (resultEl) { resultEl.textContent = data.text || ''; console.log('[DEBUG] set result text'); }
+
+          // Show changes
+          var changes = data.changes || [];
+          var countEl = document.getElementById('tl-changes-count');
+          if (countEl) countEl.textContent = '(' + changes.length + ')';
+
+          var listEl = document.getElementById('tl-changes-list');
+          if (listEl) {
+            if (!changes.length) {
+              listEl.innerHTML = '<div class="translate-changes-empty">' + t('translate.noChanges') + '</div>';
+            } else {
+              var typeIcons = { food: '🍚', utensil: '🍴', customs: '🎎', greeting: '🤝', culture: '🏛️', custom: '✏️' };
+              var typeNames = {
+                food: t('translate.changeFood'),
+                utensil: t('translate.changeUtensil'),
+                customs: t('translate.changeCustom'),
+                custom: t('translate.changeCustom2')
+              };
+              listEl.innerHTML = changes.map(function(c) {
+                return '<div class="translate-change-item' + (c.confirmed ? ' confirmed' : ' pending') + '">' +
+                  '<div class="translate-change-type">' + (typeIcons[c.changeType] || '✏️') + ' ' + (typeNames[c.changeType] || c.changeType) + '</div>' +
+                  '<div class="translate-change-text"><span class="original">' + escapeHtml(c.original) + '</span> → <span class="transformed">' + escapeHtml(c.transformed) + '</span></div>' +
+                  (c.confirmed ? '<span class="change-confirmed">✓</span>' : '<span class="change-pending">?</span>') +
+                '</div>';
+              }).join('');
+            }
+          }
+
+          state.currentTranslationId = data.translationId;
+        }
+      } catch(e) {
+        console.log('[DEBUG] fetch error:', e.message);
+        alert(t('errors.networkError') + ': ' + e.message);
+      }
+
+      btn.disabled = false;
+      btn.textContent = t('actions.translate');
+    });
+  }
+
+  // Load book content
+  var loadBtn = document.getElementById('tl-load-book');
+  if (loadBtn && !loadBtn.dataset.bound) {
+    loadBtn.dataset.bound = '1';
+    loadBtn.addEventListener('click', async function() {
+      if (!state.currentBook) { alert('请先打开一本书'); return; }
+      try {
+        var res = await fetch('/api/events/timeline/' + state.currentBook.id);
+        var result = await res.json();
+        if (result.success && result.data && result.data.events) {
+          var text = result.data.events.map(function(ev) {
+            return (ev.chapter ? ev.chapter + ' ' : '') + ev.title + '\n' + (ev.result || ev.process || '');
+          }).join('\n\n');
+          var ta = document.getElementById('tl-original-text');
+          if (ta) ta.value = text;
+        }
+      } catch(e) {
+        alert(t('errors.loadFailed'));
+      }
+    });
+  }
+
+  // Copy result
+  var copyBtn = document.getElementById('tl-copy-result');
+  if (copyBtn && !copyBtn.dataset.bound) {
+    copyBtn.dataset.bound = '1';
+    copyBtn.addEventListener('click', function() {
+      var text = (document.getElementById('tl-result-text') || {}).textContent || '';
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(function() {
+        var originalText = copyBtn.textContent;
+        copyBtn.textContent = t('actions.copied') || '✓';
+        setTimeout(function() { copyBtn.textContent = originalText; }, 1500);
+      });
+    });
+  }
+}

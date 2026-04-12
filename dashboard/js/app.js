@@ -1,3 +1,4 @@
+// ============ 第1部分: i18n 国际化 ============
 // ============ i18n 内联实现 ============
 
 ;(function() {
@@ -129,6 +130,7 @@ const state = {
 
 
 
+// ============ 第2部分: 图标和工具函数 ============
 function icon(name) { return Icons[name] || ''; }
 
 var Icons = {
@@ -390,6 +392,7 @@ function renderNovelTab() {
 
 // ============ 分层导航树 ============
 
+// ============ 第4部分: 导航树 ============
 var NAV_TREE = [
   { label: '导航', id: 'nav', icon: 'compass', children: [
     { label: '角色', id: 'roles', icon: 'roles' },
@@ -436,6 +439,7 @@ var SPECIAL_TABS = { genesis: true, event: true, nvwa: true, analysis: true, ten
 
 
 
+// ============ 第5部分: 渲染函数 ============
 function renderLeftDrawerNav() {
   var html = '';
 
@@ -669,6 +673,7 @@ window.DrawerApp = {
 
 
 // ============ 全局设置 ============
+// ============ 第6部分: 设置功能 ============
 function showGlobalSettings() {
   var modal = document.getElementById('settings-modal');
   if (!modal) {
@@ -808,6 +813,7 @@ function saveDrawerConfig(cfg) {
 
 // ============ 导航页 ============
 
+// ============ 第7部分: Tab渲染 ============
 function renderHomeTab() {
 
   // 当前选中的实体类型（默认角色）
@@ -1060,6 +1066,7 @@ function renderHomeTab_entityList(type) {
 
 // ============ 事件线 Tab ============
 
+// ============ 第8部分: 事件时间线 ============
 function renderEventTab() {
 
   return '<div class="event-tab-root" id="event-tab-root">' +
@@ -1078,6 +1085,7 @@ function renderEventTab() {
 
 // ============ 女娲 Tab ============
 
+// ============ 第9部分: 女娲系统 ============
 function renderNvwaTab() {
   window.state = state;
   return NvwaUI.init();
@@ -1088,6 +1096,7 @@ function renderNvwaTab() {
 
 // ============ 实体详情 ============
 
+// ============ 第10部分: 实体详情 ============
 function renderEntityDetail() {
 
   if (!state.selectedEntity) return '<div class="empty-hint">← 点击实体查看详情</div>';
@@ -1168,6 +1177,7 @@ async function loadBooks() {
 
 
 
+// ============ 第11部分: 书籍管理 ============
 function renderBooksList() {
 
   var c = document.getElementById('books-list');
@@ -1326,6 +1336,7 @@ async function loadBookData() {
 
 // ============ 事件绑定 ============
 
+// ============ 第12部分: 事件绑定 ============
 function bindWelcomeEvents() {
 
   // Toolbar lang/theme/docs/log bindings
@@ -1506,6 +1517,7 @@ function bindBookEvents() {
 
 
 
+// ============ 第13部分: 导航事件 ============
 function bindDrawerNavEvents() {
 
   document.querySelectorAll('.drawer-group-header').forEach(function(header) {
@@ -1606,6 +1618,7 @@ function bindDrawerNavEvents() {
 
 
 
+// ============ 第14部分: Tab事件 ============
 function bindTabContentEvents() {
 
   var uploadZone = document.getElementById('home-upload-zone');
@@ -1955,6 +1968,7 @@ async function loadEventTimeline() {
 
 
 
+// ============ 第15部分: 时间线渲染 ============
 function renderEventTimeline(events, arcs) {
 
   var html = '<div class="event-list">';
@@ -2477,6 +2491,7 @@ function showLongTextAnalyzeModal() {
 
 // ============ 初始化 ============
 
+// ============ 第17部分: 初始化 ============
 function init() {
 
   function doRender() { renderApp(); }
@@ -2533,6 +2548,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 
 
+// ============ 第16部分: 翻译系统 ============
 function renderTranslateTab() {
   return '<div class="translate-tab-root" id="translate-tab-root">' +
     '<div class="translate-header">' +

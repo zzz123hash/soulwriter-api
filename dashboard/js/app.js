@@ -115,26 +115,9 @@ function renderApp() {
 
 // ============ 欢迎页 ============
 // ============ 顶部工具栏 ============
-function renderToolbar() {
-  var locale = (window._i18n && window._i18n.currentLocale) || 'zh';
-  return '<div id="sw-toolbar">' +
-    '<div class="toolbar-left">' +
-      '<span class="toolbar-logo">' + t('app.name') + '</span>' +
-    '</div>' +
-    '<div class="toolbar-right">' +
-      '<select class="toolbar-select" id="btn-theme">' +
-        '<option value="dark">' + t('settings.themeDark') + '</option>' +
-        '<option value="soft">' + t('settings.themeSoft') + '</option>' +
-        '<option value="blue">' + t('settings.themeBlue') + '</option>' +
-        '<option value="green">' + t('settings.themeGreen') + '</option>' +
-      '</select>' +
-      '<select class="toolbar-select" id="btn-lang">' +
-        '<option value="zh-CN"' + (locale === 'zh' ? ' selected' : '') + '>🇨🇳 中文</option>' +
-        '<option value="en-US"' + (locale === 'en' ? ' selected' : '') + '>🇺🇸 English</option>' +
-      '</select>' +
-    '</div>' +
-  '</div>';
-}
+// Toolbar is managed by logger.js (permanent, in body)
+// app.js 只管理内容区域，不创建 toolbar
+function renderToolbar() { return ''; }
 
 function renderWelcome() {
   return renderToolbar() + '<div class="welcome-page">' +
@@ -549,7 +532,7 @@ async function loadBookData() {
 
 // ============ 事件绑定 ============
 function bindWelcomeEvents() {
-  // Toolbar lang/theme bindings
+  // Toolbar lang/theme/docs/log bindings
   var btnLang = document.getElementById('btn-lang');
   if (btnLang) btnLang.addEventListener('change', function() {
     var locale = this.value === 'en-US' ? 'en' : 'zh';
@@ -559,6 +542,15 @@ function bindWelcomeEvents() {
   if (btnTheme) btnTheme.addEventListener('change', function() {
     document.documentElement.setAttribute('data-theme', this.value);
     localStorage.setItem('sw-theme', this.value);
+  });
+  var btnDocs = document.getElementById('btn-docs');
+  if (btnDocs) btnDocs.addEventListener('click', function() {
+    window.open('https://github.com/zzz123hash/soulwriter-api', '_blank');
+  });
+  var btnLog = document.getElementById('btn-log');
+  if (btnLog) btnLog.addEventListener('click', function() {
+    var panel = document.getElementById('log-panel');
+    if (panel) panel.classList.toggle('open');
   });
 
   var btn = document.getElementById('create-book-btn');
@@ -567,7 +559,7 @@ function bindWelcomeEvents() {
 }
 
 function bindBookEvents() {
-  // Toolbar lang/theme bindings
+  // Toolbar lang/theme/docs/log bindings
   var btnLang = document.getElementById('btn-lang');
   if (btnLang) btnLang.addEventListener('change', function() {
     var locale = this.value === 'en-US' ? 'en' : 'zh';
@@ -577,6 +569,15 @@ function bindBookEvents() {
   if (btnTheme) btnTheme.addEventListener('change', function() {
     document.documentElement.setAttribute('data-theme', this.value);
     localStorage.setItem('sw-theme', this.value);
+  });
+  var btnDocs = document.getElementById('btn-docs');
+  if (btnDocs) btnDocs.addEventListener('click', function() {
+    window.open('https://github.com/zzz123hash/soulwriter-api', '_blank');
+  });
+  var btnLog = document.getElementById('btn-log');
+  if (btnLog) btnLog.addEventListener('click', function() {
+    var panel = document.getElementById('log-panel');
+    if (panel) panel.classList.toggle('open');
   });
 
   var btnBack = document.getElementById('back-to-books'); if (btnBack) btnBack.addEventListener('click', function() {
@@ -1120,6 +1121,16 @@ function init() {
       doRender();
     });
   }
+
+  // Listen to logger.js toolbar events for lang/theme sync
+  window.addEventListener('lang-change', function(e) {
+    var locale = e.detail.lang === 'en-US' ? 'en' : 'zh';
+    if (window._i18n) window._i18n.setLocale(locale);
+  });
+
+  window.addEventListener('theme-change', function(e) {
+    document.documentElement.setAttribute('data-theme', e.detail.theme);
+  });
 }
 document.addEventListener('DOMContentLoaded', init);
 /**

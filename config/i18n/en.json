@@ -202,5 +202,9 @@
     "name": "Name",
     "description": "Description",
     "properties": "Properties"
+  },
+  "toolbar": {
+    "docs": "📖 Docs",
+    "log": "📋 Log"
   }
 }

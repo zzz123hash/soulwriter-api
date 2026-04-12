@@ -257,7 +257,8 @@ function renderEventTab() {
 }
 
 function renderNvwaTab() {
-  return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="margin-bottom:12px;font-size:2em;">' + icon('nvwa') + '</div><div style="margin-bottom:8px;">女娲编辑器</div><div style="font-size:12px;">功能开发中...</div></div>';
+  setTimeout(function() { loadNvwaData(); }, 0);
+  return '<div class="nvwa-tab-root" id="nvwa-tab-root"><div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">加载中...</div></div>';
 }
 
 function renderNovelTab() {
@@ -373,6 +374,7 @@ function bindBookEvents() {
       state.currentTab = tab.dataset.tab;
       state.selectedEntity = null;
       if (tab.dataset.tab === 'event') { renderApp(); loadEventTimeline(); }
+      else if (tab.dataset.tab === 'nvwa') { state.nvwaSelectedChar = null; state.nvwaMemoryData = null; state.nvwaActiveLayer = 'buffer'; renderApp(); loadNvwaData(); }
       else renderApp();
     });
   });
@@ -928,5 +930,364 @@ async function loadEventTimeline() {
     }
   } catch (e) {
     console.error('loadEventTimeline error:', e);
+  }
+}
+function renderNvwaTab() {
+  return '<div class="nvwa-tab-root" id="nvwa-tab-root">' +
+    '<div class="nvwa-loading" style="padding:40px;text-align:center;color:var(--text2);">加载中...</div>' +
+  '</div>';
+}
+
+function renderNvwaContent(roles, memoryData) {
+  if (!roles || roles.length === 0) {
+    return '<div class="nvwa-empty" style="padding:40px;text-align:center;color:var(--text2);">' +
+      '<div style="font-size:2em;margin-bottom:12px;">' + icon('nvwa') + '</div>' +
+      '<div>请先创建角色</div>' +
+    '</div>';
+  }
+
+  var html = '<div class="nvwa-layout">';
+
+  // Left: character list
+  html += '<div class="nvwa-char-list">' +
+    '<div class="nvwa-section-title">选择角色</div>';
+  roles.forEach(function(r) {
+    var isActive = state.nvwaSelectedChar === r.id ? 'active' : '';
+    html += '<div class="nvwa-char-item ' + isActive + '" data-id="' + r.id + '">' +
+      '<div class="nvwa-char-avatar">' + icon('roles') + '</div>' +
+      '<div class="nvwa-char-name">' + escapeHtml(r.title || r.name || '未命名') + '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+
+  // Right: memory view
+  html += '<div class="nvwa-memory-view" id="nvwa-memory-view">';
+  if (state.nvwaSelectedChar) {
+    var mem = memoryData[state.nvwaSelectedChar] || { buffer: [], core: [], recall: [], archival: [], summary: '' };
+    html += renderNvwaMemoryPanel(state.nvwaSelectedChar, mem);
+  } else {
+    html += '<div class="nvwa-hint">请从左侧选择一个角色</div>';
+  }
+  html += '</div></div>';
+
+  return html;
+}
+
+function renderNvwaMemoryPanel(characterId, mem) {
+  var bufferCount = (mem.buffer || []).length;
+  var coreCount = (mem.core || []).length;
+  var recallCount = (mem.recall || []).length;
+  var archivalCount = (mem.archival || []).length;
+
+  var html = '<div class="nvwa-panel-header">' +
+    '<div class="nvwa-layer-stats">' +
+      '<span class="nvwa-stat buffer"><span class="nvwa-stat-num">' + bufferCount + '</span><span class="nvwa-stat-label">缓冲区</span></span>' +
+      '<span class="nvwa-stat core"><span class="nvwa-stat-num">' + coreCount + '</span><span class="nvwa-stat-label">核心</span></span>' +
+      '<span class="nvwa-stat recall"><span class="nvwa-stat-num">' + recallCount + '</span><span class="nvwa-stat-label">召回</span></span>' +
+      '<span class="nvwa-stat archival"><span class="nvwa-stat-num">' + archivalCount + '</span><span class="nvwa-stat-label">归档</span></span>' +
+    '</div>' +
+    '<button class="nvwa-add-btn" id="nvwa-add-btn">+ 添加记忆</button>' +
+  '</div>';
+
+  if (mem.summary) {
+    html += '<div class="nvwa-summary">' +
+      '<div class="nvwa-summary-label">角色摘要</div>' +
+      '<div class="nvwa-summary-text">' + escapeHtml(mem.summary) + '</div>' +
+    '</div>';
+  }
+
+  // Tabs for each layer
+  html += '<div class="nvwa-layer-tabs">' +
+    '<button class="nvwa-layer-tab active" data-layer="buffer">缓冲区 (' + bufferCount + ')</button>' +
+    '<button class="nvwa-layer-tab" data-layer="core">核心记忆 (' + coreCount + ')</button>' +
+    '<button class="nvwa-layer-tab" data-layer="recall">召回索引 (' + recallCount + ')</button>' +
+    '<button class="nvwa-layer-tab" data-layer="archival">归档 (' + archivalCount + ')</button>' +
+  '</div>';
+
+  // Layer content
+  var activeLayer = state.nvwaActiveLayer || 'buffer';
+  var layerEntries = mem[activeLayer] || [];
+  html += '<div class="nvwa-layer-content" id="nvwa-layer-content">';
+  if (layerEntries.length === 0) {
+    html += '<div class="nvwa-empty-layer">此层暂无记忆</div>';
+  } else {
+    layerEntries.forEach(function(entry) {
+      var emotionTags = (entry.emotions || []).map(function(e) { return '<span class="nvwa-emotion-tag">' + escapeHtml(e) + '</span>'; }).join('');
+      html += '<div class="nvwa-entry" data-id="' + entry.id + '">' +
+        '<div class="nvwa-entry-header">' +
+          '<span class="nvwa-entry-time">' + formatTime(entry.timestamp) + '</span>' +
+          '<span class="nvwa-entry-importance" style="color: hsl(' + (entry.importance * 9.6) + ', 70%, 60%);">★' + entry.importance + '</span>' +
+          emotionTags +
+          '<div class="nvwa-entry-actions">' +
+            '<button class="nvwa-entry-edit" data-id="' + entry.id + '">编辑</button>' +
+            '<button class="nvwa-entry-delete" data-id="' + entry.id + '">删除</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="nvwa-entry-content">' + escapeHtml(entry.content) + '</div>' +
+      '</div>';
+    });
+  }
+  html += '</div>';
+
+  return html;
+}
+
+function formatTime(ts) {
+  if (!ts) return '';
+  var d = new Date(ts);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function bindNvwaTabEvents() {
+  // Character selection
+  document.querySelectorAll('.nvwa-char-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      state.nvwaSelectedChar = this.dataset.id;
+      state.nvwaActiveLayer = 'buffer';
+      loadNvwaData();
+    });
+  });
+
+  // Layer tabs
+  document.querySelectorAll('.nvwa-layer-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      state.nvwaActiveLayer = this.dataset.layer;
+      document.querySelectorAll('.nvwa-layer-tab').forEach(function(t) { t.classList.remove('active'); });
+      this.classList.add('active');
+      // Re-render layer content
+      var charId = state.nvwaSelectedChar;
+      if (charId && state.nvwaMemoryData && state.nvwaMemoryData[charId]) {
+        var mem = state.nvwaMemoryData[charId];
+        var content = document.getElementById('nvwa-layer-content');
+        if (content) {
+          var entries = mem[state.nvwaActiveLayer] || [];
+          var html = '';
+          if (entries.length === 0) {
+            html = '<div class="nvwa-empty-layer">此层暂无记忆</div>';
+          } else {
+            entries.forEach(function(entry) {
+              var emotionTags = (entry.emotions || []).map(function(e) { return '<span class="nvwa-emotion-tag">' + escapeHtml(e) + '</span>'; }).join('');
+              html += '<div class="nvwa-entry" data-id="' + entry.id + '">' +
+                '<div class="nvwa-entry-header">' +
+                  '<span class="nvwa-entry-time">' + formatTime(entry.timestamp) + '</span>' +
+                  '<span class="nvwa-entry-importance" style="color: hsl(' + (entry.importance * 9.6) + ', 70%, 60%);">★' + entry.importance + '</span>' +
+                  emotionTags +
+                  '<div class="nvwa-entry-actions">' +
+                    '<button class="nvwa-entry-edit" data-id="' + entry.id + '">编辑</button>' +
+                    '<button class="nvwa-entry-delete" data-id="' + entry.id + '">删除</button>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="nvwa-entry-content">' + escapeHtml(entry.content) + '</div>' +
+              '</div>';
+            });
+          }
+          content.innerHTML = html;
+          bindNvwaEntryEvents();
+        }
+      }
+    });
+  });
+
+  // Add memory button
+  var addBtn = document.getElementById('nvwa-add-btn');
+  if (addBtn && !addBtn.dataset.bound) {
+    addBtn.dataset.bound = '1';
+    addBtn.addEventListener('click', showNvwaAddMemoryModal);
+  }
+
+  bindNvwaEntryEvents();
+}
+
+function bindNvwaEntryEvents() {
+  document.querySelectorAll('.nvwa-entry-edit').forEach(function(btn) {
+    if (!btn.dataset.bound) {
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', function() {
+        var entryId = this.dataset.id;
+        var layer = state.nvwaActiveLayer;
+        var mem = state.nvwaMemoryData[state.nvwaSelectedChar];
+        var entry = (mem[layer] || []).find(function(e) { return e.id === entryId; });
+        if (entry) showNvwaEditMemoryModal(entry, layer);
+      });
+    }
+  });
+
+  document.querySelectorAll('.nvwa-entry-delete').forEach(function(btn) {
+    if (!btn.dataset.bound) {
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', function() {
+        var entryId = this.dataset.id;
+        if (!confirm('确认删除此记忆？')) return;
+        deleteNvwaEntry(entryId);
+      });
+    }
+  });
+}
+
+function showNvwaAddMemoryModal() {
+  var charId = state.nvwaSelectedChar;
+  if (!charId) return;
+  var modal = document.getElementById('nvwa-add-modal');
+  if (!modal) {
+    var m = document.createElement('div');
+    m.id = 'nvwa-add-modal';
+    m.className = 'modal-overlay';
+    m.innerHTML = '<div class="modal-box">' +
+      '<div class="modal-title">添加记忆</div>' +
+      '<div class="modal-body">' +
+        '<div class="field"><label>内容</label><textarea id="nvwa-new-content" rows="5" placeholder="记忆内容..."></textarea></div>' +
+        '<div class="field-row">' +
+          '<div class="field"><label>重要性 (1-10)</label><input id="nvwa-new-importance" type="range" min="1" max="10" value="5"><span id="nvwa-imp-val">5</span></div>' +
+          '<div class="field"><label>情感标签</label><input id="nvwa-new-emotions" placeholder="如: 开心, 悲伤 (逗号分隔)"></div>' +
+        '</div>' +
+        '<div class="field"><label>目标层级</label>' +
+          '<select id="nvwa-new-status">' +
+            '<option value="buffer">缓冲区</option>' +
+            '<option value="core">核心记忆</option>' +
+            '<option value="recall">召回索引</option>' +
+            '<option value="archival">归档</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn btn-primary" id="nvwa-save-btn">保存</button>' +
+        '<button class="btn btn-secondary" id="nvwa-cancel-btn">取消</button>' +
+      '</div>' +
+    '</div>';
+    document.body.appendChild(m);
+    modal = m;
+
+    document.getElementById('nvwa-new-importance').addEventListener('input', function() {
+      document.getElementById('nvwa-imp-val').textContent = this.value;
+    });
+    document.getElementById('nvwa-cancel-btn').addEventListener('click', function() {
+      modal.classList.remove('open');
+    });
+    document.getElementById('nvwa-save-btn').addEventListener('click', function() {
+      var content = document.getElementById('nvwa-new-content').value.trim();
+      if (!content) { alert('请输入记忆内容'); return; }
+      var bookId = state.currentBook ? state.currentBook.id : '';
+      fetch('/api/memory/' + bookId + '/' + charId, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: content,
+          importance: parseInt(document.getElementById('nvwa-new-importance').value),
+          emotions: document.getElementById('nvwa-new-emotions').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+          status: document.getElementById('nvwa-new-status').value
+        })
+      }).then(function(r) { return r.json(); }).then(function(res) {
+        if (res.success) {
+          modal.classList.remove('open');
+          loadNvwaData();
+        }
+      });
+    });
+  }
+  modal.classList.add('open');
+}
+
+function showNvwaEditMemoryModal(entry, layer) {
+  var modal = document.getElementById('nvwa-edit-modal');
+  if (!modal) {
+    var m = document.createElement('div');
+    m.id = 'nvwa-edit-modal';
+    m.className = 'modal-overlay';
+    m.innerHTML = '<div class="modal-box">' +
+      '<div class="modal-title">编辑记忆</div>' +
+      '<div class="modal-body">' +
+        '<div class="field"><label>内容</label><textarea id="nvwa-edit-content" rows="5"></textarea></div>' +
+        '<div class="field-row">' +
+          '<div class="field"><label>重要性</label><input id="nvwa-edit-importance" type="range" min="1" max="10"><span id="nvwa-edit-imp-val"></span></div>' +
+          '<div class="field"><label>状态</label>' +
+            '<select id="nvwa-edit-status">' +
+              '<option value="buffer">缓冲区</option>' +
+              '<option value="core">核心记忆</option>' +
+              '<option value="recall">召回索引</option>' +
+              '<option value="archival">归档</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn btn-primary" id="nvwa-edit-save-btn">保存</button>' +
+        '<button class="btn btn-secondary" id="nvwa-edit-cancel-btn">取消</button>' +
+      '</div>' +
+    '</div>';
+    document.body.appendChild(m);
+    modal = m;
+    document.getElementById('nvwa-edit-importance').addEventListener('input', function() {
+      document.getElementById('nvwa-edit-imp-val').textContent = this.value;
+    });
+    document.getElementById('nvwa-edit-cancel-btn').addEventListener('click', function() {
+      modal.classList.remove('open');
+    });
+  }
+
+  document.getElementById('nvwa-edit-content').value = entry.content || '';
+  document.getElementById('nvwa-edit-importance').value = entry.importance || 5;
+  document.getElementById('nvwa-edit-imp-val').textContent = entry.importance || 5;
+  document.getElementById('nvwa-edit-status').value = layer;
+  var saveBtn = document.getElementById('nvwa-edit-save-btn');
+  saveBtn.onclick = function() {
+    var bookId = state.currentBook ? state.currentBook.id : '';
+    fetch('/api/memory/' + bookId + '/' + state.nvwaSelectedChar + '/' + entry.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: document.getElementById('nvwa-edit-content').value,
+        importance: parseInt(document.getElementById('nvwa-edit-importance').value),
+        status: document.getElementById('nvwa-edit-status').value
+      })
+    }).then(function(r) { return r.json(); }).then(function(res) {
+      if (res.success) {
+        modal.classList.remove('open');
+        loadNvwaData();
+      }
+    });
+  };
+  modal.classList.add('open');
+}
+
+async function deleteNvwaEntry(entryId) {
+  var bookId = state.currentBook ? state.currentBook.id : '';
+  await fetch('/api/memory/' + bookId + '/' + state.nvwaSelectedChar + '/' + entryId, { method: 'DELETE' });
+  loadNvwaData();
+}
+
+async function loadNvwaData() {
+  if (!state.currentBook) {
+    var root = document.getElementById('nvwa-tab-root');
+    if (root) root.innerHTML = '<div class="nvwa-empty" style="padding:40px;text-align:center;color:var(--text2);">请先打开一本书</div>';
+    return;
+  }
+  try {
+    // Load characters
+    var res = await fetch('/api/entities/' + state.currentBook.id + '/roles');
+    var result = await res.json();
+    var roles = result.success ? (result.data || []) : [];
+
+    // Load memory for each character
+    var memoryData = {};
+    for (var i = 0; i < roles.length; i++) {
+      var r = roles[i];
+      var mRes = await fetch('/api/memory/' + state.currentBook.id + '/' + r.id);
+      var mResult = await mRes.json();
+      if (mResult.success) memoryData[r.id] = mResult.data;
+    }
+
+    // Select first if none
+    if (!state.nvwaSelectedChar && roles.length > 0) {
+      state.nvwaSelectedChar = roles[0].id;
+    }
+    state.nvwaMemoryData = memoryData;
+
+    var root = document.getElementById('nvwa-tab-root');
+    if (root) {
+      root.innerHTML = renderNvwaContent(roles, memoryData);
+      bindNvwaTabEvents();
+    }
+  } catch (e) {
+    console.error('loadNvwaData error:', e);
   }
 }

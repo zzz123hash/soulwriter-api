@@ -627,3 +627,53 @@ body {
 .detail-actions { display: flex; gap: 8px; margin-top: 16px; }
 .btn-save { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 .btn-delete { background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+/* ============ 女娲记忆 Tab ============ */
+.nvwa-tab-root { padding: 16px; max-width: 1100px; margin: 0 auto; }
+.nvwa-layout { display: grid; grid-template-columns: 200px 1fr; gap: 16px; min-height: 500px; }
+.nvwa-char-list { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.nvwa-section-title { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; padding: 0 4px; }
+.nvwa-char-item { display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 8px; cursor: pointer; transition: background 0.15s; margin-bottom: 4px; }
+.nvwa-char-item:hover { background: var(--bg); }
+.nvwa-char-item.active { background: var(--accent); color: white; }
+.nvwa-char-avatar { font-size: 16px; }
+.nvwa-char-name { font-size: 13px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nvwa-memory-view { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.nvwa-hint { text-align: center; color: var(--text2); padding: 40px; font-size: 13px; }
+.nvwa-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.nvwa-layer-stats { display: flex; gap: 16px; }
+.nvwa-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.nvwa-stat-num { font-size: 20px; font-weight: 700; }
+.nvwa-stat.buffer .nvwa-stat-num { color: #3b82f6; }
+.nvwa-stat.core .nvwa-stat-num { color: #f59e0b; }
+.nvwa-stat.recall .nvwa-stat-num { color: #8b5cf6; }
+.nvwa-stat.archival .nvwa-stat-num { color: #6b7280; }
+.nvwa-stat-label { font-size: 10px; color: var(--text2); }
+.nvwa-add-btn { background: var(--accent); color: white; border: none; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-size: 12px; }
+.nvwa-summary { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 14px; }
+.nvwa-summary-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+.nvwa-summary-text { font-size: 13px; line-height: 1.6; color: var(--text); }
+.nvwa-layer-tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.nvwa-layer-tab { background: transparent; border: 1px solid var(--border); color: var(--text2); padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+.nvwa-layer-tab:hover { border-color: var(--accent); color: var(--accent); }
+.nvwa-layer-tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+.nvwa-layer-content { max-height: 400px; overflow-y: auto; }
+.nvwa-empty-layer { text-align: center; padding: 20px; color: var(--text2); font-size: 13px; }
+.nvwa-entry { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.nvwa-entry-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.nvwa-entry-time { font-size: 11px; color: var(--text2); }
+.nvwa-entry-importance { font-size: 12px; }
+.nvwa-emotion-tag { font-size: 10px; background: var(--bg2); padding: 1px 6px; border-radius: 10px; color: var(--text2); }
+.nvwa-entry-actions { margin-left: auto; display: flex; gap: 6px; }
+.nvwa-entry-actions button { background: none; border: none; cursor: pointer; font-size: 11px; padding: 2px 6px; border-radius: 4px; }
+.nvwa-entry-edit { color: var(--accent); }
+.nvwa-entry-delete { color: #ef4444; }
+.nvwa-entry-content { font-size: 13px; line-height: 1.6; color: var(--text); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; width: 500px; max-width: 90vw; max-height: 80vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.modal-body .field { margin-bottom: 12px; }
+.modal-body .field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+.modal-body .field input, .modal-body .field select, .modal-body .field textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; }
+.modal-body .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }

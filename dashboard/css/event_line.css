@@ -1,0 +1,98 @@
+/* EventLine 事件线样式 */
+.eventline-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.eventline-svg {
+  width: 100%;
+  height: 100%;
+  background: var(--bg, #0f0f1a);
+  cursor: grab;
+}
+
+.eventline-svg:active {
+  cursor: grabbing;
+}
+
+.ev-node {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.ev-node:hover {
+  transform: scale(1.1);
+}
+
+.ev-node circle,
+.ev-node rect {
+  transition: all 0.2s;
+}
+
+.ev-label {
+  font-family: var(--font, sans-serif);
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.ev-tooltip {
+  display: none;
+  position: fixed;
+  background: var(--bg2, #1a1a2e);
+  border: 1px solid var(--border, #2a2a4a);
+  border-radius: 8px;
+  padding: 8px 12px;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.ev-tooltip span:first-child {
+  font-size: 16px;
+}
+
+.ev-tooltip .ev-type {
+  font-size: 11px;
+  color: var(--text2, #a0a0a0);
+  margin-left: 8px;
+}
+
+.ev-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+
+.ev-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #2a2a4a);
+  background: var(--bg2, #1a1a2e);
+  color: var(--text, #e8e8e8);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ev-btn:hover {
+  background: var(--bg3, #16213e);
+  border-color: var(--accent, #e94560);
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+}

@@ -1176,17 +1176,17 @@ function renderHomeTab_entityList(type) {
 
 // ============ 第8部分: 事件时间线 ============
 function renderEventTab() {
-
+  // EventLine 事件线 - 鱼骨图风格
   return '<div class="event-tab-root" id="event-tab-root">' +
-
-    '<div class="event-toolbar"><div class="event-arcs-filter" id="event-arcs-filter"></div>' +
-
-    '<button class="event-add-btn" id="event-add-btn">' + icon('plus') + ' 新增事件</button></div>' +
-
-    '<div class="event-timeline" id="event-timeline"><div class="event-loading">'+t('errors.loading')+'</div></div>' +
-
+    '<div id="event-timeline" class="event-timeline"></div>' +
+    '<div id="eventline-detail-panel" class="event-detail-panel">' +
+      '<div style="padding:20px;text-align:center;color:var(--text2);">' +
+        '<div style="font-size:2em;margin-bottom:8px;">📖</div>' +
+        '<p style="margin:0;">点击事件查看详情</p>' +
+        '<p style="font-size:12px;margin-top:8px;">拖拽平移，滚轮缩放</p>' +
+      '</div>' +
+    '</div>' +
   '</div>';
-
 }
 
 
@@ -1575,7 +1575,14 @@ function bindBookEvents() {
       if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
       bindTabContentEvents();
 
-      if (tab.dataset.tab === 'event') loadEventTimeline();
+      if (tab.dataset.tab === 'event') {// EventLine initialization
+        setTimeout(function() {
+          var tl = document.getElementById('event-timeline');
+          if (tl && typeof EventLine !== 'undefined') {
+            EventLine.init('event-timeline');
+            EventLine.loadData(state.currentBook?.id || 'demo');
+          }
+        }, 500);}
 
       if (tab.dataset.tab === 'nvwa') { state.nvwaSelectedChar = null; loadNvwaData(); }
 
@@ -1693,7 +1700,14 @@ function bindDrawerNavEvents() {
         if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
         bindTabContentEvents();
 
-        if (id === 'event') loadEventTimeline();
+        if (id === 'event') {// EventLine initialization
+        setTimeout(function() {
+          var tl = document.getElementById('event-timeline');
+          if (tl && typeof EventLine !== 'undefined') {
+            EventLine.init('event-timeline');
+            EventLine.loadData(state.currentBook?.id || 'demo');
+          }
+        }, 500);}
 
         if (id === 'nvwa') { state.nvwaSelectedChar = null; loadNvwaData(); }
 
@@ -1815,8 +1829,6 @@ function bindTabContentEvents() {
 
         if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
         bindTabContentEvents();
-
-        loadEventTimeline();
 
       }
 
@@ -1966,7 +1978,15 @@ function bindTabContentEvents() {
       if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
       bindTabContentEvents();
 
-      if (state.currentTab === 'event') loadEventTimeline();
+      if (state.currentTab === 'event' && typeof EventLine !== 'undefined') {
+        setTimeout(function() {
+          var tl = document.getElementById('event-timeline');
+          if (tl && typeof EventLine !== 'undefined') {
+            EventLine.init('event-timeline');
+            EventLine.loadData(state.currentBook?.id || 'demo');
+          }
+        }, 500);
+      }
 
     });
 

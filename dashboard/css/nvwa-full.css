@@ -409,3 +409,196 @@
     min-width: 280px;
   }
 }
+
+/* ============ 全局控制面板 ============ */
+.nvwa-global-panel {
+  background: var(--bg2);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.nvwa-global-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.nvwa-global-icon {
+  font-size: 18px;
+}
+
+.nvwa-global-section {
+  margin-bottom: 16px;
+}
+
+.nvwa-global-label {
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.nvwa-weather-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.nvwa-weather-btn {
+  padding: 8px 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.nvwa-weather-btn:hover {
+  background: var(--bg3);
+}
+
+.nvwa-weather-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.nvwa-time-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.nvwa-time-btn {
+  padding: 6px 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.nvwa-time-btn:hover {
+  background: var(--bg3);
+}
+
+.nvwa-time-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.nvwa-global-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+/* ============ 赏罚面板 ============ */
+.nvwa-judgment-panel {
+  background: var(--bg2);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.nvwa-judgment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.nvwa-judgment-icon {
+  font-size: 18px;
+}
+
+.nvwa-judgment-section {
+  margin-bottom: 16px;
+}
+
+.nvwa-judgment-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.nvwa-judgment-cost {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.nvwa-judgment-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nvwa-judgment-btn {
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.nvwa-judgment-btn:hover {
+  background: var(--bg3);
+  border-color: var(--accent);
+}
+
+.nvwa-judgment-result {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  min-height: 60px;
+}
+
+.nvwa-error {
+  color: #ef4444;
+  font-size: 13px;
+}
+
+.nvwa-judgment-success {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.nvwa-result-text {
+  margin-bottom: 8px;
+}
+
+.nvwa-result-meta {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ============ 女娲根容器 ============ */
+.nvwa-root {
+  display: flex;
+  height: 100%;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg);
+}

@@ -1088,7 +1088,7 @@ function renderEventTab() {
 // ============ 第9部分: 女娲系统 ============
 function renderNvwaTab() {
   NvwaUI.init();
-  return NvwaUI.render();
+  return NvwaUI.renderNvwa();
 }
 
 

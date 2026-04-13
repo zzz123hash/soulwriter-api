@@ -1456,7 +1456,7 @@ async function loadBookData() {
 
     try {
 
-      var evRes = await fetch('/api/events/timeline/' + state.currentBook.id);
+      var evRes = await fetch('/api/v1/nvwa/events');
 
       var evResult = await evRes.json();
 
@@ -2086,7 +2086,7 @@ async function loadEventTimeline() {
 
   try {
 
-    var res = await fetch('/api/events/timeline/' + state.currentBook.id);
+    var res = await fetch('/api/v1/nvwa/events?limit=100');
 
     var result = await res.json();
 
@@ -2321,7 +2321,7 @@ function bindEventDetailEvents() {
 
         data.bookId = state.currentBook.id;
 
-        fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        fetch('/api/v1/nvwa/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
 
           .then(function(r) { return r.json(); })
 
@@ -2329,7 +2329,7 @@ function bindEventDetailEvents() {
 
       } else {
 
-        fetch('/api/events/' + ev.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        fetch('/api/v1/nvwa/events/' + ev.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
 
           .then(function(r) { return r.json(); })
 
@@ -2349,7 +2349,7 @@ function bindEventDetailEvents() {
 
       if (!confirm('确认删除？')) return;
 
-      fetch('/api/events/' + state.selectedEntity.id, { method: 'DELETE' })
+      fetch('/api/v1/nvwa/events/' + state.selectedEntity.id, { method: 'DELETE' })
 
         .then(function(r) { return r.json(); })
 
@@ -3007,7 +3007,7 @@ function bindTranslateTabEvents() {
     loadBtn.addEventListener('click', async function() {
       if (!state.currentBook) { alert('请先打开一本书'); return; }
       try {
-        var res = await fetch('/api/events/timeline/' + state.currentBook.id);
+        var res = await fetch('/api/v1/nvwa/events?limit=100');
         var result = await res.json();
         if (result.success && result.data && result.data.events) {
           var text = result.data.events.map(function(ev) {
@@ -3036,4 +3036,15 @@ function bindTranslateTabEvents() {
       });
     });
   }
+}
+
+
+// ============ 设置Tab ============
+function renderSettingsTab() {
+  return '<div class="settings-tab-root">' +
+    '<div class="settings-header"><h2>⚙️ 设置</h2></div>' +
+    '<div class="settings-section">' +
+      '<p style="color:var(--text2);text-align:center;padding:40px;">设置功能开发中...</p>' +
+    '</div>' +
+  '</div>';
 }

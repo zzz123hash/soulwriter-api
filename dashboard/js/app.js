@@ -584,6 +584,16 @@ window.DrawerApp = {
       var tabCanvas = document.getElementById('tab-canvas');
       if (tabCanvas) {
         tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
         bindTabContentEvents();
       }
     }
@@ -600,6 +610,16 @@ window.DrawerApp = {
       var tabCanvas = document.getElementById('tab-canvas');
       if (tabCanvas) {
         tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
         bindTabContentEvents();
       }
       return;
@@ -612,6 +632,16 @@ window.DrawerApp = {
       var tabCanvas = document.getElementById('tab-canvas');
       if (tabCanvas) {
         tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
         bindTabContentEvents();
       }
     }
@@ -652,6 +682,16 @@ window.DrawerApp = {
       var tabCanvas = document.getElementById('tab-canvas');
       if (tabCanvas) {
         tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
         bindTabContentEvents();
       }
 
@@ -676,6 +716,16 @@ window.DrawerApp = {
       var tabCanvas = document.getElementById('tab-canvas');
       if (tabCanvas) {
         tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
         bindTabContentEvents();
       }
     }
@@ -737,6 +787,16 @@ window.DrawerApp = {
       var tabCanvas = document.getElementById('tab-canvas');
       if (tabCanvas) {
         tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
         bindTabContentEvents();
       }
     };
@@ -1596,6 +1656,16 @@ function bindBookEvents() {
       var tabCanvas = document.getElementById('tab-canvas');
 
       if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
 
       bindTabContentEvents();
 
@@ -1715,6 +1785,16 @@ function bindDrawerNavEvents() {
         var tabCanvas = document.getElementById('tab-canvas');
 
         if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
 
         bindTabContentEvents();
 
@@ -1737,6 +1817,16 @@ function bindDrawerNavEvents() {
         var tabCanvas = document.getElementById('tab-canvas');
 
         if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
 
         bindTabContentEvents();
 
@@ -1806,6 +1896,16 @@ function bindTabContentEvents() {
       var tabCanvas = document.getElementById('tab-canvas');
 
       if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
 
       bindTabContentEvents();
 
@@ -1838,6 +1938,16 @@ function bindTabContentEvents() {
         var tabCanvas = document.getElementById('tab-canvas');
 
         if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
 
         bindTabContentEvents();
 
@@ -1989,6 +2099,16 @@ function bindTabContentEvents() {
       var tabCanvas = document.getElementById('tab-canvas');
 
       if (tabCanvas) tabCanvas.innerHTML = renderTabContent();
+    
+    // 渲染后初始化EntityCards
+    if (state.currentTab === 'home' && typeof EntityCards !== 'undefined') {
+      setTimeout(function() {
+        var container = document.getElementById('entity-list-container');
+        if (container) {
+          EntityCards.renderEntityList(state.roles || [], 'entity-list-container');
+        }
+      }, 50);
+    }
 
       bindTabContentEvents();
 

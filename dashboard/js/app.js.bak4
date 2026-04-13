@@ -457,7 +457,7 @@ var SPECIAL_TABS = { genesis: true, event: true, nvwa: true, analysis: true, ten
 
 
 // ============ 第5部分: 渲染函数 ============
-function renderLeftDrawerNav() { return renderDrawerNavInline(); }; function renderLeftDrawerNav_OLD() {
+function renderLeftDrawerNav() {
   var html = '';
 
   NAV_TREE.forEach(function(group) {
@@ -476,79 +476,6 @@ function renderLeftDrawerNav() { return renderDrawerNavInline(); }; function ren
 
   return html;
 }
-
-
-// 抽屉展开状态
-var drawerExpanded = {};
-function toggleDrawer(id) {
-  drawerExpanded[id] = !drawerExpanded[id];
-  refreshDrawerNav();
-}
-function refreshDrawerNav() {
-  var nav = document.getElementById('drawer-nav-tree');
-  if (nav) {
-    nav.innerHTML = renderDrawerNavInline();
-  }
-}
-function renderDrawerNavInline() {
-  var html = '';
-  NAV_TREE.forEach(function(group) {
-    html += renderNavGroup(group, 1);
-  });
-  return html;
-}
-function renderNavGroup(group, level) {
-  var hasChildren = group.children && group.children.length > 0;
-  var isOpen = drawerExpanded[group.id];
-  var indent = (level - 1) * 16;
-  var arrow = hasChildren ? (isOpen ? '▼' : '▶') : '';
-  var html = '<div class="drawer-nav-group">';
-  html += '<div class="drawer-nav-item drawer-nav-level' + level + '" style="padding-left:' + indent + 'px" onclick="';
-  if (hasChildren) {
-    html += "toggleDrawer('" + group.id + ")'";
-  } else if (group.panel) {
-    html += "goToTab('" + group.panel + ")'";
-  } else {
-    html += "selectNavItem('" + group.id + ")'";
-  }
-  html += '">';
-  html += '<span class="drawer-nav-arrow">' + arrow + '</span>';
-  html += '<span class="drawer-nav-icon">' + (group.icon ? icon(group.icon) : '') + '</span>';
-  html += '<span class="drawer-nav-label">' + escapeHtml(group.label) + '</span>';
-  html += '</div>';
-  if (hasChildren && isOpen) {
-    html += '<div class="drawer-nav-children">';
-    group.children.forEach(function(child) {
-      html += renderNavGroup(child, level + 1);
-    });
-    html += '</div>';
-  }
-  html += '</div>';
-  return html;
-}
-function selectNavItem(id) {
-  console.log('[Nav] Select:', id);
-  state.currentEntity = id;
-  state.currentTab = 'home';
-  refreshTab();
-}
-function goToTab(tabId) {
-  state.currentTab = tabId;
-  refreshTab();
-}
-function refreshTab() {
-  var canvas = document.getElementById('tab-canvas');
-  if (canvas) {
-    canvas.innerHTML = renderTabContent();
-    bindTabContentEvents();
-  }
-  document.querySelectorAll('.book-tab').forEach(function(t) {
-    t.classList.toggle('active', t.dataset.tab === state.currentTab);
-  });
-}
-// 默认展开
-drawerExpanded['nav'] = true;
-drawerExpanded['plot'] = true;
 
 // DrawerApp namespace
 window.DrawerApp = {

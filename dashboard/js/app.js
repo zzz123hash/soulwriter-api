@@ -330,6 +330,8 @@ function renderTabContent() {
 
     case 'novel': return renderNovelTab();
 
+    case 'chapters': return renderChaptersTab();
+
     case 'analysis': return renderAnalysisTab();
 
     default: return renderHomeTab();
@@ -354,6 +356,16 @@ function renderGenesisTab() {
   '</div>';
 }
 
+
+function renderChaptersTab() {
+  var bookId = state.currentBook ? state.currentBook.id : 'default';
+  if (window.UnitEditor) {
+    UnitEditor.init(bookId);
+  }
+  return '<div id="unit-editor-container" class="unit-editor-panel">' +
+    '<div class="unit-loading">加载中...</div>' +
+  '</div>';
+}
 function renderNovelTab() {
 
   return '<div style="padding:40px;text-align:center;color:var(--text2);"><div style="font-size:2em;margin-bottom:12px;">' + icon('novel') + '</div><div style="margin-bottom:8px;">小说视图</div><div style="font-size:12px;">功能开发中...</div></div>';

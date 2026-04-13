@@ -361,6 +361,7 @@ const NvwaUI = {
           ${NvwaCreativePoints.renderPanel()}
           ${NvwaIntervention.renderInterventionPanel(charId)}
           ${NvwaJudgment.renderJudgmentPanel(charId)}
+          ${StoryFlowEngine.renderPanel()}
         </div>
       </div>
     `;
@@ -381,4 +382,17 @@ function bindNvwaEvents() {
       NvwaUI.selectLayer(layer);
     });
   });
+  
+  // Bind StoryFlow events
+  if (typeof StoryFlowEngine !== 'undefined') {
+    StoryFlowEngine.init();
+    StoryFlowEngine.setMainChar('林墨');
+    document.querySelectorAll('.storyflow-option').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = parseInt(this.dataset.id);
+        const result = StoryFlowEngine.execute(id);
+        document.getElementById('storyflow-result').innerHTML = '<div class="storyflow-result-text">' + result + '</div>';
+      });
+    });
+  }
 }

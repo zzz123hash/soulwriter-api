@@ -1,0 +1,244 @@
+/**
+ * SoulWriter - 顺理成章 StoryFlow 面板样式
+ */
+
+/* ============ 顺理成章面板 ============ */
+.storyflow-panel {
+  background: var(--bg2);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+
+.storyflow-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.storyflow-icon {
+  font-size: 20px;
+}
+
+.storyflow-turns {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 2px 8px;
+  background: var(--accent);
+  color: white;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.storyflow-stats {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+.storyflow-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.storyflow-stat:last-child {
+  margin-bottom: 0;
+}
+
+.storyflow-stat .stat-label {
+  width: 40px;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.storyflow-stat .stat-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.storyflow-stat .stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #f59e0b);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.storyflow-stat span:not(.stat-label):not(.stat-bar) {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.storyflow-stat span:first-child {
+  margin-right: 12px;
+}
+
+/* ============ 选项列表 ============ */
+.storyflow-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.storyflow-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.storyflow-option:hover {
+  background: var(--bg3);
+  border-color: var(--accent);
+  transform: translateX(4px);
+}
+
+.option-type {
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg2);
+  border-radius: 6px;
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-lead {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.option-hint {
+  font-size: 11px;
+  color: var(--text2);
+  font-style: italic;
+}
+
+/* ============ 结果展示 ============ */
+.storyflow-result {
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  min-height: 60px;
+}
+
+.storyflow-result-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* ============ 顺理成章按钮 ============ */
+.btn-storyflow {
+  padding: 10px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-storyflow:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-storyflow:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============ 张力指示器 ============ */
+.tension-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.tension-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.tension-fill {
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.tension-low { background: #10b981; }
+.tension-mid { background: #f59e0b; }
+.tension-high { background: #ef4444; }
+
+/* ============ 历史记录 ============ */
+.storyflow-history {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.history-title {
+  font-size: 11px;
+  color: var(--text2);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.history-item {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-turn {
+  color: var(--text2);
+  flex-shrink: 0;
+}
+
+.history-content {
+  color: var(--text);
+  flex: 1;
+}

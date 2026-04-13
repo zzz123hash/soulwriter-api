@@ -458,96 +458,24 @@ var SPECIAL_TABS = { genesis: true, event: true, nvwa: true, analysis: true, ten
 
 // ============ 第5部分: 渲染函数 ============
 function renderLeftDrawerNav() {
-  window._navExpand = window._navExpand || {};
-  window._toggleNav = function(id) {
-    window._navExpand[id] = !window._navExpand[id];
-    window._refreshNav();
-  };
-  window._refreshNav = function() {
-    var el = document.getElementById('drawer-nav-tree');
-    if (el) el.innerHTML = window._renderNavHtml();
-    window._bindNavClick();
-  };
-  window._renderNavHtml = function() {
-    var html = '';
-    NAV_TREE.forEach(function(g) { html += window._renderNavGroup(g, 1); });
-    return html;
-  };
-  window._renderNavGroup = function(g, level) {
-    var hasChildren = g.children && g.children.length > 0;
-    var isOpen = window._navExpand[g.id];
-    var indent = (level - 1) * 14;
-    var arrow = hasChildren ? (isOpen ? '\u25bc' : '\u25b6') : '';
-    var cls = 'drawer-nav-l' + level;
-    if (hasChildren) cls += ' has-child';
-    if (isOpen) cls += ' expanded';
-    var html = '<div class="drawer-nav-group">';
-    html += '<div class="' + cls + '" style="padding-left:' + indent + 'px" data-id="' + g.id + '">';
-    html += '<span class="nav-arrow">' + arrow + '</span>';
-    html += '<span class="nav-icon">' + (g.icon ? icon(g.icon) : '') + '</span>';
-    html += '<span class="nav-label">' + escapeHtml(g.label) + '</span>';
-    html += '</div>';
-    if (hasChildren && isOpen) {
-      html += '<div class="nav-children">';
-      g.children.forEach(function(c) { html += window._renderNavGroup(c, level + 1); });
-      html += '</div>';
-    }
-    html += '</div>';
-    return html;
-  };
-  window._bindNavClick = function() {
-    var nav = document.getElementById('drawer-nav-tree');
-    if (!nav) return;
-    nav.onclick = function(e) {
-      var item = e.target.closest('.drawer-nav-l1, .drawer-nav-l2, .drawer-nav-l3');
-      if (!item) return;
-      var id = item.dataset.id;
-      var g = window._findGroup(id);
-      if (g && g.children && g.children.length > 0) {
-        window._toggleNav(id);
-      } else {
-        window._selectNav(id);
-      }
-    };
-  };
-  window._findGroup = function(id, groups) {
-    groups = groups || NAV_TREE;
-    for (var i = 0; i < groups.length; i++) {
-      if (groups[i].id === id) return groups[i];
-      if (groups[i].children) {
-        var f = window._findGroup(id, groups[i].children);
-        if (f) return f;
-      }
-    }
-    return null;
-  };
-  window._selectNav = function(id) {
-    console.log('[Nav] Select: ' + id);
-    var main = id.split('-')[0];
-    if (['roles','items','locations','events'].indexOf(main) !== -1) {
-      state.currentEntity = main;
-      state.currentTab = 'home';
-    } else if (['chapters','nvwa','script','novel','map','analysis'].indexOf(main) !== -1) {
-      state.currentTab = main;
-    } else if (id === 'event-line') {
-      state.currentTab = 'event';
-    } else if (id === 'storyflow') {
-      state.currentTab = 'storyflow';
-    }
-    var canvas = document.getElementById('tab-canvas');
-    if (canvas) { canvas.innerHTML = renderTabContent(); bindTabContentEvents(); }
-    document.querySelectorAll('.book-tab').forEach(function(t) {
-      t.classList.toggle('active', t.dataset.tab === state.currentTab);
-    });
-  };
-  if (Object.keys(window._navExpand).length === 0) {
-    window._navExpand['nav'] = true;
-    window._navExpand['plot'] = true;
-  }
-  setTimeout(window._bindNavClick, 100);
-  return window._renderNavHtml();
-}
+  var html = '';
 
+  NAV_TREE.forEach(function(group) {
+    var hasChildren = group.children && group.children.length > 0;
+
+    html += '<div class="drawer-group" data-group="' + group.id + '">';
+
+    html += '<div class="drawer-level1-item' + (hasChildren ? ' has-children' : '') + '" data-group="' + group.id + '" onclick="DrawerApp.openPanel(\'' + group.id + '\')">' +
+      '<span class="drawer-l1-prefix">' + (hasChildren ? '+' : '') + '</span>' +
+      '<span class="drawer-l1-icon">' + (group.icon ? icon(group.icon) : '') + '</span>' +
+      '<span class="drawer-l1-label">' + escapeHtml(group.label) + '</span>' +
+      (hasChildren ? '<span class="drawer-l1-arrow">></span>' : '') + '</div>';
+
+    html += '</div>';
+  });
+
+  return html;
+}
 
 // DrawerApp namespace
 window.DrawerApp = {

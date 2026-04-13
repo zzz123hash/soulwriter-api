@@ -406,7 +406,7 @@ soulwriter-api/
 │   ├── css/
 │   │   └── unified_drawer.css    # 统一抽屉+面板样式
 │   └── js/
-│       ├── app.js                # 主应用 (2646行)
+│       ├── app.js                # 主应用 (3215行)
 │       ├── genesis_tree_v2.js    # 创世树v2
 │       └── event_line.js         # 事件线v2
 ├── config/
@@ -421,6 +421,6 @@ soulwriter-api/
 
 ## ⚠️ 已知问题
 
-- app.js 较大（2646行），计划拆分为多个模块
+- app.js 较大（3215行），计划拆分为多个模块
 - GitHub推送偶有超时（网络问题）
 

@@ -511,7 +511,132 @@ window.DrawerApp = {
     this.currentPanel = null;
   },
   
+  // 显示三级菜单
+  showLevel3: function(children, parentLabel) {
+    var container = document.getElementById('drawer-panel-container');
+    if (!container) return;
+    
+    var html = '<div class="drawer-panel drawer-panel-level3">' +
+      '<div class="drawer-panel-header">' +
+      '<span class="drawer-panel-back" onclick="DrawerApp.showLevel2()">←</span>' +
+      '<span class="drawer-panel-title">+ ' + escapeHtml(parentLabel) + '</span>' +
+      '</div>' +
+      '<div class="drawer-panel-content">';
+    
+    children.forEach(function(gc) {
+      html += '<div class="drawer-panel-item drawer-panel-item-level3" onclick="DrawerApp.selectFinal(\'' + gc.id + '\')">' +
+        '<span class="drawer-panel-item-prefix">+++</span>' +
+        '<span class="drawer-panel-item-label">' + escapeHtml(gc.label) + '</span>' +
+      '</div>';
+    });
+    
+    html += '</div></div>';
+    container.innerHTML = html;
+    container.classList.add('open');
+  },
+  
+  // 返回二级菜单
+  showLevel2: function() {
+    if (!this.currentPanel) return;
+    var group = NAV_TREE.find(function(g) { return g.id === this.currentPanel; }, this);
+    if (!group) return;
+    
+    var container = document.getElementById('drawer-panel-container');
+    if (!container) return;
+    
+    var html = '<div class="drawer-panel">' +
+      '<div class="drawer-panel-header">' +
+      '<span class="drawer-panel-back" onclick="DrawerApp.closePanel()">←</span>' +
+      '<span class="drawer-panel-title">+ ' + escapeHtml(group.label) + '</span>' +
+      '</div>' +
+      '<div class="drawer-panel-content">';
+    
+    if (group.children) {
+      group.children.forEach(function(child) {
+        var hasChildren = child.children && child.children.length > 0;
+        html += '<div class="drawer-panel-item" onclick="DrawerApp.showDetail(\'' + group.id + '\', \'' + child.id + '\')">' +
+          '<span class="drawer-panel-item-prefix">' + (hasChildren ? '++' : '++') + '</span>' +
+          '<span class="drawer-panel-item-label">' + escapeHtml(child.label) + '</span>' +
+          '<span class="drawer-panel-item-arrow">' + (hasChildren ? '>' : '') + '</span></div>';
+      });
+    }
+    
+    html += '</div></div>';
+    container.innerHTML = html;
+    container.classList.add('open');
+  },
+  
+  // 选择最终项目
+  selectFinal: function(finalId) {
+    this.closePanel();
+    // 执行最终选择
+    this.doAction(finalId, finalId);
+  },
+  
+  // 执行动作
+  // 跳转到指定tab
+  goToTab: function(tabId) {
+    var targetTab = (tabId === 'nvwa-main' || tabId === 'storyflow' || tabId === 'causal') ? 'nvwa' : tabId;
+    
+    if (SPECIAL_TABS[targetTab]) {
+      state.currentTab = targetTab;
+      document.querySelectorAll('.book-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === targetTab);
+      });
+      var tabCanvas = document.getElementById('tab-canvas');
+      if (tabCanvas) {
+        tabCanvas.innerHTML = renderTabContent();
+        bindTabContentEvents();
+      }
+    }
+  },
+  
+  doAction: function(tabId, entityId) {
+    var entityTypes = ['roles', 'items', 'locations', 'buildings', 'events', 'chapters'];
+    if (entityTypes.indexOf(tabId) !== -1) {
+      state.currentTab = 'home';
+      state.currentEntity = tabId;
+      document.querySelectorAll('.book-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === 'home');
+      });
+      var tabCanvas = document.getElementById('tab-canvas');
+      if (tabCanvas) {
+        tabCanvas.innerHTML = renderTabContent();
+        bindTabContentEvents();
+      }
+      return;
+    }
+    if (SPECIAL_TABS[tabId]) {
+      state.currentTab = tabId;
+      document.querySelectorAll('.book-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === tabId);
+      });
+      var tabCanvas = document.getElementById('tab-canvas');
+      if (tabCanvas) {
+        tabCanvas.innerHTML = renderTabContent();
+        bindTabContentEvents();
+      }
+    }
+  },
+  
   showDetail: function(parentId, childId) {
+    // 查找当前group和child
+    var group = NAV_TREE.find(function(g) { return g.id === parentId; });
+    var child = group && group.children ? group.children.find(function(c) { return c.id === childId; }) : null;
+    
+    // 如果有panel属性，直接跳转
+    if (child && child.panel) {
+      this.goToTab(child.panel);
+      this.closePanel();
+      return;
+    }
+    
+    // 如果有三级子菜单，显示三级面板
+    if (child && child.children && child.children.length > 0) {
+      this.showLevel3(child.children, child.label);
+      return;
+    }
+    
     // Close drawer panel
     this.closePanel();
 

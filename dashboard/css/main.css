@@ -1170,3 +1170,49 @@ body { padding-top: 48px; }
   font-size: 13px;
   cursor: pointer;
 }
+
+/* Entity List in Detail Panel */
+.entity-list-header {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.entity-list {
+  padding: 8px;
+}
+
+.entity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.entity-item:hover {
+  background: var(--bg3);
+}
+
+.entity-item-icon {
+  font-size: 16px;
+}
+
+.entity-item-name {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entity-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text2);
+}

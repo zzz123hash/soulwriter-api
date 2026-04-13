@@ -638,25 +638,53 @@ window.DrawerApp = {
     // Close drawer panel
     this.closePanel();
 
-    // For entity types (roles, items, locations), show entity list in main content
+    // For entity types, show list in right detail panel
     var entityTypes = ['roles', 'items', 'locations', 'buildings', 'events', 'chapters'];
     if (entityTypes.indexOf(childId) !== -1) {
-      // Switch to home tab and show entity list
-      state.currentTab = 'home';
       state.currentEntity = childId;
-
-      document.querySelectorAll('.book-tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.tab === 'home');
-      });
-
-      var tabCanvas = document.getElementById('tab-canvas');
-      if (tabCanvas) {
-        tabCanvas.innerHTML = renderTabContent();        bindTabContentEvents();
+      state.selectedEntity = null;
+      
+      var dp = document.getElementById('detail-panel');
+      if (dp) {
+        dp.classList.add('open');
+        var dc = document.getElementById('detail-content');
+        if (dc) {
+          dc.innerHTML = '<div class="entity-loading">加载中...</div>';
+          // Render entity list
+          var book = state.currentBook;
+          var entities = book ? (book[childId] || []) : [];
+          var icons = {roles:'👤',items:'📦',locations:'📍',buildings:'🏛️',events:'📋',chapters:'📑'};
+          var labels = {roles:'角色',items:'物品',locations:'地点',buildings:'建筑',events:'事件',chapters:'章节'};
+          var icon = icons[childId] || '📂';
+          var label = labels[childId] || childId;
+          
+          var html = '<div class="entity-list-header">' + icon + ' ' + label + ' (' + entities.length + ')</div>';
+          html += '<div class="entity-list">';
+          entities.forEach(function(ent) {
+            html += '<div class="entity-item" data-id="' + ent.id + '" data-type="' + childId + '">' +
+              '<span class="entity-item-icon">' + icon + '</span>' +
+              '<span class="entity-item-name">' + escapeHtml(ent.name || ent.title || '未命名') + '</span></div>';
+          });
+          html += '</div>';
+          dc.innerHTML = html;
+          
+          // Bind click events
+          setTimeout(function() {
+            document.querySelectorAll('.entity-item').forEach(function(item) {
+              item.addEventListener('click', function() {
+                var id = this.dataset.id;
+                var type = this.dataset.type;
+                var ent = (state.currentBook && state.currentBook[type]) ? 
+                  state.currentBook[type].find(function(e) { return e.id === id; }) : null;
+                if (ent) {
+                  state.selectedEntity = ent;
+                  dc.innerHTML = renderEntityDetail();
+                }
+              });
+            });
+          }, 50);
+        }
       }
-
-      document.querySelectorAll('.entity-type-tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.type === childId);
-      });
       return;
     }
 

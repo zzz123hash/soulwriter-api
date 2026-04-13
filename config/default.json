@@ -9,10 +9,15 @@
   },
   "upload": {
     "maxSize": "50mb",
-    "allowedTypes": [".txt", ".docx", ".epub", ".md"]
+    "allowedTypes": [
+      ".txt",
+      ".docx",
+      ".epub",
+      ".md"
+    ]
   },
   "ai": {
-    "defaultProvider": "moss",
+    "defaultProvider": "omnihex",
     "providers": {
       "moss": {
         "baseUrl": "http://localhost:13000",
@@ -22,6 +27,11 @@
         "baseUrl": "https://api.openai.com",
         "model": "gpt-4",
         "apiKey": ""
+      },
+      "omnihex": {
+        "baseUrl": "https://apimark.omnihex.xyz",
+        "model": "MiniMax-M2.7-highspeed",
+        "apiKey": "sk-oU3t81L9LoCCSZPqluBcAScJiurOQBdhqjypRSisgv64QWzG"
       }
     }
   },

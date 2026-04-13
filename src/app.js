@@ -559,7 +559,7 @@ select,input{background:#252552;border:1px solid #333;color:#fff;padding:10px;bo
 .endpoints span{background:#252552;padding:5px 10px;border-radius:5px;font-family:monospace;font-size:0.85em}
 </style></head><body>
 <div class="c">
-<h1>🎭 绘梦 SoulWriter</h1>
+<h1>🎭 绘梦 SoulWriter</h1><div style="text-align:center;margin:20px 0;"><a href="/dashboard/" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:15px 40px;border-radius:12px;text-decoration:none;font-size:1.2em;font-weight:bold;">🚀 进入 SoulWriter App</a></div>
 <div class="bar">
 <div class="b"><div class="v" id="status">-</div><div class="l">API状态</div></div>
 <div class="b"><div class="v" id="projects">-</div><div class="l">项目</div></div>

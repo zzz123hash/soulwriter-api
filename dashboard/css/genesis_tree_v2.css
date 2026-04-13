@@ -1,0 +1,138 @@
+/* GenesisTree v2 样式 */
+.gt-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.gt-svg {
+  width: 100%;
+  height: 100%;
+  background: var(--bg, #0f0f1a);
+}
+
+.gt-node {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.gt-node:hover circle {
+  filter: brightness(1.2);
+}
+
+.gt-node:hover {
+  transform: scale(1.1);
+}
+
+.gt-label {
+  font-family: var(--font, sans-serif);
+  pointer-events: none;
+}
+
+.gt-tooltip {
+  display: none;
+  position: fixed;
+  background: var(--bg2, #1a1a2e);
+  border: 1px solid var(--border, #2a2a4a);
+  border-radius: 8px;
+  padding: 8px 12px;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.gt-tooltip span:first-child {
+  font-size: 16px;
+}
+
+/* 详情面板 */
+#genesis-detail-panel {
+  background: var(--bg2, #1a1a2e);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border, #2a2a4a);
+}
+
+.detail-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.detail-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.detail-type {
+  font-size: 12px;
+  color: var(--text2, #a0a0a0);
+}
+
+.detail-body {
+  padding: 16px;
+}
+
+.detail-field {
+  margin-bottom: 16px;
+}
+
+.detail-field label {
+  display: block;
+  font-size: 11px;
+  color: var(--text2, #a0a0a0);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.detail-field p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text, #e8e8e8);
+}
+
+.detail-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.link-tag {
+  padding: 4px 8px;
+  background: var(--bg, #0f0f1a);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--text2, #a0a0a0);
+}
+
+.link-tag.parent {
+  border-left: 2px solid var(--accent, #e94560);
+}
+
+.link-tag.child {
+  border-left: 2px solid var(--accent2, #0f3460);
+}
+
+.detail-actions {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border, #2a2a4a);
+  display: flex;
+  gap: 8px;
+}
+
+/* 节点类型颜色 */
+.gt-node circle {
+  transition: all 0.2s;
+}

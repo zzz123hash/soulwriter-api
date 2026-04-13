@@ -8,8 +8,8 @@
    ============================================ */
 .left-drawer {
   position: relative;
-  width: 56px;
-  min-width: 56px;
+  width: var(--left-drawer-w, 200px);
+  min-width: var(--left-drawer-w, 200px);
   height: 100%;
   background: var(--bg2);
   border-right: 1px solid var(--border);
@@ -20,8 +20,8 @@
 }
 
 .left-drawer.collapsed {
-  width: 56px;
-  min-width: 56px;
+  width: var(--left-drawer-w, 200px);
+  min-width: var(--left-drawer-w, 200px);
   border-right: 1px solid var(--border);
 }
 

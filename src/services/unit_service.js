@@ -1,23 +1,5 @@
 /**
  * 单元服务
- * 
- * 数据结构：
- * Unit = {
- *   id, bookId, title,
- *   fragments: [Fragment],
- *   perspective, perspectiveScore,
- *   settings: { dialogueRatio, sceneryRatio, emotionRatio },
- *   createdAt, updatedAt
- * }
- * 
- * Fragment = {
- *   id, unitId, nodeId,
- *   time, place, characters: [],
- *   content, emotion,
- *   perspective,
- *   position,
- *   createdAt, updatedAt
- * }
  */
 
 const path = require('path');
@@ -311,8 +293,88 @@ async function rewritePerspective(unitId, targetRoleId, perspectiveType) {
   };
 }
 
-// ============ 小说生成 ============
+// ============ AI生成小说 ============
 
+/**
+ * 调用AI生成小说内容
+ */
+async function callAIForNovel(prompt, settings) {
+  const configPath = path.join(__dirname, '../../config/default.json');
+  const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  const aiConfig = config.ai;
+  
+  let content = '';
+  
+  try {
+    if (aiConfig.defaultProvider === 'omnihex') {
+      const provider = aiConfig.providers.omnihex;
+      const url = `${provider.baseUrl}/v1/chat/completions`;
+      
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${provider.apiKey}`
+        },
+        body: JSON.stringify({
+          model: provider.model || 'MiniMax-M2.7-highspeed',
+          messages: [
+            { role: 'system', content: '你是一个专业的小说作者，擅长根据故事大纲生成精彩的小说内容。' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.8,
+          max_tokens: 8000
+        })
+      });
+      
+      if (!res.ok) {
+        throw new Error('AI API error: ' + res.status);
+      }
+      
+      const data = await res.json();
+      // MiniMax uses reasoning_content, fall back to content
+      content = data?.choices?.[0]?.message?.content || 
+                data?.choices?.[0]?.message?.reasoning_content || '';
+    } else {
+      // Default OpenAI compatible
+      const provider = aiConfig.providers.openai;
+      const url = `${provider.baseUrl}/chat/completions`;
+      
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${provider.apiKey}`
+        },
+        body: JSON.stringify({
+          model: provider.model || 'gpt-4',
+          messages: [
+            { role: 'system', content: '你是一个专业的小说作者。' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.8,
+          max_tokens: 8000
+        })
+      });
+      
+      if (!res.ok) {
+        throw new Error('AI API error: ' + res.status);
+      }
+      
+      const data = await res.json();
+      content = data?.choices?.[0]?.message?.content || '';
+    }
+  } catch (e) {
+    console.error('[UnitService] callAIForNovel error:', e);
+    throw e;
+  }
+  
+  return content;
+}
+
+/**
+ * 生成小说
+ */
 async function generateNovel(unitId, settings) {
   const unit = getUnit(unitId);
   if (!unit) return { success: false, message: 'Unit not found' };
@@ -320,50 +382,79 @@ async function generateNovel(unitId, settings) {
   settings = settings || {};
   const { dialogueRatio = 30, sceneryRatio = 20, emotionRatio = 50 } = settings;
   
-  // 按时间线顺序组合片段生成小说
+  // 按时间线顺序组合片段
   const sortedFragments = [...(unit.fragments || [])].sort((a, b) => a.position - b.position);
   
-  // 生成小说内容
-  let content = '# ' + unit.title + '\n\n';
-  
-  for (let i = 0; i < sortedFragments.length; i++) {
-    const f = sortedFragments[i];
-    content += '## 第' + (i + 1) + '幕';
-    if (f.time) content += ' ' + f.time;
-    if (f.place) content += ' · ' + f.place;
-    content += '\n\n';
-    
-    if (f.characters && f.characters.length) {
-      content += '出场人物：' + f.characters.join('、') + '\n\n';
-    }
-    
-    if (f.content) {
-      content += f.content + '\n\n';
-    }
-    
-    if (f.emotion) {
-      content += '【情绪：' + f.emotion + '】\n\n';
-    }
+  if (!sortedFragments.length) {
+    return { success: false, message: 'No fragments to generate from' };
   }
   
-  // TODO: 调用AI进行润色和扩展
-  // const aiContent = await callAIForNovel(content, settings);
+  // 构建故事大纲
+  let outline = '【故事大纲】\n';
+  outline += '标题：' + unit.title + '\n';
+  outline += '视角：' + (unit.perspective || '第三人称') + '\n\n';
   
-  const novel = {
-    unitId,
-    title: unit.title,
-    perspective: unit.perspective,
-    perspectiveScore: unit.perspectiveScore,
-    settings,
-    content: content,
-    wordCount: content.length,
-    createdAt: new Date().toISOString()
-  };
+  outline += '【场景列表】\n';
+  for (let i = 0; i < sortedFragments.length; i++) {
+    const f = sortedFragments[i];
+    outline += `\n--- 第${i + 1}幕 ---\n`;
+    if (f.time) outline += '时间：' + f.time + '\n';
+    if (f.place) outline += '地点：' + f.place + '\n';
+    if (f.characters && f.characters.length) {
+      outline += '人物：' + f.characters.join('、') + '\n';
+    }
+    if (f.content) outline += '内容：' + f.content + '\n';
+    if (f.emotion) outline += '情绪：' + f.emotion + '\n';
+  }
   
-  return {
-    success: true,
-    data: novel
-  };
+  outline += '\n\n【写作要求】\n';
+  outline += '1. 对话比例：' + dialogueRatio + '%\n';
+  outline += '2. 风景描写比例：' + sceneryRatio + '%\n';
+  outline += '3. 情感表达比例：' + emotionRatio + '%\n';
+  outline += '4. 请生成完整、流畅的小说章节内容\n';
+  outline += '5. 如果是第一人称视角，以视角角色的口吻叙述\n';
+  outline += '6. 保留原作的人物性格和语言风格\n';
+  
+  // 判断视角类型
+  const perspectiveType = unit.perspective ? 
+    (calculateRoleScores(unitId, unit.perspective)?.perspectiveType || 'third-person') : 
+    'third-person';
+  
+  if (perspectiveType === 'first-person') {
+    outline += '7. 采用第一人称叙述，突出视角角色的内心独白和感受\n';
+  } else if (perspectiveType === 'side-story') {
+    outline += '7. 可以加入番外、小剧场风格的补充内容\n';
+  }
+  
+  try {
+    console.log('[UnitService] Generating novel for unit:', unitId);
+    const novelContent = await callAIForNovel(outline, settings);
+    
+    if (!novelContent) {
+      return { success: false, message: 'AI生成失败，内容为空' };
+    }
+    
+    const novel = {
+      unitId,
+      title: unit.title,
+      perspective: unit.perspective,
+      perspectiveScore: unit.perspectiveScore,
+      perspectiveType,
+      settings,
+      content: novelContent,
+      outline: outline,
+      wordCount: novelContent.length,
+      createdAt: new Date().toISOString()
+    };
+    
+    return {
+      success: true,
+      data: novel
+    };
+  } catch (e) {
+    console.error('[UnitService] generateNovel error:', e);
+    return { success: false, message: 'AI生成失败: ' + e.message };
+  }
 }
 
 // ============ 克隆与合并 ============
@@ -430,7 +521,6 @@ async function mergeUnits(sourceUnitIds, targetBookId) {
     }
   }
   
-  // 按position排序
   mergedUnit.fragments.sort((a, b) => a.position - b.position);
   
   const units = getUnitDb(targetBookId);
@@ -440,45 +530,6 @@ async function mergeUnits(sourceUnitIds, targetBookId) {
   return {
     success: true,
     data: mergedUnit
-  };
-}
-
-// ============ 导出 ============
-
-function exportUnit(unitId) {
-  const unit = getUnit(unitId);
-  if (!unit) return null;
-  
-  return {
-    format: 'soulwriter-unit-v1',
-    version: '1.0.0',
-    data: unit,
-    exportedAt: new Date().toISOString()
-  };
-}
-
-function importUnit(bookId, exportData) {
-  if (!exportData || exportData.format !== 'soulwriter-unit-v1') {
-    return { success: false, message: 'Invalid format' };
-  }
-  
-  const unit = exportData.data;
-  unit.id = uuid();
-  unit.bookId = bookId;
-  unit.fragments = (unit.fragments || []).map(f => ({
-    ...f,
-    id: uuid()
-  }));
-  unit.createdAt = new Date().toISOString();
-  unit.updatedAt = new Date().toISOString();
-  
-  const units = getUnitDb(bookId);
-  units.push(unit);
-  saveUnitDb(bookId, units);
-  
-  return {
-    success: true,
-    data: unit
   };
 }
 
@@ -497,7 +548,5 @@ module.exports = {
   rewritePerspective,
   generateNovel,
   cloneUnit,
-  mergeUnits,
-  exportUnit,
-  importUnit
+  mergeUnits
 };

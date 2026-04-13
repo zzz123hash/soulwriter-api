@@ -1,0 +1,106 @@
+[
+  {
+    "id": "bb0bd85d-5826-4ac7-9a00-96d355ab83ac",
+    "bookId": "test-book-1776082927861",
+    "title": "第一章 野猪林",
+    "fragments": [
+      {
+        "id": "b9e3e863-0afe-4bf9-bce2-6daec7ab56c0",
+        "unitId": "bb0bd85d-5826-4ac7-9a00-96d355ab83ac",
+        "nodeId": null,
+        "time": "子时三刻",
+        "place": "野猪林",
+        "characters": [
+          "林冲",
+          "薛霸",
+          "鲁智深"
+        ],
+        "content": "薛霸举起水火棍照着林冲脑袋砍下去。只听得一声怒吼，鲁智深从松树后跳出来...",
+        "emotion": "紧张",
+        "perspective": null,
+        "position": 0,
+        "createdAt": "2026-04-13T12:22:07.877Z",
+        "updatedAt": "2026-04-13T12:22:07.877Z"
+      },
+      {
+        "id": "95d649c1-1101-4e1f-97fd-1e658b270dbd",
+        "unitId": "bb0bd85d-5826-4ac7-9a00-96d355ab83ac",
+        "nodeId": null,
+        "time": "稍前",
+        "place": "野猪林外",
+        "characters": [
+          "林冲",
+          "鲁智深"
+        ],
+        "content": "鲁智深暗中跟踪，见薛霸要动手，大喝一声冲进林来。",
+        "emotion": "危机",
+        "perspective": null,
+        "position": 1,
+        "createdAt": "2026-04-13T12:22:07.882Z",
+        "updatedAt": "2026-04-13T12:22:07.882Z"
+      }
+    ],
+    "perspective": null,
+    "perspectiveScore": 0,
+    "settings": {
+      "dialogueRatio": 30,
+      "sceneryRatio": 20,
+      "emotionRatio": 50
+    },
+    "history": [],
+    "createdAt": "2026-04-13T12:22:07.872Z",
+    "updatedAt": "2026-04-13T12:22:07.882Z"
+  },
+  {
+    "id": "ea9ffb5e-6158-404c-89ae-81a763243638",
+    "bookId": "test-book-1776082927861",
+    "title": "第一章 野猪林 (副本)",
+    "fragments": [
+      {
+        "id": "c2254bc4-63e0-4436-8b31-9adb2427ade7",
+        "unitId": "bb0bd85d-5826-4ac7-9a00-96d355ab83ac",
+        "nodeId": null,
+        "time": "子时三刻",
+        "place": "野猪林",
+        "characters": [
+          "林冲",
+          "薛霸",
+          "鲁智深"
+        ],
+        "content": "薛霸举起水火棍照着林冲脑袋砍下去。只听得一声怒吼，鲁智深从松树后跳出来...",
+        "emotion": "紧张",
+        "perspective": null,
+        "position": 0,
+        "createdAt": "2026-04-13T12:22:07.877Z",
+        "updatedAt": "2026-04-13T12:22:07.877Z"
+      },
+      {
+        "id": "abed8c53-b6a9-4f84-ba48-4688628cb868",
+        "unitId": "bb0bd85d-5826-4ac7-9a00-96d355ab83ac",
+        "nodeId": null,
+        "time": "稍前",
+        "place": "野猪林外",
+        "characters": [
+          "林冲",
+          "鲁智深"
+        ],
+        "content": "鲁智深暗中跟踪，见薛霸要动手，大喝一声冲进林来。",
+        "emotion": "危机",
+        "perspective": null,
+        "position": 1,
+        "createdAt": "2026-04-13T12:22:07.882Z",
+        "updatedAt": "2026-04-13T12:22:07.882Z"
+      }
+    ],
+    "perspective": null,
+    "perspectiveScore": 0,
+    "settings": {
+      "dialogueRatio": 30,
+      "sceneryRatio": 20,
+      "emotionRatio": 50
+    },
+    "history": [],
+    "createdAt": "2026-04-13T12:22:07.891Z",
+    "updatedAt": "2026-04-13T12:22:07.891Z"
+  }
+]

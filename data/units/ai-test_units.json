@@ -1,0 +1,53 @@
+[
+  {
+    "id": "191983f2-08e0-469b-b70a-fd9f7c1bb053",
+    "bookId": "ai-test",
+    "title": "第一章 野猪林",
+    "fragments": [
+      {
+        "id": "4bf532ec-36fd-4bf2-bee2-9af41fc572e4",
+        "unitId": "191983f2-08e0-469b-b70a-fd9f7c1bb053",
+        "nodeId": null,
+        "time": "子时三刻",
+        "place": "野猪林",
+        "characters": [
+          "林冲",
+          "薛霸"
+        ],
+        "content": "薛霸将水火棍高高举起，照着林冲的脑门就要砍下去。只听得一声怒吼，鲁智深从松树后飞身跳出，禅杖挂着风声砸向水火棍。",
+        "emotion": "紧张",
+        "perspective": null,
+        "position": 0,
+        "createdAt": "2026-04-13T12:34:31.596Z",
+        "updatedAt": "2026-04-13T12:34:31.596Z"
+      },
+      {
+        "id": "3f6c71dc-ae0e-411b-be46-beafa6b53938",
+        "unitId": "191983f2-08e0-469b-b70a-fd9f7c1bb053",
+        "nodeId": null,
+        "time": "稍后",
+        "place": "野猪林深处",
+        "characters": [
+          "鲁智深",
+          "林冲"
+        ],
+        "content": "鲁智深扶起林冲，拔刀割开车夫脚筋。林冲谢过，拔步便行，忽见air冢上有个灯笼，晃悠悠而来。",
+        "emotion": "紧张、获救",
+        "perspective": null,
+        "position": 1,
+        "createdAt": "2026-04-13T12:34:31.634Z",
+        "updatedAt": "2026-04-13T12:34:31.634Z"
+      }
+    ],
+    "perspective": null,
+    "perspectiveScore": 0,
+    "settings": {
+      "dialogueRatio": 30,
+      "sceneryRatio": 20,
+      "emotionRatio": 50
+    },
+    "history": [],
+    "createdAt": "2026-04-13T12:34:20.028Z",
+    "updatedAt": "2026-04-13T12:34:31.634Z"
+  }
+]

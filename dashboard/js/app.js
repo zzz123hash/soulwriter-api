@@ -650,7 +650,6 @@ window.DrawerApp = {
         var dc = document.getElementById('detail-content');
         if (dc) {
           dc.innerHTML = '<div class="entity-loading">加载中...</div>';
-          // Render entity list
           var book = state.currentBook;
           var entities = book ? (book[childId] || []) : [];
           var icons = {roles:'👤',items:'📦',locations:'📍',buildings:'🏛️',events:'📋',chapters:'📑'};
@@ -668,7 +667,6 @@ window.DrawerApp = {
           html += '</div>';
           dc.innerHTML = html;
           
-          // Bind click events
           setTimeout(function() {
             document.querySelectorAll('.entity-item').forEach(function(item) {
               item.addEventListener('click', function() {
@@ -683,6 +681,24 @@ window.DrawerApp = {
               });
             });
           }, 50);
+        }
+      }
+      return;
+    }
+    
+    // For novelparse tool, show novel parsing UI
+    if (childId === 'novelparse') {
+      var dp = document.getElementById('detail-panel');
+      if (dp) {
+        dp.classList.add('open');
+        var dc = document.getElementById('detail-content');
+        if (dc) {
+          dc.innerHTML = '<div class="novel-parse-ui">' +
+            '<div class="novel-parse-header">📖 小说解析</div>' +
+            '<textarea id="novel-parse-text" class="novel-parse-textarea" placeholder="粘贴要解析的小说内容..."></textarea>' +
+            '<button class="btn btn-primary" onclick="DrawerApp.parseNovel()">🔍 开始解析</button>' +
+            '<div id="novel-parse-result" class="novel-parse-result"></div>' +
+          '</div>';
         }
       }
       return;

@@ -1905,6 +1905,21 @@ function bindTabContentEvents() {
 
   // 实体列表项点击 → 打开详情
 
+  // 抽屉面板点击外部关闭
+  document.addEventListener('click', function(e) {
+    var panel = document.getElementById('drawer-panel-container');
+    var drawer = document.querySelector('.left-drawer');
+    var btn = e.target.closest('.drawer-level1-item, .drawer-toggle, .drawer-panel-item, .drawer-panel-back');
+    
+    // 如果点击在抽屉面板、左侧抽屉或按钮上，不关闭
+    if (panel && panel.classList.contains('open') && 
+        !panel.contains(e.target) && 
+        !drawer?.contains(e.target) &&
+        !btn) {
+      DrawerApp.closePanel();
+    }
+  });
+
   // 实体列表项点击 → 打开详情 (使用事件委托)
   document.addEventListener("click", function(e) {
     var item = e.target.closest(".entity-list-item");

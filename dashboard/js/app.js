@@ -835,9 +835,44 @@ window.DrawerApp = {
   },
   
   parseNovel: function() {
-    var text = document.getElementById("novel-parse-text") && document.getElementById("novel-parse-text").value;
+    var textEl = document.getElementById("novel-parse-text");
+    if (!textEl) { alert("请输入小说内容"); return; }
+    var text = textEl.value;
     if (!text) { alert("请输入小说内容"); return; }
-    alert("小说解析功能开发中");
+    
+    var btn = document.querySelector("button[onclick*='DrawerApp.parseNovel']");
+    if (btn) { btn.disabled = true; btn.textContent = '解析中...'; }
+    
+    var resultEl = document.getElementById("novel-parse-result");
+    if (resultEl) { resultEl.style.display = 'block'; resultEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">分析中...</div>'; }
+    
+    fetch('/api/split', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text, depth: 'normal', bookId: window.state?.currentBook?.id || '' })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(result) {
+      if (result.success) {
+        var data = result.data || {};
+        var html = '<div style="padding:16px;">';
+        if (data.characters && data.characters.length) html += '<div style="margin-bottom:8px;"><b style="color:var(--accent);">角色：</b>' + data.characters.join('、') + '</div>';
+        if (data.locations && data.locations.length) html += '<div style="margin-bottom:8px;"><b style="color:var(--accent);">地点：</b>' + data.locations.join('、') + '</div>';
+        if (data.items && data.items.length) html += '<div style="margin-bottom:8px;"><b style="color:var(--accent);">物品：</b>' + data.items.join('、') + '</div>';
+        if (data.events && data.events.length) html += '<div style="margin-bottom:8px;"><b style="color:var(--accent);">事件：</b>' + data.events.length + '个</div>';
+        if (html === '<div style="padding:16px;">') html = '<div style="color:var(--text2);padding:16px;">未提取到信息</div>';
+        else html += '</div>';
+        if (resultEl) resultEl.innerHTML = html;
+      } else {
+        if (resultEl) resultEl.innerHTML = '<div style="color:#ef4444;padding:16px;">解析失败：' + (result.message || '未知错误') + '</div>';
+      }
+    })
+    .catch(function(e) {
+      if (resultEl) resultEl.innerHTML = '<div style="color:#ef4444;padding:16px;">请求失败：' + e.message + '</div>';
+    })
+    .finally(function() {
+      if (btn) { btn.disabled = false; btn.textContent = '🔍 开始解析'; }
+    });
   }
 };
 

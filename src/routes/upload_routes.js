@@ -64,7 +64,7 @@ async function uploadRoutes(fastify, options) {
         });
         if (!res.ok) throw new Error('Local AI error: ' + res.status);
         const data = await res.json();
-        content = data?.choices?.[0]?.message?.content || '';
+        content = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.message?.reasoning_content || '';
       } else {
         const baseUrl = String(aiConfig.baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '');
         const url = `${baseUrl}/chat/completions`;
@@ -82,7 +82,7 @@ async function uploadRoutes(fastify, options) {
         });
         if (!res.ok) throw new Error('Cloud AI error: ' + res.status);
         const data = await res.json();
-        content = data?.choices?.[0]?.message?.content || '';
+        content = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.message?.reasoning_content || '';
       }
     } catch (e) {
       return { success: false, message: e.message };

@@ -1,0 +1,176 @@
+/* ============ 多级抽屉导航系统 ============ */
+#drawer-nav-v2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#drawer-nav-v2.open {
+  pointer-events: auto;
+}
+
+.drawer-level {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  overflow: hidden;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+}
+
+.drawer-level.open {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.drawer-level-0 {
+  left: 48px;
+  width: 240px;
+}
+
+.drawer-level-1 {
+  left: 288px;
+  width: 220px;
+}
+
+.drawer-level-2 {
+  left: 508px;
+  width: 200px;
+}
+
+.drawer-header {
+  padding: 20px 20px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+}
+
+.drawer-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.drawer-back {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.drawer-back:hover {
+  background: rgba(255,255,255,0.35);
+  transform: translateX(-2px);
+}
+
+.drawer-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.drawer-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.15) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.drawer-item:hover::before {
+  opacity: 1;
+}
+
+.drawer-item:hover {
+  border-left-color: #667eea;
+  background: rgba(255,255,255,0.03);
+}
+
+.drawer-item.active {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.25) 0%, transparent 100%);
+  border-left-color: #667eea;
+}
+
+.drawer-item.has-children {
+  border-left-color: #764ba2;
+}
+
+.item-icon {
+  font-size: 22px;
+  width: 32px;
+  text-align: center;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.item-label {
+  flex: 1;
+  font-size: 14px;
+  color: #e2e8f0;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.item-arrow {
+  font-size: 20px;
+  color: #764ba2;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+
+.drawer-item:hover .item-arrow {
+  transform: translateX(3px);
+  color: #667eea;
+}
+
+/* 滚动条 */
+.drawer-items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.drawer-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-items::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+}
+
+.drawer-items::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.25);
+}

@@ -412,6 +412,11 @@ var NAV_TREE = [
     { label: '剧本', id: 'script', icon: 'script' },
     { label: '小说', id: 'novel', icon: 'novel' },
   ]},
+  { label: '女娲', id: 'nvwa', icon: 'magic', children: [
+    { label: '女娲系统', id: 'nvwa-main', icon: 'magic', panel: 'nvwa' },
+    { label: '顺理成章', id: 'storyflow', icon: 'flow', panel: 'storyflow' },
+    { label: '因果链', id: 'causal', icon: 'chain', panel: 'causal' },
+  ]},
   { label: '创意', id: 'idea', icon: 'lightbulb', children: [
     { label: '想法', id: 'thoughts', icon: 'thoughts' },
     { label: '灵感', id: 'inspiration', icon: 'inspiration' },
@@ -534,12 +539,15 @@ window.DrawerApp = {
     }
 
     // For special tabs, switch to that tab
-    if (SPECIAL_TABS[childId]) {
-      state.currentTab = childId;
+    var isNvwaChild = (childId === 'nvwa-main' || childId === 'storyflow' || childId === 'causal');
+    var targetTab = isNvwaChild ? 'nvwa' : childId;
+    
+    if (SPECIAL_TABS[childId] || isNvwaChild) {
+      state.currentTab = targetTab;
       state.currentEntity = childId;
 
       document.querySelectorAll('.book-tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.tab === childId);
+        t.classList.toggle('active', t.dataset.tab === targetTab);
       });
 
       var tabCanvas = document.getElementById('tab-canvas');
@@ -637,7 +645,7 @@ window.DrawerApp = {
           html += '<div class="detail-empty"><div class="detail-empty-icon">👤</div><div>暂无角色</div></div>';
         } else {
           roles.forEach(function(r) {
-            html += '<div class="detail-list-item"><div class="detail-list-item-icon">👤</div>' +
+            html += '<div class="detail-list-item" data-entity-id="' + (r.id || '') + '" data-entity-type="role" draggable="true"><div class="detail-list-item-icon">👤</div>' +
               '<div class="detail-list-item-content"><div class="detail-list-item-title">' + (r.name || '未命名') + '</div>' +
               '<div class="detail-list-item-desc">' + (r.description || '暂无描述') + '</div></div>' +
               '<div class="detail-list-item-arrow">></div></div>';

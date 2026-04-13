@@ -1087,8 +1087,8 @@ function renderEventTab() {
 
 // ============ 第9部分: 女娲系统 ============
 function renderNvwaTab() {
-  window.state = state;
-  return NvwaUI.init();
+  NvwaUI.init();
+  return NvwaUI.render();
 }
 
 
@@ -1640,7 +1640,10 @@ function bindTabContentEvents() {
 
   if (ltZone) ltZone.addEventListener('click', function() { showLongTextAnalyzeModal(); });
 
-
+  // Bind Nvwa events if on nvwa tab
+  if (typeof bindNvwaEvents === 'function') {
+    setTimeout(function() { bindNvwaEvents(); }, 100);
+  }
 
   document.querySelectorAll('.home-stat-card[data-id]').forEach(function(card) {
 

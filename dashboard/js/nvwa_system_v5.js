@@ -549,3 +549,10 @@ window.NvwaUIV4 = {
   }
 };
 
+
+// ============ NvwaUI 兼容性 ============
+window.NvwaUI = {
+  init: function() {
+    console.log('NvwaUI init');
+  }
+};

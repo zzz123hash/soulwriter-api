@@ -335,3 +335,92 @@ MIT
 ---
 
 *SoulWriter - 不是工具，是伙伴。*
+
+---
+
+## 📋 更新历史（续）
+
+### v2.1 (2026-04-13) 界面优化 + 小说解析
+
+**新增功能：**
+- 📖 **小说解析功能**：上传小说文本，自动提取角色/物品/地点/事件
+  - AI智能识别（MiniMax推理模型）
+  - 支持批量导入
+- 🎨 **创世树v2**：D3力导向图，科技树/星盘结构
+  - 8种节点类型：root/plot/role/item/location/world/climax/end
+  - 10个演示节点，点击查看详情，双击添加节点
+- 📋 **事件线v2**：鱼骨图思维导图风格
+  - 6种事件类型：开场/情节/冲突/高潮/转折/结局
+  - 14个演示事件，拖拽平移+滚轮缩放
+
+**界面优化：**
+- 抽屉系统：56px图标模式，悬停展开
+- 实体点击：直接弹出详情面板（不再是旧右侧面板）
+- 根路径：添加"进入SoulWriter App"大按钮
+- Page errors：全部清零
+
+**代码优化：**
+- MiniMax API reasoning_content字段处理
+- API路由解耦（works/storage/ai routes分离）
+- 事件委托修复，动态元素点击正常
+
+**修复：**
+- novelparse工具点击无反应问题
+- drawer宽度56px修复
+- entity click shows in detail panel
+
+### 最近的Commits (2026-04-13)
+
+| Commit | 描述 |
+|--------|------|
+| `a5ede19` | fix: 根路径添加进入App的链接 |
+| `787d731` | feat: 新建角色功能 + 角色列表API绑定 |
+| `de5014e` | fix: 实现parseNovel函数真实API调用 |
+| `65e955a` | fix: 修复小说解析功能 + 工具分组点击 |
+| `b1f9dfb` | fix: drawer width 56px + entity click shows in detail panel |
+| `5116a1f` | feat: 创世树v2 - D3力导向图科技树 |
+| `19b01d0` | feat: 事件线v2 - 鱼骨图思维导图 |
+| `65e955a` | fix: 修复小说解析功能 |
+
+---
+
+## 🗂️ 当前项目结构
+
+```
+soulwriter-api/
+├── src/
+│   ├── app.js                    # Fastify 主服务 (2700+行)
+│   ├── books_routes.js           # 书本/角色/物品/地点 CRUD
+│   ├── nvwa_engine.js            # 女娲推演引擎
+│   ├── modules/nvwa/             # 女娲模块
+│   └── routes/
+│       ├── works_routes.js       # 项目CRUD
+│       ├── events_routes.js       # 事件线
+│       ├── upload_routes.js      # 上传+解析
+│       ├── translate_routes.js    # 语种翻译
+│       ├── memory_routes.js       # 女娲记忆
+│       ├── settings_routes.js    # 全局设置
+│       └── ai_routes.js          # AI配置
+├── dashboard/
+│   ├── index.html                # 单页应用入口
+│   ├── css/
+│   │   └── unified_drawer.css    # 统一抽屉+面板样式
+│   └── js/
+│       ├── app.js                # 主应用 (2646行)
+│       ├── genesis_tree_v2.js    # 创世树v2
+│       └── event_line.js         # 事件线v2
+├── config/
+│   ├── default.json              # 服务器配置
+│   ├── i18n/zh.json             # 中文语言包
+│   ├── i18n/en.json             # 英文语言包
+│   └── translation_cultural.json  # 文化映射库
+└── data/                        # SQLite数据库目录
+```
+
+---
+
+## ⚠️ 已知问题
+
+- app.js 较大（2646行），计划拆分为多个模块
+- GitHub推送偶有超时（网络问题）
+

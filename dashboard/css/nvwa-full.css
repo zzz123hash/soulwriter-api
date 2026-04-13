@@ -1,604 +1,380 @@
-/**
- * SoulWriter - 女娲推演引擎 完整CSS
- * 神明视角创作体验
- */
-
-/* ============ 根容器 ============ */
-.nvwa-root {
-  display: flex;
-  height: 100%;
-  gap: 16px;
-  padding: 16px;
-  background: var(--bg);
-}
-
-/* ============ 主区域 ============ */
-.nvwa-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow: hidden;
-}
-
-/* ============ 层级面板 ============ */
-.nvwa-layers {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  background: var(--bg2);
-  border-radius: 12px;
-  flex-shrink: 0;
-}
-
-.nvwa-layer {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: var(--bg);
-  border: 1px solid transparent;
-}
-
-.nvwa-layer:hover {
-  background: var(--bg3);
-}
-
-.nvwa-layer.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-.nvwa-layer-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-.nvwa-layer-name {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.nvwa-layer-count {
-  font-size: 10px;
-  opacity: 0.7;
-  margin-top: 2px;
-}
-
-/* ============ 记忆列表 ============ */
-.nvwa-memory-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-right: 8px;
-}
-
-.nvwa-memory-card {
+/* ============ 多实体选择器 ============ */
+.multi-selector {
   background: var(--bg2);
   border-radius: 12px;
   padding: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
   border: 1px solid var(--border);
+  margin-bottom: 16px;
 }
 
-.nvwa-memory-card:hover {
-  border-color: var(--accent);
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.nvwa-memory-header {
+.selector-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--text);
 }
 
-.nvwa-memory-time {
-  font-size: 12px;
-  color: var(--text2);
-  font-weight: 500;
+.selector-icon {
+  font-size: 18px;
 }
 
-.nvwa-memory-emotion {
+.selector-count {
+  margin-left: auto;
   font-size: 11px;
   padding: 2px 8px;
   background: var(--accent);
   color: white;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
-.nvwa-memory-content {
-  font-size: 14px;
-  line-height: 1.6;
+.selector-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.selector-tab {
+  flex: 1;
+  padding: 8px 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
   color: var(--text);
 }
 
-.nvwa-empty {
-  text-align: center;
-  padding: 40px;
-  color: var(--text2);
-  font-size: 14px;
+.selector-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
 }
 
-/* ============ 侧边栏 ============ */
-.nvwa-sidebar {
-  width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.selector-list {
+  max-height: 150px;
   overflow-y: auto;
+  margin-bottom: 12px;
 }
 
-/* ============ 心理面板 ============ */
-.nvwa-psych-panel {
+.selector-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.selector-item:hover {
+  background: var(--bg3);
+}
+
+.selector-item.selected {
+  background: var(--accent);
+  color: white;
+}
+
+.selector-item-name {
+  flex: 1;
+  font-size: 13px;
+}
+
+.selector-empty {
+  text-align: center;
+  padding: 20px;
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.selector-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-toggle-all {
+  flex: 1;
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.btn-toggle-all:hover {
+  background: var(--bg3);
+}
+
+/* ============ K线图表 ============ */
+.kline-container {
   background: var(--bg2);
   border-radius: 12px;
   padding: 16px;
   border: 1px solid var(--border);
-}
-
-.nvwa-psych-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.nvwa-psych-icon {
-  font-size: 18px;
-}
-
-.nvwa-psych-mood {
   margin-bottom: 16px;
 }
 
-.nvwa-mood-label {
-  font-size: 12px;
-  color: var(--text2);
-  margin-bottom: 6px;
-}
-
-.nvwa-mood-bar {
-  height: 8px;
-  background: var(--bg3);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.nvwa-mood-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), #f59e0b);
-  border-radius: 4px;
-  transition: width 0.3s;
-}
-
-.nvwa-mood-value {
-  font-size: 11px;
-  color: var(--text2);
-  text-align: right;
-  margin-top: 4px;
-}
-
-.nvwa-psych-dimensions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.nvwa-dimension {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.nvwa-dim-name {
-  width: 40px;
-  font-size: 11px;
-  color: var(--text2);
-}
-
-.nvwa-dim-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--bg3);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.nvwa-dim-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 3px;
-}
-
-.nvwa-psych-thoughts {
+.kline-svg {
+  display: block;
   background: var(--bg);
   border-radius: 8px;
-  padding: 12px;
 }
 
-.nvwa-thoughts-label {
-  font-size: 11px;
-  color: var(--text2);
-  margin-bottom: 6px;
+.kline-grid {
+  stroke: var(--border);
+  stroke-width: 0.5;
 }
 
-.nvwa-thoughts-content {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text);
-  font-style: italic;
+.kline-candle {
+  rx: 1;
 }
 
-/* ============ 创意点数面板 ============ */
-.nvwa-creative-panel {
-  background: var(--bg2);
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid var(--border);
-}
-
-.nvwa-points-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.nvwa-points-icon {
-  font-size: 18px;
-}
-
-.nvwa-points-title {
-  flex: 1;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.nvwa-points-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.nvwa-points-bar {
-  height: 10px;
-  background: var(--bg3);
-  border-radius: 5px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-
-.nvwa-points-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), #f59e0b);
-  border-radius: 5px;
-  transition: width 0.3s;
-}
-
-.nvwa-points-history {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.nvwa-points-item {
+.kline-ai-prediction {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: 6px;
+}
+
+.kline-label {
+  font-size: 12px;
   color: var(--text2);
 }
 
-.nvwa-points-item .cost {
-  color: var(--accent);
+.kline-trend {
+  font-size: 13px;
   font-weight: 600;
 }
 
-/* ============ 干预面板 ============ */
-.nvwa-intervention-panel {
+.kline-trend.up {
+  color: #10b981;
+}
+
+.kline-trend.down {
+  color: #ef4444;
+}
+
+.kline-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.kline-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.kline-btn.buy {
+  background: #10b981;
+  color: white;
+}
+
+.kline-btn.sell {
+  background: #ef4444;
+  color: white;
+}
+
+.kline-btn:hover {
+  opacity: 0.9;
+}
+
+/* ============ 因果链 ============ */
+.causal-chain-panel {
+  background: var(--bg2);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.chain-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chain-icon {
+  font-size: 18px;
+}
+
+.chain-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+.chain-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.chain-node.cause {
+  border-left: 3px solid #f59e0b;
+}
+
+.chain-node.effect {
+  border-left: 3px solid #8b5cf6;
+}
+
+.chain-node-icon {
+  font-size: 14px;
+}
+
+.chain-node-name {
+  flex: 1;
+  color: var(--text);
+}
+
+.chain-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chain-btn {
+  flex: 1;
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.chain-btn:hover {
+  background: var(--bg3);
+}
+
+/* ============ 变数系统 ============ */
+.variation-panel {
   background: var(--bg2);
   border-radius: 12px;
   padding: 16px;
   border: 1px solid var(--border);
 }
 
-.nvwa-intervention-header {
+.variation-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   font-weight: 600;
   color: var(--text);
 }
 
-.nvwa-intervention-icon {
+.variation-icon {
   font-size: 18px;
 }
 
-.nvwa-intervention-types {
+.variation-types {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: 12px;
 }
 
-.nvwa-intervention-btn {
+.variation-type-btn {
   display: flex;
   align-items: center;
+  gap: 8px;
   padding: 10px 12px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  width: 100%;
   text-align: left;
 }
 
-.nvwa-intervention-btn:hover {
+.variation-type-btn:hover {
   background: var(--bg3);
   border-color: var(--accent);
-  transform: translateX(4px);
 }
 
-.nvwa-btn-icon {
-  font-size: 18px;
-  margin-right: 10px;
-}
-
-.nvwa-btn-name {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.nvwa-btn-cost {
-  font-size: 11px;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.nvwa-intervention-result {
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 12px;
-  min-height: 60px;
-}
-
-.nvwa-result-success {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.5;
-  margin-bottom: 8px;
-}
-
-.nvwa-result-remaining {
-  font-size: 11px;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* ============ 响应式 ============ */
-@media (max-width: 1200px) {
-  .nvwa-root {
-    flex-direction: column;
-  }
-  
-  .nvwa-sidebar {
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-  
-  .nvwa-sidebar > * {
-    flex: 1;
-    min-width: 280px;
-  }
-}
-
-/* ============ 全局控制面板 ============ */
-.nvwa-global-panel {
-  background: var(--bg2);
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid var(--border);
-}
-
-.nvwa-global-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.nvwa-global-icon {
-  font-size: 18px;
-}
-
-.nvwa-global-section {
-  margin-bottom: 16px;
-}
-
-.nvwa-global-label {
-  font-size: 11px;
-  color: var(--text2);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-
-.nvwa-weather-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-}
-
-.nvwa-weather-btn {
-  padding: 8px 4px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: all 0.2s;
-}
-
-.nvwa-weather-btn:hover {
-  background: var(--bg3);
-}
-
-.nvwa-weather-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.nvwa-time-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-}
-
-.nvwa-time-btn {
-  padding: 6px 4px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 11px;
-  color: var(--text);
-  transition: all 0.2s;
-}
-
-.nvwa-time-btn:hover {
-  background: var(--bg3);
-}
-
-.nvwa-time-btn.active {
+.variation-type-btn.active {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
 }
 
-.nvwa-global-select {
-  width: 100%;
-  padding: 8px 12px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-size: 13px;
-}
-
-/* ============ 赏罚面板 ============ */
-.nvwa-judgment-panel {
-  background: var(--bg2);
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid var(--border);
-}
-
-.nvwa-judgment-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.nvwa-judgment-icon {
+.vtype-icon {
   font-size: 18px;
 }
 
-.nvwa-judgment-section {
-  margin-bottom: 16px;
-}
-
-.nvwa-judgment-section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+.vtype-name {
   font-size: 13px;
   font-weight: 500;
 }
 
-.nvwa-judgment-cost {
+.vtype-desc {
   font-size: 11px;
-  color: var(--accent);
-  font-weight: 600;
+  opacity: 0.7;
+  margin-left: auto;
 }
 
-.nvwa-judgment-options {
+.variation-form {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.nvwa-judgment-btn {
-  padding: 6px 12px;
+.variation-content {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
+  border-radius: 8px;
+  font-size: 13px;
   color: var(--text);
-  transition: all 0.2s;
+  resize: vertical;
+  box-sizing: border-box;
 }
 
-.nvwa-judgment-btn:hover {
-  background: var(--bg3);
+.variation-content:focus {
+  outline: none;
   border-color: var(--accent);
 }
 
-.nvwa-judgment-result {
-  margin-top: 12px;
-  padding: 12px;
-  background: var(--bg);
+.btn-create-variation {
+  padding: 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
   border-radius: 8px;
-  min-height: 60px;
-}
-
-.nvwa-error {
-  color: #ef4444;
   font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.nvwa-judgment-success {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.nvwa-result-text {
-  margin-bottom: 8px;
-}
-
-.nvwa-result-meta {
-  font-size: 11px;
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* ============ 女娲根容器 ============ */
-.nvwa-root {
-  display: flex;
-  height: 100%;
-  gap: 16px;
-  padding: 16px;
-  background: var(--bg);
+.btn-create-variation:hover {
+  opacity: 0.9;
 }

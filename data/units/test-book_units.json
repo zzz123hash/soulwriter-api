@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1c57cf07-7167-4efd-9a4d-738b7d3593cd",
+    "bookId": "test-book",
+    "title": "第一章 野猪林",
+    "fragments": [],
+    "perspective": null,
+    "perspectiveScore": 0,
+    "settings": {
+      "dialogueRatio": 30,
+      "sceneryRatio": 20,
+      "emotionRatio": 50
+    },
+    "history": [],
+    "createdAt": "2026-04-13T12:03:34.799Z",
+    "updatedAt": "2026-04-13T12:03:34.799Z"
+  }
+]

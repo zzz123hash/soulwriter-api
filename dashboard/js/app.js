@@ -242,17 +242,18 @@ function renderBookView() {
 
       '<div class="book-tabs">' +
 
-        '<button class="book-tab ' + (state.currentTab === 'home' ? 'active' : '') + '" data-tab="home">' + icon('home') + ' ' + t('nav.home') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'home' ? 'active' : '') + '" data-tab="home">导航页</button>' +
 
-        '<button class="book-tab ' + (state.currentTab === 'genesis' ? 'active' : '') + '" data-tab="genesis">' + icon('genesis') + ' ' + t('genesis.title') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'genesis' ? 'active' : '') + '" data-tab="genesis">创世树</button>' +
 
-        '<button class="book-tab ' + (state.currentTab === 'event' ? 'active' : '') + '" data-tab="event">' + icon('event') + ' ' + t('event.title') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'event' ? 'active' : '') + '" data-tab="event">事件线</button>' +
 
-        '<button class="book-tab ' + (state.currentTab === 'nvwa' ? 'active' : '') + '" data-tab="nvwa">' + icon('nvwa') + ' ' + t('nvwa.title') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'nvwa' ? 'active' : '') + '" data-tab="nvwa">女娲推演</button>' +
 
-        '<button class="book-tab" data-tab="translate">' + icon('translate') + ' ' + t('translate.title') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'translate' ? 'active' : '') + '" data-tab="translate">语种转义</button>' +
 
-        '<button class="book-tab ' + (state.currentTab === 'novel' ? 'active' : '') + '" data-tab="novel">' + icon('novel') + ' ' + t('entity.novels') + '</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'novel' ? 'active' : '') + '" data-tab="novel">小说/剧本</button>' +
+        '<button class="book-tab ' + (state.currentTab === 'analysis' ? 'active' : '') + '" data-tab="analysis">合册分析</button>' +
 
       '</div>' +
 
@@ -411,9 +412,6 @@ var NAV_TREE = [
   { label: '创作', id: 'creation', icon: 'create', children: [
     { label: '剧本', id: 'script', icon: 'script' },
     { label: '小说', id: 'novel', icon: 'novel' },
-  ]},
-  { label: '女娲', id: 'nvwa', icon: 'magic', children: [
-    { label: '女娲系统', id: 'nvwa-main', icon: 'magic', panel: 'nvwa' },
     { label: '顺理成章', id: 'storyflow', icon: 'flow', panel: 'storyflow' },
     { label: '因果链', id: 'causal', icon: 'chain', panel: 'causal' },
   ]},

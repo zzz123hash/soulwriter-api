@@ -493,7 +493,7 @@ window.DrawerApp = {
       container = document.createElement('div');
       container.id = 'drawer-panel-container';
       container.className = 'drawer-panel-container';
-      document.querySelector('#main-canvas').appendChild(container);
+      document.getElementById('tab-canvas').appendChild(container);
     }
     
     var html = '<div class="drawer-panel">' +

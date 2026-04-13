@@ -1,0 +1,116 @@
+/* Route System CSS */
+.route-category {
+  margin-bottom: 20px;
+}
+
+.route-category-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.route-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.route-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+.route-name {
+  font-size: 13px;
+  color: var(--text);
+  min-width: 120px;
+}
+
+.route-select {
+  padding: 6px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  min-width: 140px;
+}
+
+.route-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Prompt Card */
+.prompt-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.prompt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.prompt-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.prompt-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.prompt-btn {
+  padding: 4px 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.prompt-btn:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.prompt-template {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.5;
+  padding: 10px;
+  background: var(--bg2);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+
+.prompt-vars {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.prompt-vars code {
+  padding: 2px 6px;
+  background: var(--bg3);
+  border-radius: 4px;
+  font-family: monospace;
+  margin-left: 4px;
+}

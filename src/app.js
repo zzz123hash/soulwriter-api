@@ -12,6 +12,7 @@ const eventsRoutes = require('./routes/events_routes');
 const memoryRoutes = require('./routes/memory_routes');
 const settingsRoutes = require('./routes/settings_routes');
 const translateRoutes = require('./routes/translate_routes');
+const aiRoutes = require('../routes/ai_routes');
 const db = new Database(path.join(__dirname, '..', 'data.db'));
 
 // ============ Init DB ============
@@ -316,6 +317,7 @@ fastify.get('/api/v1/projects/:projectId/chapters', (req) => {
     fastify.register(settingsRoutes, { db });
     fastify.register(genesisNvwaRoutes, { db });
     fastify.register(translateRoutes, { db });
+    fastify.register(aiRoutes, { prefix: '/api/v1/ai' });
 
 fastify.post('/api/v1/chapters', async (req) => {
   const { projectId, title, orderIndex } = req.body;

@@ -1,0 +1,464 @@
+/**
+ * SoulWriter - 增强弹窗样式
+ */
+
+/* ============ 弹窗容器 ============ */
+.drawer-panel-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.drawer-panel-container.open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.drawer-panel-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* ============ 弹窗主体 ============ */
+.drawer-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 90%;
+  max-width: 480px;
+  max-height: 80vh;
+  background: linear-gradient(145deg, #1e1e2e 0%, #16213e 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              opacity 0.3s ease;
+  opacity: 0;
+}
+
+.drawer-panel-container.open .drawer-panel {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* ============ 弹窗头部 ============ */
+.drawer-panel-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.drawer-panel-back {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: all 0.2s;
+}
+
+.drawer-panel-back:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-2px);
+}
+
+.drawer-panel-title {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.drawer-panel-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drawer-panel-close:hover {
+  background: rgba(233, 69, 96, 0.5);
+  color: #fff;
+}
+
+/* ============ 弹窗内容 ============ */
+.drawer-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* ============ 菜单项 ============ */
+.drawer-panel-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drawer-panel-item:hover {
+  background: rgba(233, 69, 96, 0.15);
+  border-color: rgba(233, 69, 96, 0.3);
+  transform: translateX(4px);
+}
+
+.drawer-panel-item:active {
+  transform: translateX(2px) scale(0.98);
+}
+
+.drawer-panel-item-prefix {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(233, 69, 96, 0.2);
+  border-radius: 6px;
+  color: #e94560;
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 12px;
+}
+
+.drawer-panel-item-label {
+  flex: 1;
+  font-size: 15px;
+  color: #e0e0e0;
+}
+
+.drawer-panel-item-arrow {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  transition: transform 0.2s;
+}
+
+.drawer-panel-item:hover .drawer-panel-item-arrow {
+  transform: translateX(4px);
+  color: #e94560;
+}
+
+/* ============ 三级菜单 ============ */
+.drawer-panel-level3 {
+  max-width: 520px;
+}
+
+.drawer-panel-item-level3 {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.03);
+}
+
+.drawer-panel-item-level3:hover {
+  background: rgba(0, 210, 106, 0.1);
+  border-color: rgba(0, 210, 106, 0.3);
+}
+
+.drawer-panel-item-level3 .drawer-panel-item-prefix {
+  background: rgba(0, 210, 106, 0.2);
+  color: #00d26a;
+}
+
+/* ============ 四级菜单 ============ */
+.drawer-panel-level4 {
+  max-width: 560px;
+}
+
+.drawer-panel-item-level4 {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.03);
+}
+
+.drawer-panel-item-level4:hover {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.drawer-panel-item-level4 .drawer-panel-item-prefix {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+/* ============ 特殊菜单项 ============ */
+.drawer-panel-item-special {
+  background: linear-gradient(135deg, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0.05) 100%);
+  border-color: rgba(233, 69, 96, 0.2);
+}
+
+.drawer-panel-item-special:hover {
+  background: linear-gradient(135deg, rgba(233, 69, 96, 0.2) 0%, rgba(233, 69, 96, 0.1) 100%);
+  border-color: rgba(233, 69, 96, 0.4);
+}
+
+.drawer-panel-item-special .drawer-panel-item-prefix {
+  background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+  color: #fff;
+}
+
+/* ============ 节点卡片 ============ */
+.node-card {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.node-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(233, 69, 96, 0.3);
+  transform: translateY(-2px);
+}
+
+.node-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.node-card-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(233, 69, 96, 0.15);
+  border-radius: 8px;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.node-card-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.node-card-meta {
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  gap: 12px;
+}
+
+.node-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============ 女娲面板 ============ */
+.nvwa-panel {
+  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid rgba(0, 210, 106, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.nvwa-panel-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.nvwa-panel-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #00d26a 0%, #00b85c 100%);
+  border-radius: 10px;
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.nvwa-panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.nvwa-panel-desc {
+  font-size: 13px;
+  color: #888;
+}
+
+.nvwa-panel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #00d26a 0%, #00b85c 100%);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nvwa-panel-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 210, 106, 0.3);
+}
+
+/* ============ 视角评分卡片 ============ */
+.perspective-card {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.perspective-card.can-first {
+  border-color: rgba(0, 210, 106, 0.4);
+  background: rgba(0, 210, 106, 0.05);
+}
+
+.perspective-card.can-third {
+  border-color: rgba(255, 193, 7, 0.4);
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.perspective-card.can-side {
+  border-color: rgba(233, 69, 96, 0.4);
+  background: rgba(233, 69, 96, 0.05);
+}
+
+.perspective-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.perspective-card-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.perspective-card-score {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.perspective-card.can-first .perspective-card-score {
+  background: #00d26a;
+  color: #fff;
+}
+
+.perspective-card.can-third .perspective-card-score {
+  background: #ffc107;
+  color: #1a1a2e;
+}
+
+.perspective-card.can-side .perspective-card-score {
+  background: #e94560;
+  color: #fff;
+}
+
+.perspective-card-types {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.perspective-type-tag {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #a0a0a0;
+}
+
+.perspective-type-tag.active {
+  background: rgba(233, 69, 96, 0.3);
+  color: #e94560;
+}
+
+/* ============ 空状态 ============ */
+.drawer-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.drawer-empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.drawer-empty-text {
+  font-size: 14px;
+  color: #888;
+}
+
+/* ============ 滚动条 ============ */
+.drawer-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drawer-panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-panel-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.drawer-panel-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

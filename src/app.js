@@ -12,6 +12,7 @@ const eventsRoutes = require('./routes/events_routes');
 const memoryRoutes = require('./routes/memory_routes');
 const settingsRoutes = require('./routes/settings_routes');
 const translateRoutes = require('./routes/translate_routes');
+const nvwaRoutes = require('./routes/nvwa_routes');
 const scoringRoutes = require('./routes/scoring_routes');
 const cultureRoutes = require('./routes/culture_routes');
 const unitRoutes = require('./routes/unit_routes');
@@ -320,6 +321,7 @@ fastify.get('/api/v1/projects/:projectId/chapters', (req) => {
     fastify.register(settingsRoutes, { db });
     fastify.register(unitRoutes, { db });
     fastify.register(cultureRoutes, { db });
+    fastify.register(nvwaRoutes, { db });
     fastify.register(scoringRoutes, { db });
     fastify.register(genesisNvwaRoutes, { db });
     fastify.register(translateRoutes, { db });

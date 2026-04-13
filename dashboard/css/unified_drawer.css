@@ -20,9 +20,9 @@
 }
 
 .left-drawer.collapsed {
-  width: 0;
-  min-width: 0;
-  border-right: none;
+  width: 56px;
+  min-width: 56px;
+  border-right: 1px solid var(--border);
 }
 
 /* ============================================

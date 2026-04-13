@@ -810,7 +810,7 @@ window.DrawerApp = {
         } else {
           roles.forEach(function(r) {
             html += '<div class="detail-list-item" data-entity-id="' + (r.id || '') + '" data-entity-type="role" draggable="true"><div class="detail-list-item-icon">👤</div>' +
-              '<div class="detail-list-item-content"><div class="detail-list-item-title">' + (r.name || '未命名') + '</div>' +
+              '<div class="detail-list-item-content"><div class="detail-list-item-title">' + (r.title || r.name || '未命名') + '</div>' +
               '<div class="detail-list-item-desc">' + (r.description || '暂无描述') + '</div></div>' +
               '<div class="detail-list-item-arrow">></div></div>';
           });
@@ -831,7 +831,88 @@ window.DrawerApp = {
   createRole: function() {
     var name = prompt("角色名称：");
     if (!name) return;
-    alert("创建角色: " + name + " (功能开发中)");
+    var bookId = window.state?.currentBook?.id;
+    if (!bookId) { alert("请先打开一本书"); return; }
+    var desc = prompt("角色描述（可选）：") || '';
+    fetch('/api/roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create', bookId: bookId, title: name, description: desc })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.success) {
+        alert("角色「" + name + "」创建成功！");
+        DrawerApp.refreshRoleList && DrawerApp.refreshRoleList();
+      } else {
+        alert("创建失败：" + (res.message || '未知错误'));
+      }
+    })
+    .catch(function(e) { alert("请求失败：" + e.message); });
+  },
+  
+  refreshRoleList: function() {
+    var bookId = window.state?.currentBook?.id;
+    if (!bookId) return;
+    var listEl = document.getElementById('role-list');
+    if (!listEl) return;
+    fetch('/api/roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list', bookId: bookId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.success && res.data) {
+        var roles = res.data;
+        if (roles.length === 0) {
+          listEl.innerHTML = '<div style="color:var(--text2);padding:16px;text-align:center;">暂无角色</div>';
+        } else {
+          listEl.innerHTML = roles.map(function(r) {
+            return '<div class="drawer-panel-item" onclick="DrawerApp.showRoleDetail(\'' + r.id + '\')">' +
+              '<span>👤</span><span>' + (r.title || r.name) + '</span></div>';
+          }).join('');
+        }
+      }
+    })
+    .catch(function(e) { console.error(e); });
+  },
+  
+  showRoleDetail: function(roleId) {
+    var bookId = window.state?.currentBook?.id;
+    if (!bookId) return;
+    fetch('/api/roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get', bookId: bookId, id: roleId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.success && res.data) {
+        var role = res.data;
+        var modal = document.getElementById('entity-modal');
+        if (!modal) {
+          modal = document.createElement('div');
+          modal.id = 'entity-modal';
+          modal.className = 'detail-modal';
+          modal.innerHTML = '<div class="detail-modal-backdrop"></div>' +
+            '<div class="detail-modal-box"><div class="detail-modal-header">' +
+            '<span class="detail-modal-title" id="entity-modal-title">角色详情</span>' +
+            '<button class="detail-modal-close">×</button></div>' +
+            '<div class="detail-modal-body" id="entity-modal-body"></div></div>';
+          document.body.appendChild(modal);
+          modal.querySelector('.detail-modal-backdrop').onclick = function() { modal.classList.remove('open'); };
+          modal.querySelector('.detail-modal-close').onclick = function() { modal.classList.remove('open'); };
+        }
+        document.getElementById('entity-modal-title').textContent = '👤 ' + role.name;
+        document.getElementById('entity-modal-body').innerHTML = '<div style="padding:16px;">' +
+          '<p><b>ID：</b>' + role.id + '</p>' +
+          '<p><b>描述：</b>' + (role.description || '无') + '</p>' +
+          '<p><b>创建时间：</b>' + (role.createdAt || '未知') + '</p></div>';
+        modal.classList.add('open');
+      }
+    })
+    .catch(function(e) { console.error(e); });
   },
   
   parseNovel: function() {
@@ -1401,6 +1482,19 @@ async function openBook(id) {
   if (result.success && (result.data || result.meta || result.books)) {
 
     state.currentBook = result.data || result.meta || result.books[0];
+
+    // Load roles from server
+    try {
+      var rolesRes = await fetch('/api/roles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'list', bookId: id })
+      });
+      var rolesData = await rolesRes.json();
+      if (rolesData.success && rolesData.data) {
+        state.currentBook.roles = rolesData.data;
+      }
+    } catch(e) { console.error('Failed to load roles:', e); }
 
     state.currentView = 'book';
 
